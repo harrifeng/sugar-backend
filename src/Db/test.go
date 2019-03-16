@@ -1,5 +1,14 @@
 package Db
 
+import "fmt"
+
+func SetNewVerificationCodeTest() {
+	err := SetNewVerificationCode("2323", "21321")
+	if err != nil {
+		fmt.Printf("%s", err)
+	}
+}
+
 func AutoCreateTableTest() {
 	db.AutoMigrate(&User{})
 	db.AutoMigrate(&Article{})

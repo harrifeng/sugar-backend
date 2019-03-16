@@ -2,7 +2,6 @@ package main
 
 import (
 	"Db"
-	"Server"
 	"fmt"
 )
 
@@ -11,8 +10,8 @@ func DbTest() {
 }
 
 func main() {
-	// init db
-	db, err := Db.Init()
+	// init mysql
+	db, err := Db.InitMysql()
 	if err != nil {
 		fmt.Printf("%s", err)
 		return
@@ -24,6 +23,18 @@ func main() {
 			return
 		}
 	}()
-	Server.Start()
 
+	// init redis
+	redisPool := Db.InitRedis()
+	defer func() {
+		err := redisPool.Close()
+		if err != nil {
+			fmt.Printf("%s", err)
+			return
+		}
+
+	}()
+
+	//Server.Start()
+	Db.SetNewVerificationCodeTest()
 }
