@@ -11,8 +11,16 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
+
+# golang
 .idea
 src/github.com
 src/gopkg.in
 pkg
 config.go
+
+# python
+config.py
+venv
+
+
