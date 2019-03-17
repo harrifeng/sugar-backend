@@ -1,23 +1,23 @@
 package main
 
 import (
-	"Db"
+	"db"
 	"fmt"
 )
 
 func DbTest() {
-	Db.AutoCreateTableTest()
+	db.AutoCreateTableTest()
 }
 
 func main() {
 	// init mysql
-	db, err := Db.InitMysql()
+	mysqlDb, err := db.InitMysql()
 	if err != nil {
 		fmt.Printf("%s", err)
 		return
 	}
 	defer func() {
-		err = db.Close()
+		err = mysqlDb.Close()
 		if err != nil {
 			fmt.Printf("%s", err)
 			return
@@ -25,7 +25,7 @@ func main() {
 	}()
 
 	// init redis
-	redisPool := Db.InitRedis()
+	redisPool := db.InitRedis()
 	defer func() {
 		err := redisPool.Close()
 		if err != nil {
@@ -35,6 +35,6 @@ func main() {
 
 	}()
 
-	//Server.Start()
-	Db.SetNewVerificationCodeTest()
+	//server.Start()
+	db.SetNewVerificationCodeTest()
 }

@@ -1,4 +1,4 @@
-package Db
+package db
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-var db *gorm.DB
+var mysqlDb *gorm.DB
 var redisPool *redis.Pool
 
 func mysqlLinkString() string {
@@ -29,6 +29,6 @@ func InitRedis() *redis.Pool {
 
 func InitMysql() (*gorm.DB, error) {
 	var err error
-	db, err = gorm.Open("mysql", mysqlLinkString())
-	return db, err
+	mysqlDb, err = gorm.Open("mysql", mysqlLinkString())
+	return mysqlDb, err
 }

@@ -1,4 +1,4 @@
-package Db
+package db
 
 //const(
 // mysql config

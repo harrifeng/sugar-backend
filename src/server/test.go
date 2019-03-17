@@ -1,4 +1,4 @@
-package Server
+package server
 
 func SendMessageTest(PhoneNumber string) {
 	err := AddVerificationCode("18061532353")

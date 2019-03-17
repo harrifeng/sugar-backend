@@ -1,4 +1,4 @@
-package Server
+package server
 
 func initRouter() {
 	r.GET("/", index)

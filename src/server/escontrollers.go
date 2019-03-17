@@ -1,8 +1,8 @@
-package Server
+package server
 
 import (
-	"Db"
-	"Utils"
+	"db"
+	"utils"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -10,7 +10,7 @@ import (
 )
 
 func AddVerificationCode(PhoneNumber string) error {
-	code := Utils.RandCode()
+	code := utils.RandCode()
 	url := fmt.Sprintf("http://127.0.0.1:7799/send_message?phone_number=%s&code=%s",
 		PhoneNumber, code)
 	resp, err := http.Get(url)
@@ -32,7 +32,7 @@ func AddVerificationCode(PhoneNumber string) error {
 		return err
 	}
 	if body[0] == 'o' {
-		return Db.SetNewVerificationCode(PhoneNumber, code)
+		return db.SetNewVerificationCode(PhoneNumber, code)
 	}
 	return errors.New("external service error")
 
