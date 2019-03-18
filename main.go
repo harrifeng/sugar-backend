@@ -3,6 +3,7 @@ package main
 import (
 	"db"
 	"fmt"
+	"server"
 )
 
 func DbTest() {
@@ -34,7 +35,10 @@ func main() {
 		}
 
 	}()
+	server.Start()
+	//conn :=redisPool.Get()
+	//server.SendMessageTest("18061532353")
+	//r,err:=conn.Do("EXISTS","ptc_18061532353")
+	//fmt.Printf("%d",r.(int64))
 
-	//server.Start()
-	db.SetNewVerificationCodeTest()
 }

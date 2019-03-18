@@ -1,8 +1,10 @@
 package server
 
+import "fmt"
+
 func SendMessageTest(PhoneNumber string) {
-	err := AddVerificationCode("18061532353")
+	err := SendVerificationCode(PhoneNumber)
 	if err != nil {
-		return
+		fmt.Println(err)
 	}
 }

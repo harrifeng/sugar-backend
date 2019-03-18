@@ -9,7 +9,14 @@ import (
 	"net/http"
 )
 
-func AddVerificationCode(PhoneNumber string) error {
+func SendVerificationCode(PhoneNumber string) error {
+	exists,err:=db.CheckPhoneCodeExist(PhoneNumber)
+	if err!=nil{
+		return err
+	}
+	if exists {
+		return errors.New("phone number key has exists")
+	}
 	code := utils.RandCode()
 	url := fmt.Sprintf("http://127.0.0.1:7799/send_message?phone_number=%s&code=%s",
 		PhoneNumber, code)
@@ -34,6 +41,6 @@ func AddVerificationCode(PhoneNumber string) error {
 	if body[0] == 'o' {
 		return db.SetNewVerificationCode(PhoneNumber, code)
 	}
-	return errors.New("external service error")
+	return errors.New("external service(send message) error")
 
 }

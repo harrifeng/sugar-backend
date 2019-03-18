@@ -6,7 +6,6 @@ from qcloudsms_py.httpclient import HTTPError
 import config
 
 
-
 class SendMessageHandler(tornado.web.RequestHandler):
     def get(self):
         phone_number = self.get_argument('phone_number')
