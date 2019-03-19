@@ -2,48 +2,90 @@ package db
 
 import (
 	"fmt"
-	"github.com/gomodule/redigo/redis"
 )
 
-func checkKeyExistFromConn(conn redis.Conn, key string) (bool,error) {
-	r,err:=conn.Do("EXISTS",key)
-	if err !=nil{
-		return false,err
-	}
-	return r.(int64)==1,err
+func phoneNumberToKey(PhoneNumber string) string {
+	return fmt.Sprintf("ptc_%s", PhoneNumber)
 }
 
-func checkKeyExist(key string) (bool,error){
+func replyToString(r interface{}) string {
+	return string(r.([]uint8))
+}
+
+func getValueFromKey(key string) (string, error) {
 	conn := redisPool.Get()
 	defer func() {
-		err:=conn.Close()
-		if err!=nil{
-			fmt.Printf("%s",err)
+		err := conn.Close()
+		if err != nil {
+			fmt.Printf("%s", err)
 			return
 		}
 	}()
 
-	return checkKeyExistFromConn(conn,key)
+	r, err := conn.Do("GET", key)
+	if err != nil {
+		return "", err
+	}
+	if r != nil {
+		return replyToString(r), nil
+	}
+	return "", nil
 }
 
-func CheckPhoneCodeExist(PhoneNumber string) (bool,error){
-	return checkKeyExist(fmt.Sprintf("ptc_%s", PhoneNumber))
+func setKeyToValue(key string, value string) error {
+	conn := redisPool.Get()
+	defer func() {
+		err := conn.Close()
+		if err != nil {
+			fmt.Printf("%s", err)
+			return
+		}
+	}()
+	err := conn.Send("SET", key, value)
+	return err
+}
+
+func setKeyToValueLimitTime(key string, value string, limitTime int64) error {
+	conn := redisPool.Get()
+	defer func() {
+		err := conn.Close()
+		if err != nil {
+			fmt.Printf("%s", err)
+			return
+		}
+	}()
+	var err error
+	err = conn.Send("MULTI")
+	if err != nil {
+		return err
+	}
+	err = conn.Send("SET", key, value)
+	if err != nil {
+		return err
+	}
+	err = conn.Send("EXPIRE", key, 180)
+	if err != nil {
+		return err
+	}
+	_, err = conn.Do("EXEC")
+	return err
+}
+
+func CheckPhoneCodeCorrection(PhoneNumber string, Code string) (bool, error) {
+	value, err := GetNowVerificationCode(PhoneNumber)
+	if err != nil {
+		return false, err
+	}
+	if value == Code {
+		return true, nil
+	}
+	return false, nil
+}
+
+func GetNowVerificationCode(PhoneNumber string) (string, error) {
+	return getValueFromKey(phoneNumberToKey(PhoneNumber))
 }
 
 func SetNewVerificationCode(PhoneNumber string, Code string) error {
-	conn := redisPool.Get()
-	defer func() {
-		err:=conn.Close()
-		if err!=nil{
-			fmt.Printf("%s",err)
-			return
-		}
-	}()
-	key := fmt.Sprintf("ptc_%s", PhoneNumber)
-
-	_ = conn.Send("MULTI")
-	_ = conn.Send("SET", key, Code)
-	_ = conn.Send("EXPIRE", key, 180)
-	_, err := conn.Do("EXEC")
-	return err
+	return setKeyToValueLimitTime(phoneNumberToKey(PhoneNumber), Code, 180)
 }

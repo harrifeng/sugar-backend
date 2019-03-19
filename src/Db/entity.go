@@ -7,15 +7,15 @@ type User struct {
 
 	// User Basic data
 	UserName    string
-	PhoneNumber string
-	Password    string
+	PhoneNumber string `gorm:"unique;not null"`
+	Password    string `gorm:"not null"`
 	Gender      string
 	Age         int
 
 	// User Account data
-	Exp               int
-	Level             int
-	HeadPortraitUrl   string
+	Exp               int       `gorm:"not null;default:'0'"`
+	Level             int       `gorm:"not null;default:'1'"`
+	HeadPortraitUrl   string    ``
 	FollowUsers       []*User   `gorm:"many2many:user_follow_ships;association_jointable_foreignkey:follow_user_id"`
 	CollectedArticles []Article `gorm:"many2many:user_collected_article"`
 	CollectedTopics   []Topic   `gorm:"many2many:user_collected_topic"`
@@ -35,17 +35,17 @@ type ArticleLabel struct {
 
 type Article struct {
 	gorm.Model
-	Title         string
-	Content       string
+	Title         string          `gorm:"not null"`
+	Content       string          `gorm:"not null"`
 	Labels        []*ArticleLabel `gorm:"many2many:articles_to_labels;"`
 	CoverImageUrl string
-	ReadCount     int
+	ReadCount     int `gorm:"not null;default:'0'"`
 }
 
 type ArticleComment struct {
 	gorm.Model
-	Content       string
-	ThumbsUpCount int
+	Content       string `gorm:"not null"`
+	ThumbsUpCount int    `gorm:"not null;default:'0'"`
 	Article       Article
 	User          User
 	ArticleID     int
@@ -54,27 +54,27 @@ type ArticleComment struct {
 
 type Topic struct {
 	gorm.Model
-	Content       string
+	Content       string `gorm:"not null"`
 	User          User
 	PictureUrls   string
-	ThumbsUpCount int
+	ThumbsUpCount int `gorm:"not null;default:'0'"`
 	LordReplies   []TopicLordReply
 }
 
 type TopicLordReply struct {
 	gorm.Model
-	Content       string
+	Content       string `gorm:"not null"`
 	User          User
 	PictureUrls   string
-	ThumbsUpCount int
+	ThumbsUpCount int `gorm:"not null;default:'0'"`
 	TopicID       uint
 	LayerReplies  []TopicLayerReply
 }
 
 type TopicLayerReply struct {
 	gorm.Model
-	Content          string
+	Content          string `gorm:"not null"`
 	User             User
-	ThumbsUpCount    int
+	ThumbsUpCount    int `gorm:"not null;default:'0'"`
 	TopicLordReplyID uint
 }

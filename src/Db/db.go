@@ -1,6 +1,7 @@
 package db
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gomodule/redigo/redis"
 	"github.com/jinzhu/gorm"
@@ -31,4 +32,14 @@ func InitMysql() (*gorm.DB, error) {
 	var err error
 	mysqlDb, err = gorm.Open("mysql", mysqlLinkString())
 	return mysqlDb, err
+}
+
+func CreateNewUser(user User) error {
+	var userTmp User
+	if mysqlDb.Where(&User{PhoneNumber: user.PhoneNumber}).First(&userTmp).RecordNotFound() {
+		mysqlDb.Create(&user)
+		mysqlDb.Save(&user)
+		return nil
+	}
+	return errors.New("this user has existed")
 }

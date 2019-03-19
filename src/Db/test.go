@@ -20,8 +20,11 @@ func AutoCreateTableTest() {
 }
 
 func Test() {
-	mysqlDb.AutoMigrate(&User{})
-	user := User{UserName: "haha", Age: 122, PhoneNumber: "213213213"}
-	mysqlDb.Create(&user)
-	mysqlDb.Save(&user)
+
+	//AutoCreateTableTest()
+	//user := User{UserName: "haha", Age: 122, PhoneNumber: "213213213"}
+	//err:=CreateNewUser(user)
+	//if err!=nil{
+	//	fmt.Println(err)
+	//}
 }

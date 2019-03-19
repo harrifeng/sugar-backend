@@ -2,22 +2,24 @@ package server
 
 import (
 	"db"
-	"utils"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"utils"
 )
 
 func SendVerificationCode(PhoneNumber string) error {
-	exists,err:=db.CheckPhoneCodeExist(PhoneNumber)
-	if err!=nil{
+	nowCode, err := db.GetNowVerificationCode(PhoneNumber)
+	if err != nil {
 		return err
 	}
-	if exists {
-		return errors.New("phone number key has exists")
+	var code string
+	if nowCode != "" {
+		code = nowCode
+	} else {
+		code = utils.RandCode()
 	}
-	code := utils.RandCode()
 	url := fmt.Sprintf("http://127.0.0.1:7799/send_message?phone_number=%s&code=%s",
 		PhoneNumber, code)
 	resp, err := http.Get(url)
@@ -42,5 +44,8 @@ func SendVerificationCode(PhoneNumber string) error {
 		return db.SetNewVerificationCode(PhoneNumber, code)
 	}
 	return errors.New("external service(send message) error")
+}
 
+func CheckVerificationCodeCorrection(PhoneNumber string, Code string) (bool, error) {
+	return db.CheckPhoneCodeCorrection(PhoneNumber, Code)
 }
