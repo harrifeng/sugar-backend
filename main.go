@@ -6,10 +6,6 @@ import (
 	"server"
 )
 
-func DbTest() {
-	db.AutoCreateTableTest()
-}
-
 func main() {
 	// init mysql
 	mysqlDb, err := db.InitMysql()
@@ -35,12 +31,6 @@ func main() {
 		}
 
 	}()
-	server.CheckVerificationCodeTest()
-	//server.Start()
-	//db.Test()
-	//conn :=redisPool.Get()
-	//server.SendMessageTest("18061532353")
-	//r,err:=conn.Do("EXISTS","ptc_18061532353")
-	//fmt.Printf("%d",r.(int64))
+	server.Start()
 
 }

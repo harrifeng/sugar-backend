@@ -2,25 +2,25 @@ package server
 
 import (
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func accountSendVerificationCode(c *gin.Context) {
 	PhoneNumber := c.Query("phone_number")
-	err := SendVerificationCode(PhoneNumber)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-	c.String(http.StatusOK, "ok")
+	resp := sendVerificationCode(PhoneNumber)
+	c.JSON(resp.Status, resp.Data)
 }
 
-func accountRegisterNewAccount(c *gin.Context) {
-	//PhoneNumber :=c.PostForm("phone_number")
-	//UserName := c.PostForm("username")
-	//Password := c.PostForm("password")
-	//Code :=c.PostForm("code")
+func accountRegister(c *gin.Context) {
+	PhoneNumber := c.PostForm("phone_number")
+	Password := c.PostForm("password")
+	Code := c.PostForm("code")
+	resp := registerNewUser(PhoneNumber, Password, Code)
+	c.JSON(resp.Status, resp.Data)
+}
 
+func accountLogin(c *gin.Context) {
+	PhoneNumber := c.Query("phone_number")
+	Password := c.Query("password")
+	resp := loginUser(PhoneNumber, Password)
+	c.JSON(resp.Status, resp.Data)
 }

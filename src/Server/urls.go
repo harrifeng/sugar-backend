@@ -16,11 +16,18 @@ func urlsRoot(c *gin.Context) {
 }
 
 func initRouter() {
+	if gin.Mode() == "debug" {
+		//test start
+		r.GET("/test/db/init", initDb)
+		//test url end
+	}
+
 	r.GET("/", urlsRoot)
 
 	// account start
 	r.GET("/accounts/code", accountSendVerificationCode)
-	r.POST("/accounts/create", accountRegisterNewAccount)
+	r.POST("/accounts/create", accountRegister)
+	r.GET("/accounts/login", accountLogin)
 	// account end
 
 }

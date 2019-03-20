@@ -43,3 +43,12 @@ func CreateNewUser(user User) error {
 	}
 	return errors.New("this user has existed")
 }
+
+func GetUserFromPhoneNumber(PhoneNumber string) (User, error) {
+	var userTmp User
+	if mysqlDb.Where(&User{PhoneNumber: PhoneNumber}).First(&userTmp).RecordNotFound() {
+		return userTmp, errors.New("this user has not existed")
+	}
+	return userTmp, nil
+
+}

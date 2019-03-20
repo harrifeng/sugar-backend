@@ -4,8 +4,12 @@ import (
 	"fmt"
 )
 
-func phoneNumberToKey(PhoneNumber string) string {
+func phoneNumberToCodeKey(PhoneNumber string) string {
 	return fmt.Sprintf("ptc_%s", PhoneNumber)
+}
+
+func phoneNumberToSessionIdKey(PhoneNumber string) string {
+	return fmt.Sprintf("sid_%s", PhoneNumber)
 }
 
 func replyToString(r interface{}) string {
@@ -63,7 +67,7 @@ func setKeyToValueLimitTime(key string, value string, limitTime int64) error {
 	if err != nil {
 		return err
 	}
-	err = conn.Send("EXPIRE", key, 180)
+	err = conn.Send("EXPIRE", key, limitTime)
 	if err != nil {
 		return err
 	}
@@ -83,9 +87,17 @@ func CheckPhoneCodeCorrection(PhoneNumber string, Code string) (bool, error) {
 }
 
 func GetNowVerificationCode(PhoneNumber string) (string, error) {
-	return getValueFromKey(phoneNumberToKey(PhoneNumber))
+	return getValueFromKey(phoneNumberToCodeKey(PhoneNumber))
 }
 
 func SetNewVerificationCode(PhoneNumber string, Code string) error {
-	return setKeyToValueLimitTime(phoneNumberToKey(PhoneNumber), Code, 180)
+	return setKeyToValueLimitTime(phoneNumberToCodeKey(PhoneNumber), Code, VerificationCodeLimitedTime)
+}
+
+func SetNewSessionId(PhoneNumber string, SessionId string) error {
+	return setKeyToValueLimitTime(phoneNumberToSessionIdKey(PhoneNumber), SessionId, SessionIdLimitedTime)
+}
+
+func GetNowSessionId(PhoneNumber string) (string, error) {
+	return getValueFromKey(phoneNumberToSessionIdKey(PhoneNumber))
 }
