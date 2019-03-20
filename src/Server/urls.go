@@ -28,6 +28,7 @@ func initRouter() {
 	r.GET("/accounts/code", accountSendVerificationCode)
 	r.POST("/accounts/create", accountRegister)
 	r.GET("/accounts/login", accountLogin)
+	r.POST("/accounts/alter", accountAlterInformation)
 	// account end
 
 }

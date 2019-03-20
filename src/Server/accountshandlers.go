@@ -84,7 +84,7 @@ func registerNewUser(PhoneNumber string, Password string, Code string) responseB
 func loginUser(PhoneNumber string, Password string) responseBody {
 	user, err := db.GetUserFromPhoneNumber(PhoneNumber)
 	if err != nil {
-		return responseNormalError("用户已存在")
+		return responseNormalError("用户不存在")
 	}
 	if user.Password != Password {
 		return responseNormalError("密码错误")
@@ -112,6 +112,57 @@ func loginUser(PhoneNumber string, Password string) responseBody {
 	})
 }
 
-func checkPasswordCorrection(PhoneNumber string, Password string) (bool, error) {
-	return true, nil
+func alterUserInformation(SessionId string, UserName string, Gender string, Height float64,
+	Weight float64, Area string, Job string, Age int) responseBody {
+	userId, err := db.GetNowSessionId(SessionId)
+	fmt.Println(userId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	err = db.AlterUserInformationFromUserId(userId, UserName, Gender, Height, Weight, Area, Job, Age)
+	if err != nil {
+		return responseNormalError("用户不存在")
+	}
+	return responseOK()
+}
+
+func getUserInformationFromSessionId(SessionId string) responseBody {
+	return responseBody{}
+}
+
+func getOtherUserInformationFromUserId(UserId string) responseBody {
+	return responseBody{}
+}
+
+func alterPassword(PhoneNumber string, Code string, NewPassword string) responseBody {
+	return responseBody{}
+}
+
+func followUser(SessionId string, FollowedUserId string) responseBody {
+	return responseBody{}
+}
+
+func unfollowUser(SessionId string, FollowedUserId string) responseBody {
+	return responseBody{}
+}
+
+func getFollowUserList(SessionId string, BeginId int, NeedNumber int) responseBody {
+	return responseBody{}
+}
+
+func logoutUser(SessionId string) responseBody {
+	return responseBody{}
+}
+
+func alterUserPrivacy(SessionId string, ShowPhoneNumber bool, ShowGender bool, ShowAge bool,
+	ShowHeight bool, ShowWeight bool, ShowArea bool, ShowJob bool) responseBody {
+	return responseBody{}
+}
+
+func getUserFollowerList(SessionId string, BeginId int, NeedNumber int) responseBody {
+	return responseBody{}
+}
+
+func getUserPrivacy(SessionId string) responseBody {
+	return responseBody{}
 }

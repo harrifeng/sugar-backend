@@ -94,10 +94,10 @@ func SetNewVerificationCode(PhoneNumber string, Code string) error {
 	return setKeyToValueLimitTime(phoneNumberToCodeKey(PhoneNumber), Code, VerificationCodeLimitedTime)
 }
 
-func SetNewSessionId(PhoneNumber string, SessionId string) error {
-	return setKeyToValueLimitTime(phoneNumberToSessionIdKey(PhoneNumber), SessionId, SessionIdLimitedTime)
+func SetNewSessionId(SessionId string, PhoneNumber string) error {
+	return setKeyToValueLimitTime(phoneNumberToSessionIdKey(SessionId), PhoneNumber, SessionIdLimitedTime)
 }
 
-func GetNowSessionId(PhoneNumber string) (string, error) {
-	return getValueFromKey(phoneNumberToSessionIdKey(PhoneNumber))
+func GetNowSessionId(SessionId string) (string, error) {
+	return getValueFromKey(phoneNumberToSessionIdKey(SessionId))
 }

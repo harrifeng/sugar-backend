@@ -6,6 +6,7 @@ import (
 	"github.com/gomodule/redigo/redis"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"strconv"
 	"time"
 )
 
@@ -50,5 +51,32 @@ func GetUserFromPhoneNumber(PhoneNumber string) (User, error) {
 		return userTmp, errors.New("this user has not existed")
 	}
 	return userTmp, nil
+}
 
+func GetUserFromUserId(UserId string) (User, error) {
+	var userTmp User
+	userId, _ := strconv.Atoi(UserId)
+	if mysqlDb.First(&userTmp, userId).RecordNotFound() {
+		return userTmp, errors.New("this user has not existed")
+	}
+	return userTmp, nil
+}
+
+func AlterUserInformationFromUserId(UserId string, UserName string, Gender string, Height float64,
+	Weight float64, Area string, Job string, Age int) error {
+	userId, _ := strconv.Atoi(UserId)
+	var user User
+	err := mysqlDb.First(&user, userId).Error
+	if err != nil {
+		return err
+	}
+	user.UserName = UserName
+	user.Gender = Gender
+	user.Height = Height
+	user.Weight = Weight
+	user.Area = Area
+	user.Job = Job
+	user.Age = Age
+	mysqlDb.Save(&user)
+	return nil
 }

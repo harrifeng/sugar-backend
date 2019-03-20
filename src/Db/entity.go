@@ -21,8 +21,8 @@ type User struct {
 	CollectedTopics   []Topic   `gorm:"many2many:user_collected_topic"`
 
 	// User healthy data
-	Height int
-	Weight int
+	Height float64
+	Weight float64
 	Area   string
 	Job    string
 }
