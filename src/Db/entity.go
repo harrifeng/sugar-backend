@@ -13,18 +13,31 @@ type User struct {
 	Age         int
 
 	// User Account data
-	Exp               int       `gorm:"not null;default:'0'"`
-	Level             int       `gorm:"not null;default:'1'"`
-	HeadPortraitUrl   string    ``
-	FollowUsers       []*User   `gorm:"many2many:user_follow_ships;association_jointable_foreignkey:follow_user_id"`
-	CollectedArticles []Article `gorm:"many2many:user_collected_article"`
-	CollectedTopics   []Topic   `gorm:"many2many:user_collected_topic"`
+	Exp                  int       `gorm:"not null;default:'0'"`
+	Level                int       `gorm:"not null;default:'1'"`
+	HeadPortraitUrl      string    ``
+	FollowUsers          []*User   `gorm:"many2many:user_follow_ships;association_jointable_foreignkey:follow_user_id"`
+	CollectedArticles    []Article `gorm:"many2many:user_collected_article"`
+	CollectedTopics      []Topic   `gorm:"many2many:user_collected_topic"`
+	UserPrivacySetting   UserPrivacySetting
+	UserPrivacySettingID uint
 
 	// User healthy data
 	Height float64
 	Weight float64
 	Area   string
 	Job    string
+}
+
+type UserPrivacySetting struct {
+	gorm.Model
+	ShowPhoneNumber bool
+	ShowGender      bool
+	ShowAge         bool
+	ShowHeight      bool
+	ShowWeight      bool
+	ShowArea        bool
+	ShowJob         bool
 }
 
 type ArticleLabel struct {

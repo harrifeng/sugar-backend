@@ -26,6 +26,12 @@ func accountLogin(c *gin.Context) {
 	c.JSON(resp.Status, resp.Data)
 }
 
+func accountLogout(c *gin.Context) {
+	SessionId := c.Query("session_id")
+	resp := logoutUser(SessionId)
+	c.JSON(resp.Status, resp.Data)
+}
+
 func accountAlterInformation(c *gin.Context) {
 	SessionId := c.PostForm("session_id")
 	UserName := c.PostForm("username")
@@ -51,10 +57,30 @@ func accountGetUserInformation(c *gin.Context) {
 	c.JSON(resp.Status, resp.Data)
 }
 
-func accountsAlterPassword(c *gin.Context) {
+func accountAlterPassword(c *gin.Context) {
 	PhoneNumber := c.PostForm("phone_number")
 	Code := c.PostForm("code")
 	NewPassword := c.PostForm("password")
 	resp := alterPassword(PhoneNumber, Code, NewPassword)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func accountGetUserPrivacySetting(c *gin.Context) {
+	SessionId := c.Query("session_id")
+	resp := getUserPrivacySetting(SessionId)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func accountAlterUserPrivacySetting(c *gin.Context) {
+	SessionId := c.PostForm("session_id")
+	ShowPhoneNumber := c.PostForm("show_phone_number") == "1"
+	ShowGender := c.PostForm("show_gender") == "1"
+	ShowAge := c.PostForm("show_age") == "1"
+	ShowHeight := c.PostForm("show_height") == "1"
+	ShowWeight := c.PostForm("show_weight") == "1"
+	ShowArea := c.PostForm("show_area") == "1"
+	ShowJob := c.PostForm("show_job") == "1"
+	resp := alterUserPrivacy(SessionId, ShowPhoneNumber, ShowGender,
+		ShowAge, ShowHeight, ShowWeight, ShowArea, ShowJob)
 	c.JSON(resp.Status, resp.Data)
 }

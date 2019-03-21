@@ -35,7 +35,20 @@ func InitMysql() (*gorm.DB, error) {
 	return mysqlDb, err
 }
 
-func CreateNewUser(user User) error {
+func CreateNewUser(PhoneNumber string, Password string) error {
+	user := User{
+		PhoneNumber: PhoneNumber,
+		Password:    Password,
+		UserPrivacySetting: UserPrivacySetting{
+			ShowPhoneNumber: true,
+			ShowGender:      true,
+			ShowAge:         true,
+			ShowHeight:      true,
+			ShowWeight:      true,
+			ShowArea:        true,
+			ShowJob:         true,
+		},
+	}
 	var userTmp User
 	if mysqlDb.Where(&User{PhoneNumber: user.PhoneNumber}).First(&userTmp).RecordNotFound() {
 		mysqlDb.Create(&user)
@@ -60,6 +73,46 @@ func GetUserFromUserId(UserId string) (User, error) {
 		return userTmp, errors.New("this user has not existed")
 	}
 	return userTmp, nil
+}
+
+func GetPrivacySettingFromUserId(UserId string) (UserPrivacySetting, error) {
+	user, err := GetUserFromUserId(UserId)
+	if err != nil {
+		return UserPrivacySetting{}, err
+	}
+	var privacySetting UserPrivacySetting
+	mysqlDb.Model(&user).Association("UserPrivacySetting").Find(&privacySetting)
+	return privacySetting, nil
+}
+
+func AlterUserPrivacySettingFromUserId(UserId string, ShowPhoneNumber bool, ShowGender bool,
+	ShowAge bool, ShowHeight bool, ShowWeight bool, ShowArea bool, ShowJob bool) error {
+	user, err := GetUserFromUserId(UserId)
+	if err != nil {
+		return err
+	}
+	var privacySetting UserPrivacySetting
+	mysqlDb.Model(&user).Association("UserPrivacySetting").Find(&privacySetting)
+	privacySetting.ShowPhoneNumber = ShowPhoneNumber
+	privacySetting.ShowGender = ShowGender
+	privacySetting.ShowAge = ShowAge
+	privacySetting.ShowHeight = ShowHeight
+	privacySetting.ShowWeight = ShowWeight
+	privacySetting.ShowArea = ShowArea
+	privacySetting.ShowJob = ShowJob
+	mysqlDb.Model(&user).Association("UserPrivacySetting").Replace(&privacySetting)
+	return nil
+}
+
+func AlterUserPasswordFromPhoneNumber(PhoneNumber string, NewPassword string) error {
+	var user User
+	err := mysqlDb.Where(&User{PhoneNumber: PhoneNumber}).First(&user).Error
+	if err != nil {
+		return err
+	}
+	user.Password = NewPassword
+	mysqlDb.Save(&user)
+	return nil
 }
 
 func AlterUserInformationFromUserId(UserId string, UserName string, Gender string, Height float64,

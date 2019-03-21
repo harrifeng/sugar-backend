@@ -17,6 +17,7 @@ func AutoCreateTableTest() {
 	mysqlDb.AutoMigrate(&Topic{})
 	mysqlDb.AutoMigrate(&TopicLordReply{})
 	mysqlDb.AutoMigrate(&TopicLayerReply{})
+	mysqlDb.AutoMigrate(&UserPrivacySetting{})
 }
 
 func Test() {

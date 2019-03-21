@@ -19,6 +19,7 @@ func initRouter() {
 	if gin.Mode() == "debug" {
 		//test start
 		r.GET("/test/db/init", initDb)
+		r.GET("/test/db/create", createNewTestUser)
 		//test url end
 	}
 
@@ -29,6 +30,11 @@ func initRouter() {
 	r.POST("/accounts/create", accountRegister)
 	r.GET("/accounts/login", accountLogin)
 	r.POST("/accounts/alter", accountAlterInformation)
+	r.GET("/accounts/info", accountGetUserInformation)
+	r.POST("/accounts/alter/password", accountAlterPassword)
+	r.GET("/accounts/privacy", accountGetUserPrivacySetting)
+	r.POST("/accounts/alter/privacy", accountAlterUserPrivacySetting)
+	r.GET("accounts/logout", accountLogout)
 	// account end
 
 }

@@ -70,11 +70,7 @@ func registerNewUser(PhoneNumber string, Password string, Code string) responseB
 	if !codeCheck {
 		return responseNormalError("验证码错误或已失效")
 	}
-	user := db.User{
-		PhoneNumber: PhoneNumber,
-		Password:    Password,
-	}
-	err = db.CreateNewUser(user)
+	err = db.CreateNewUser(PhoneNumber, Password)
 	if err != nil {
 		return responseNormalError("用户已经存在")
 	}
@@ -115,7 +111,6 @@ func loginUser(PhoneNumber string, Password string) responseBody {
 func alterUserInformation(SessionId string, UserName string, Gender string, Height float64,
 	Weight float64, Area string, Job string, Age int) responseBody {
 	userId, err := db.GetNowSessionId(SessionId)
-	fmt.Println(userId)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
@@ -126,16 +121,84 @@ func alterUserInformation(SessionId string, UserName string, Gender string, Heig
 	return responseOK()
 }
 
-func getUserInformationFromSessionId(SessionId string) responseBody {
-	return responseBody{}
+func getUserInformationFromUserId(SessionId string, TargetUserId string) responseBody {
+	UserId, err := db.GetNowSessionId(SessionId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	if UserId == "" {
+		return responseNormalError("请先登录")
+	}
+	user, err := db.GetUserFromUserId(TargetUserId)
+	if err != nil {
+		return responseNormalError("用户不存在")
+	}
+	return responseOKWithData(gin.H{
+		"username": user.UserName,
+		"iconUrl":  user.HeadPortraitUrl,
+		"age":      user.Age,
+		"gender":   user.Gender,
+		"job":      user.Job,
+		"area":     user.Area,
+		"height":   user.Height,
+		"weight":   user.Weight,
+		"exp":      user.Exp,
+		"level":    user.Level,
+	})
 }
 
-func getOtherUserInformationFromUserId(UserId string) responseBody {
-	return responseBody{}
+func getUserInformationFromSessionId(SessionId string) responseBody {
+	userId, err := db.GetNowSessionId(SessionId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	return getUserInformationFromUserId(SessionId, userId)
 }
 
 func alterPassword(PhoneNumber string, Code string, NewPassword string) responseBody {
-	return responseBody{}
+	codeCheck, err := db.CheckPhoneCodeCorrection(PhoneNumber, Code)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	if !codeCheck {
+		return responseNormalError("验证码错误或已失效")
+	}
+	err = db.AlterUserPasswordFromPhoneNumber(PhoneNumber, NewPassword)
+	if err != nil {
+		return responseNormalError("用户不存在")
+	}
+	return responseOK()
+}
+
+func getUserPrivacySetting(SessionId string) responseBody {
+	userId, err := db.GetNowSessionId(SessionId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	privacySetting, err := db.GetPrivacySettingFromUserId(userId)
+	return responseOKWithData(gin.H{
+		"ShowPhoneNumber": privacySetting.ShowPhoneNumber,
+		"ShowGender":      privacySetting.ShowGender,
+		"ShowAge":         privacySetting.ShowAge,
+		"ShowHeight":      privacySetting.ShowHeight,
+		"ShowWeight":      privacySetting.ShowWeight,
+		"ShowArea":        privacySetting.ShowArea,
+		"ShowJob":         privacySetting.ShowJob,
+	})
+}
+
+func alterUserPrivacy(SessionId string, ShowPhoneNumber bool, ShowGender bool, ShowAge bool,
+	ShowHeight bool, ShowWeight bool, ShowArea bool, ShowJob bool) responseBody {
+	userId, err := db.GetNowSessionId(SessionId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	err = db.AlterUserPrivacySettingFromUserId(userId, ShowPhoneNumber, ShowGender, ShowAge,
+		ShowHeight, ShowWeight, ShowArea, ShowJob)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	return responseOK()
 }
 
 func followUser(SessionId string, FollowedUserId string) responseBody {
@@ -151,18 +214,13 @@ func getFollowUserList(SessionId string, BeginId int, NeedNumber int) responseBo
 }
 
 func logoutUser(SessionId string) responseBody {
-	return responseBody{}
-}
-
-func alterUserPrivacy(SessionId string, ShowPhoneNumber bool, ShowGender bool, ShowAge bool,
-	ShowHeight bool, ShowWeight bool, ShowArea bool, ShowJob bool) responseBody {
-	return responseBody{}
+	err := db.RemoveSessionId(SessionId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	return responseOK()
 }
 
 func getUserFollowerList(SessionId string, BeginId int, NeedNumber int) responseBody {
-	return responseBody{}
-}
-
-func getUserPrivacy(SessionId string) responseBody {
 	return responseBody{}
 }

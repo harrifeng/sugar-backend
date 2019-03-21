@@ -8,7 +8,7 @@ func phoneNumberToCodeKey(PhoneNumber string) string {
 	return fmt.Sprintf("ptc_%s", PhoneNumber)
 }
 
-func phoneNumberToSessionIdKey(PhoneNumber string) string {
+func SessionIdToSessionIdKey(PhoneNumber string) string {
 	return fmt.Sprintf("sid_%s", PhoneNumber)
 }
 
@@ -75,6 +75,22 @@ func setKeyToValueLimitTime(key string, value string, limitTime int64) error {
 	return err
 }
 
+func removeKey(key string) error {
+	conn := redisPool.Get()
+	defer func() {
+		err := conn.Close()
+		if err != nil {
+			fmt.Printf("%s", err)
+			return
+		}
+	}()
+	_, err := conn.Do("DEL", key)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func CheckPhoneCodeCorrection(PhoneNumber string, Code string) (bool, error) {
 	value, err := GetNowVerificationCode(PhoneNumber)
 	if err != nil {
@@ -95,9 +111,13 @@ func SetNewVerificationCode(PhoneNumber string, Code string) error {
 }
 
 func SetNewSessionId(SessionId string, PhoneNumber string) error {
-	return setKeyToValueLimitTime(phoneNumberToSessionIdKey(SessionId), PhoneNumber, SessionIdLimitedTime)
+	return setKeyToValueLimitTime(SessionIdToSessionIdKey(SessionId), PhoneNumber, SessionIdLimitedTime)
+}
+
+func RemoveSessionId(SessionId string) error {
+	return removeKey(SessionIdToSessionIdKey(SessionId))
 }
 
 func GetNowSessionId(SessionId string) (string, error) {
-	return getValueFromKey(phoneNumberToSessionIdKey(SessionId))
+	return getValueFromKey(SessionIdToSessionIdKey(SessionId))
 }
