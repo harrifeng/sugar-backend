@@ -38,3 +38,23 @@ func accountAlterInformation(c *gin.Context) {
 	resp := alterUserInformation(SessionId, UserName, Gender, Height, Weight, Area, Job, Age)
 	c.JSON(resp.Status, resp.Data)
 }
+
+func accountGetUserInformation(c *gin.Context) {
+	SessionId := c.Query("session_id")
+	OtherUserId := c.Query("other_user_id")
+	var resp responseBody
+	if OtherUserId == "" {
+		resp = getUserInformationFromSessionId(SessionId)
+	} else {
+		resp = getUserInformationFromUserId(SessionId, OtherUserId)
+	}
+	c.JSON(resp.Status, resp.Data)
+}
+
+func accountsAlterPassword(c *gin.Context) {
+	PhoneNumber := c.PostForm("phone_number")
+	Code := c.PostForm("code")
+	NewPassword := c.PostForm("password")
+	resp := alterPassword(PhoneNumber, Code, NewPassword)
+	c.JSON(resp.Status, resp.Data)
+}
