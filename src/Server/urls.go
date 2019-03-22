@@ -34,7 +34,17 @@ func initRouter() {
 	r.POST("/accounts/alter/password", accountAlterPassword)
 	r.GET("/accounts/privacy", accountGetUserPrivacySetting)
 	r.POST("/accounts/alter/privacy", accountAlterUserPrivacySetting)
-	r.GET("accounts/logout", accountLogout)
+	r.GET("/accounts/logout", accountLogout)
+	r.GET("/accounts/follower", accountGetUserFollowerList)
+	r.GET("/accounts/following", accountGetUserFollowingList)
+	r.POST("/accounts/following/follow", accountFollowUser)
+	r.POST("/accounts/following/ignore", accountIgnoreUser)
 	// account end
 
+	// bbs start
+	r.POST("/bbs/topic/publish")
+	r.POST("/bbs/topic/lord-reply/publish")
+	r.POST("/bbs/topic/layer-reply/publish")
+
+	// bbs end
 }

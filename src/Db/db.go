@@ -133,3 +133,36 @@ func AlterUserInformationFromUserId(UserId string, UserName string, Gender strin
 	mysqlDb.Save(&user)
 	return nil
 }
+
+func AddUserFollowing(UserId string, TargetUserId string) error {
+	var user User
+	mysqlDb.Preload("FollowUsers").First(&user, UserId)
+	userTo, err := GetUserFromUserId(TargetUserId)
+	if err != nil {
+		return err
+	}
+	mysqlDb.Model(&user).Association("FollowUsers").Append(&userTo)
+	return nil
+}
+
+func RemoveUserFollowing(UserId string, TargetUserId string) error {
+	var user User
+	mysqlDb.Preload("FollowUsers").First(&user, UserId)
+	userTo, err := GetUserFromUserId(TargetUserId)
+	if err != nil {
+		return err
+	}
+	mysqlDb.Model(&user).Association("FollowUsers").Delete(&userTo)
+	return nil
+}
+
+func GetUserFollowerList(UserId string, BeginId string, NeedNumber string) error {
+	//var user User
+	//mysqlDb.Preload("FollowUsers").First(&user,UserId)
+	//var users []User
+	//beginId,_ :=strconv.Atoi(BeginId)
+	//needNumber,_:=strconv.Atoi(NeedNumber)
+	//mysqlDb.Model(&user).Related(&users,"FollowUsers").Offset(beginId).Limit(needNumber).Find(&users)
+	//fmt.Println(users)
+	return nil
+}

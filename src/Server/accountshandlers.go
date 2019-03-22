@@ -201,15 +201,45 @@ func alterUserPrivacy(SessionId string, ShowPhoneNumber bool, ShowGender bool, S
 	return responseOK()
 }
 
-func followUser(SessionId string, FollowedUserId string) responseBody {
+func followUser(SessionId string, TargetUserId string) responseBody {
+	userId, err := db.GetNowSessionId(SessionId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	err = db.AddUserFollowing(userId, TargetUserId)
+	if err != nil {
+		responseInternalServerError(err)
+	}
+	return responseOK()
+}
+
+func ignoreUser(SessionId string, TargetUserId string) responseBody {
+	userId, err := db.GetNowSessionId(SessionId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	err = db.RemoveUserFollowing(userId, TargetUserId)
+	if err != nil {
+		responseInternalServerError(err)
+	}
+	return responseOK()
+}
+
+func getUserFollowingList(SessionId string, BeginId string, NeedNumber string) responseBody {
+	//userId,err:=db.GetNowSessionId(SessionId)
+	//if err!=nil{
+	//	return responseInternalServerError(err)
+	//}
+
 	return responseBody{}
 }
 
-func unfollowUser(SessionId string, FollowedUserId string) responseBody {
-	return responseBody{}
-}
+func getUserFollowerList(SessionId string, BeginId string, NeedNumber string) responseBody {
+	//userId,err:=db.GetNowSessionId(SessionId)
+	//if err!=nil{
+	//	return responseInternalServerError(err)
+	//}
 
-func getFollowUserList(SessionId string, BeginId int, NeedNumber int) responseBody {
 	return responseBody{}
 }
 
@@ -219,8 +249,4 @@ func logoutUser(SessionId string) responseBody {
 		return responseInternalServerError(err)
 	}
 	return responseOK()
-}
-
-func getUserFollowerList(SessionId string, BeginId int, NeedNumber int) responseBody {
-	return responseBody{}
 }

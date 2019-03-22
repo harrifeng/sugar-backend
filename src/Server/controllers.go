@@ -84,3 +84,37 @@ func accountAlterUserPrivacySetting(c *gin.Context) {
 		ShowAge, ShowHeight, ShowWeight, ShowArea, ShowJob)
 	c.JSON(resp.Status, resp.Data)
 }
+
+func accountGetUserFollowingList(c *gin.Context) {
+	SessionId := c.Query("session_id")
+	BeginId := c.Query("begin_id")
+	NeedNumber := c.Query("need_number")
+	resp := getUserFollowingList(SessionId, BeginId, NeedNumber)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func accountGetUserFollowerList(c *gin.Context) {
+	SessionId := c.Query("session_id")
+	BeginId := c.Query("begin_id")
+	NeedNumber := c.Query("need_number")
+	resp := getUserFollowerList(SessionId, BeginId, NeedNumber)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func accountFollowUser(c *gin.Context) {
+	SessionId := c.PostForm("session_id")
+	UserId := c.PostForm("other_user_id")
+	resp := followUser(SessionId, UserId)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func accountIgnoreUser(c *gin.Context) {
+	SessionId := c.PostForm("session_id")
+	UserId := c.PostForm("other_user_id")
+	resp := ignoreUser(SessionId, UserId)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func bbsPublishTopic(c *gin.Context) {
+
+}
