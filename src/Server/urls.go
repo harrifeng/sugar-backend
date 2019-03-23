@@ -20,6 +20,7 @@ func initRouter() {
 		//test start
 		r.GET("/test/db/init", initDb)
 		r.GET("/test/db/create", createNewTestUser)
+		r.GET("/test/db/article/init", initArticle)
 		//test url end
 	}
 

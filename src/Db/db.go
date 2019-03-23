@@ -166,3 +166,13 @@ func GetUserFollowerList(UserId string, BeginId string, NeedNumber string) error
 	//fmt.Println(users)
 	return nil
 }
+
+func AddNewArticle(Title string, Content string) error {
+	article := Article{
+		Title:   Title,
+		Content: Content,
+	}
+	mysqlDb.Create(&article)
+	mysqlDb.Save(&article)
+	return nil
+}

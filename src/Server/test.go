@@ -16,6 +16,12 @@ func initDb(c *gin.Context) {
 	c.JSON(resp.Status, resp.Data)
 }
 
+func initArticle(c *gin.Context) {
+	db.InitAllArticle()
+	resp := responseOK()
+	c.JSON(resp.Status, resp.Data)
+}
+
 func createNewTestUser(c *gin.Context) {
 	err := db.CreateNewUser("11111111111", "0c152176187ce61c9614c072e1a1e2f7")
 	var resp responseBody

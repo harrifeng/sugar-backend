@@ -49,7 +49,7 @@ type ArticleLabel struct {
 type Article struct {
 	gorm.Model
 	Title         string          `gorm:"not null"`
-	Content       string          `gorm:"not null"`
+	Content       string          `gorm:"not null;type:text;"`
 	Labels        []*ArticleLabel `gorm:"many2many:articles_to_labels;"`
 	CoverImageUrl string
 	ReadCount     int `gorm:"not null;default:'0'"`
@@ -57,7 +57,7 @@ type Article struct {
 
 type ArticleComment struct {
 	gorm.Model
-	Content       string `gorm:"not null"`
+	Content       string `gorm:"not null;type:text"`
 	ThumbsUpCount int    `gorm:"not null;default:'0'"`
 	Article       Article
 	User          User
@@ -67,7 +67,7 @@ type ArticleComment struct {
 
 type Topic struct {
 	gorm.Model
-	Content       string `gorm:"not null"`
+	Content       string `gorm:"not null;type:text"`
 	User          User
 	PictureUrls   string
 	ThumbsUpCount int `gorm:"not null;default:'0'"`
@@ -76,7 +76,7 @@ type Topic struct {
 
 type TopicLordReply struct {
 	gorm.Model
-	Content       string `gorm:"not null"`
+	Content       string `gorm:"not null;type:text"`
 	User          User
 	PictureUrls   string
 	ThumbsUpCount int `gorm:"not null;default:'0'"`
@@ -86,7 +86,7 @@ type TopicLordReply struct {
 
 type TopicLayerReply struct {
 	gorm.Model
-	Content          string `gorm:"not null"`
+	Content          string `gorm:"not null;type:text"`
 	User             User
 	ThumbsUpCount    int `gorm:"not null;default:'0'"`
 	TopicLordReplyID uint
