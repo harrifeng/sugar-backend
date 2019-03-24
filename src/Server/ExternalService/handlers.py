@@ -26,3 +26,4 @@ class SendMessageHandler(tornado.web.RequestHandler):
         except Exception as e:
             print(e)
             self.write('error')
+

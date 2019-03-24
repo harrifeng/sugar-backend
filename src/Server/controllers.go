@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"strconv"
 )
@@ -117,4 +118,18 @@ func accountIgnoreUser(c *gin.Context) {
 
 func bbsPublishTopic(c *gin.Context) {
 
+}
+
+func schoolGetArticle(c *gin.Context) {
+	SessionId := c.Query("session_id")
+	ArticleId := c.Query("article_id")
+	fmt.Println(ArticleId)
+	resp := getArticle(SessionId, ArticleId)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func schoolGetArticleList(c *gin.Context) {
+	//SessionId : = c.Query("session_id")
+	//BeginId := c.Query("begin_id")
+	//NeedNumber := c.Query("need_number")
 }

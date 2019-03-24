@@ -38,6 +38,13 @@ func responseOKWithData(data interface{}) responseBody {
 	}
 }
 
+func responseOKWithHtml(data string) responseBody {
+	return responseBody{
+		Status: http.StatusOK,
+		Data:   data,
+	}
+}
+
 func responseOK() responseBody {
 	return responseBody{
 		Status: http.StatusOK,

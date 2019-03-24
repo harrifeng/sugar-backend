@@ -32,3 +32,14 @@ func createNewTestUser(c *gin.Context) {
 	}
 	c.JSON(resp.Status, resp.Data)
 }
+
+func DatabaseTest() {
+	//db.AutoCreateTableTest()
+	//db.InitAllArticle()
+	//db.InitUser()
+	//db.IninArticleComment()
+	//db.GetArticleCommentListTest()
+	//db.GetSearchArticleListTest()
+	//db.AddCollectArticleTest()
+	db.RemoveCollectArticleTest()
+}

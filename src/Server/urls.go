@@ -46,6 +46,10 @@ func initRouter() {
 	r.POST("/bbs/topic/publish")
 	r.POST("/bbs/topic/lord-reply/publish")
 	r.POST("/bbs/topic/layer-reply/publish")
-
 	// bbs end
+
+	// school start
+	r.GET("/school/article", schoolGetArticle)
+	r.GET("/school/articles")
+	// school end
 }
