@@ -38,8 +38,12 @@ func DatabaseTest() {
 	//db.InitAllArticle()
 	//db.InitUser()
 	//db.IninArticleComment()
+	//db.UserFollowTest()
+	//db.GetUserFollowerListTest()
+	//db.GetUserFollowingListTest()
 	//db.GetArticleCommentListTest()
 	//db.GetSearchArticleListTest()
 	//db.AddCollectArticleTest()
-	db.RemoveCollectArticleTest()
+	//db.RemoveCollectArticleTest()
+	db.Test()
 }

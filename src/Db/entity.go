@@ -16,7 +16,8 @@ type User struct {
 	Exp                  int       `gorm:"not null;default:'0'"`
 	Level                int       `gorm:"not null;default:'1'"`
 	HeadPortraitUrl      string    ``
-	FollowUsers          []*User   `gorm:"many2many:user_follow_ships;association_jointable_foreignkey:follow_user_id"`
+	FollowingUsers       []*User   `gorm:"many2many:user_following_ships;association_jointable_foreignkey:following_user_id"`
+	FollowerUsers        []*User   `gorm:"many2many:user_follower_ships;association_jointable_foreignkey:follower_user_id"`
 	CollectedArticles    []Article `gorm:"many2many:user_collected_article"`
 	CollectedTopics      []Topic   `gorm:"many2many:user_collected_topic"`
 	UserPrivacySetting   UserPrivacySetting

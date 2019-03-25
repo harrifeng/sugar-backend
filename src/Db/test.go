@@ -65,8 +65,41 @@ func AutoCreateTableTest() {
 	fmt.Printf("tables created successfully!\n ")
 }
 
+func UserFollowTest() {
+	_ = AddUserFollowing("2", "3")
+	_ = AddUserFollowing("3", "2")
+	_ = AddUserFollowing("5", "2")
+	_ = AddUserFollowing("7", "3")
+	_ = AddUserFollowing("2", "87")
+	_ = AddUserFollowing("8", "75")
+	_ = AddUserFollowing("3", "23")
+	_ = AddUserFollowing("23", "54")
+}
+
+func GetUserFollowerListTest() {
+	users, err := GetUserFollowerList("2", "0", "10")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	for _, user := range users {
+		fmt.Println(user.ID)
+	}
+}
+
+func GetUserFollowingListTest() {
+	users, err := GetUserFollowingList("3", "0", "10")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	for _, user := range users {
+		fmt.Println(user.ID)
+	}
+}
+
 func GetArticleCommentListTest() {
-	articleComments, err := GetArticleCommentList("2", "2", "6")
+	articleComments, err := GetArticleCommentListFromArticleId("2", "2", "6")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -104,6 +137,9 @@ func RemoveCollectArticleTest() {
 }
 
 func Test() {
-	err := AddArticleComment("1", "1", "666666")
-	fmt.Println(err)
+	var users []User
+	mysqlDb.Preload("FollowingUsers").Find(&users)
+	for _, user := range users {
+		fmt.Println(user.ID)
+	}
 }
