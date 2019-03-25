@@ -142,26 +142,22 @@ func RemoveUserFollowing(UserId string, TargetUserId string) error {
 	return nil
 }
 
-// WARNING
 func GetUserFollowerList(UserId string, BeginId string, NeedNumber string) ([]User, error) {
 	var user User
 	mysqlDb.Preload("FollowerUsers").First(&user, UserId)
 	var users []User
 	beginId, _ := strconv.Atoi(BeginId)
 	needNumber, _ := strconv.Atoi(NeedNumber)
-	mysqlDb.Model(&user).Related(&users, "FollowerUsers").Offset(beginId).
-		Limit(needNumber).Find(&users)
+	mysqlDb.Model(&user).Offset(beginId).Limit(needNumber).Related(&users, "FollowerUsers")
 	return users, nil
 }
 
-// WARNING
 func GetUserFollowingList(UserId string, BeginId string, NeedNumber string) ([]User, error) {
 	var user User
 	mysqlDb.Preload("FollowingUsers").First(&user, UserId)
 	var users []User
 	beginId, _ := strconv.Atoi(BeginId)
 	needNumber, _ := strconv.Atoi(NeedNumber)
-	mysqlDb.Model(&user).Related(&users, "FollowingUsers").Offset(beginId).
-		Limit(needNumber).Find(&users)
+	mysqlDb.Model(&user).Offset(beginId).Limit(needNumber).Related(&users, "FollowingUsers")
 	return users, nil
 }

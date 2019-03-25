@@ -102,13 +102,14 @@ func RemoveUserCollectedArticle(UserId string, ArticleId string) error {
 	return nil
 }
 
-// WARNING
 func GetUserCollectedArticleList(UserId string, BeginId string, NeedNumber string) ([]Article, error) {
 	var articles []Article
 	user, err := GetUserFromUserId(UserId)
 	if err != nil {
 		return articles, err
 	}
-	mysqlDb.Model(&user).Association("CollectedArticles").Find(&articles)
+	beginId, _ := strconv.Atoi(BeginId)
+	needNumber, _ := strconv.Atoi(NeedNumber)
+	mysqlDb.Model(&user).Offset(beginId).Limit(needNumber).Related(&articles, "CollectedArticles")
 	return articles, nil
 }

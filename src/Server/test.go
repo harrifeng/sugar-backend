@@ -43,7 +43,8 @@ func DatabaseTest() {
 	//db.GetUserFollowingListTest()
 	//db.GetArticleCommentListTest()
 	//db.GetSearchArticleListTest()
-	//db.AddCollectArticleTest()
+	db.AddCollectArticleTest()
 	//db.RemoveCollectArticleTest()
-	db.Test()
+	db.GetUserCollectedArticleListTest()
+	//db.Test()
 }

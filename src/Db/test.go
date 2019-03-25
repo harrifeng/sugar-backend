@@ -66,18 +66,33 @@ func AutoCreateTableTest() {
 }
 
 func UserFollowTest() {
-	_ = AddUserFollowing("2", "3")
+	_ = AddUserFollowing("1", "2")
+	_ = AddUserFollowing("1", "5")
+	_ = AddUserFollowing("1", "6")
+	_ = AddUserFollowing("1", "3")
+	_ = AddUserFollowing("1", "8")
+	_ = AddUserFollowing("1", "12")
+	_ = AddUserFollowing("1", "56")
+	_ = AddUserFollowing("2", "4")
+	_ = AddUserFollowing("2", "66")
+	_ = AddUserFollowing("2", "23")
+	_ = AddUserFollowing("2", "1")
+	_ = AddUserFollowing("3", "8")
+	_ = AddUserFollowing("3", "21")
+	_ = AddUserFollowing("3", "78")
+	_ = AddUserFollowing("3", "4")
+	_ = AddUserFollowing("3", "1")
+	_ = AddUserFollowing("3", "9")
+	_ = AddUserFollowing("3", "7")
 	_ = AddUserFollowing("3", "2")
-	_ = AddUserFollowing("5", "2")
 	_ = AddUserFollowing("7", "3")
-	_ = AddUserFollowing("2", "87")
-	_ = AddUserFollowing("8", "75")
-	_ = AddUserFollowing("3", "23")
-	_ = AddUserFollowing("23", "54")
+	_ = AddUserFollowing("7", "2")
+	_ = AddUserFollowing("8", "2")
+	fmt.Println("user relation pairs created successfully!")
 }
 
 func GetUserFollowerListTest() {
-	users, err := GetUserFollowerList("2", "0", "10")
+	users, err := GetUserFollowerList("2", "0", "1")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -88,7 +103,7 @@ func GetUserFollowerListTest() {
 }
 
 func GetUserFollowingListTest() {
-	users, err := GetUserFollowingList("3", "0", "10")
+	users, err := GetUserFollowingList("2", "1", "2")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -121,18 +136,29 @@ func GetSearchArticleListTest() {
 }
 
 func AddCollectArticleTest() {
-	err := AddUserCollectedArticle("3", "4")
+	_ = AddUserCollectedArticle("3", "4")
+	_ = AddUserCollectedArticle("3", "2")
+	_ = AddUserCollectedArticle("3", "6")
+	_ = AddUserCollectedArticle("3", "7")
+	_ = AddUserCollectedArticle("3", "9")
+	_ = AddUserCollectedArticle("3", "2")
+	_ = AddUserCollectedArticle("1", "3")
+	_ = AddUserCollectedArticle("1", "2")
+	_ = AddUserCollectedArticle("1", "5")
+}
+
+func RemoveCollectArticleTest() {
+	_ = RemoveUserCollectedArticle("3", "4")
+}
+
+func GetUserCollectedArticleListTest() {
+	articles, err := GetUserCollectedArticleList("3", "2", "3")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-}
-
-func RemoveCollectArticleTest() {
-	err := RemoveUserCollectedArticle("3", "4")
-	if err != nil {
-		fmt.Println(err)
-		return
+	for _, article := range articles {
+		fmt.Println(article.ID)
 	}
 }
 
