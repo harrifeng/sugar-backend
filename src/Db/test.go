@@ -57,7 +57,6 @@ func AutoCreateTableTest() {
 	mysqlDb.AutoMigrate(&User{})
 	mysqlDb.AutoMigrate(&Article{})
 	mysqlDb.AutoMigrate(&ArticleComment{})
-	mysqlDb.AutoMigrate(&ArticleLabel{})
 	mysqlDb.AutoMigrate(&Topic{})
 	mysqlDb.AutoMigrate(&TopicLordReply{})
 	mysqlDb.AutoMigrate(&TopicLayerReply{})
@@ -159,6 +158,42 @@ func GetUserCollectedArticleListTest() {
 	}
 	for _, article := range articles {
 		fmt.Println(article.ID)
+	}
+}
+
+func InitTopicTest() {
+	for i := 1; i <= 500; i++ {
+		userId := rand.Intn(100) + 1
+		_ = AddTopic(strconv.Itoa(userId), utils.RandWords())
+		fmt.Printf("topic.%d created successfully!\n", i)
+	}
+}
+
+func InitTopicLordReplyTest() {
+	for i := 1; i <= 500; i++ {
+		userId := rand.Intn(100) + 1
+		topicId := rand.Intn(100) + 1
+		_ = AddTopicLordReply(strconv.Itoa(userId), strconv.Itoa(topicId), utils.RandWords())
+		fmt.Printf("topicLordReply.%d created successfully!\n", i)
+	}
+}
+
+func InitTopicLayerReplyTest() {
+	for i := 1; i <= 500; i++ {
+		userId := rand.Intn(100) + 1
+		topicLordReplyId := rand.Intn(100) + 1
+		_ = AddTopicLayerReply(strconv.Itoa(userId), strconv.Itoa(topicLordReplyId), utils.RandWords())
+		fmt.Printf("topicLordReply.%d created successfully!\n", i)
+	}
+}
+
+func GetUserReplyListTest() {
+	replies, err := GetUserReplyList("33", "0", "4")
+	if err != nil {
+		fmt.Println(err)
+	}
+	for _, reply := range replies {
+		fmt.Println(reply)
 	}
 }
 

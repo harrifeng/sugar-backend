@@ -41,17 +41,10 @@ type UserPrivacySetting struct {
 	ShowJob         bool
 }
 
-type ArticleLabel struct {
-	gorm.Model
-	Value    string
-	Articles []*Article `gorm:"many2many:articles_to_labels;"`
-}
-
 type Article struct {
 	gorm.Model
-	Title           string          `gorm:"not null"`
-	Content         string          `gorm:"not null;type:text;"`
-	Labels          []*ArticleLabel `gorm:"many2many:articles_to_labels;"`
+	Title           string `gorm:"not null"`
+	Content         string `gorm:"not null;type:text;"`
 	CoverImageUrl   string
 	ReadCount       int `gorm:"not null;default:'0'"`
 	ArticleComments []ArticleComment
@@ -70,7 +63,7 @@ type Topic struct {
 	gorm.Model
 	Content       string `gorm:"not null;type:text"`
 	User          User
-	PictureUrls   string
+	UserID        int
 	ThumbsUpCount int `gorm:"not null;default:'0'"`
 	LordReplies   []TopicLordReply
 }
@@ -79,7 +72,7 @@ type TopicLordReply struct {
 	gorm.Model
 	Content       string `gorm:"not null;type:text"`
 	User          User
-	PictureUrls   string
+	UserID        int
 	ThumbsUpCount int `gorm:"not null;default:'0'"`
 	TopicID       uint
 	LayerReplies  []TopicLayerReply
@@ -89,6 +82,15 @@ type TopicLayerReply struct {
 	gorm.Model
 	Content          string `gorm:"not null;type:text"`
 	User             User
+	UserID           int
 	ThumbsUpCount    int `gorm:"not null;default:'0'"`
+	TopicLordReplyID uint
+}
+
+type UserReply struct {
+	Content          string
+	UserId           int
+	ThumbsUpCount    int
+	TopicID          uint
 	TopicLordReplyID uint
 }

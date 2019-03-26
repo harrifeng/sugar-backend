@@ -3,6 +3,7 @@ package main
 import (
 	"db"
 	"fmt"
+	"server"
 )
 
 func main() {
@@ -31,5 +32,5 @@ func main() {
 
 	}()
 	//server.Start()
-	//server.DatabaseTest()
+	server.DatabaseTest()
 }
