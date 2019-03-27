@@ -270,13 +270,12 @@ func getUserFollowingList(SessionId string, BeginId string, NeedNumber string) r
 		return responseInternalServerError(err)
 	}
 	users, err := db.GetUserFollowingList(userId, BeginId, NeedNumber)
-	respUsers := make([]responseSimpleUser, len(users))
+	respUsers := make([]gin.H, len(users))
 	for i := 0; i < len(users); i++ {
-		fmt.Println(users[i])
-		respUsers[i] = responseSimpleUser{
-			followId: users[i].ID,
-			username: users[i].UserName,
-			iconUrl:  users[i].HeadPortraitUrl,
+		respUsers[i] = gin.H{
+			"followId": users[i].ID,
+			"username": users[i].UserName,
+			"iconUrl":  users[i].HeadPortraitUrl,
 		}
 	}
 	return responseOKWithData(gin.H{
@@ -285,15 +284,32 @@ func getUserFollowingList(SessionId string, BeginId string, NeedNumber string) r
 }
 
 func getUserFollowerList(SessionId string, BeginId string, NeedNumber string) responseBody {
-	//userId,err:=db.GetNowSessionId(SessionId)
-	//if err!=nil{
-	//	return responseInternalServerError(err)
-	//}
-
-	return responseBody{}
+	if SessionId == "" {
+		return responseNormalError("请先登录")
+	}
+	userId, err := db.GetNowSessionId(SessionId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	users, err := db.GetUserFollowerList(userId, BeginId, NeedNumber)
+	respUsers := make([]gin.H, len(users))
+	for i := 0; i < len(users); i++ {
+		respUsers[i] = gin.H{
+			"followId": users[i].ID,
+			"username": users[i].UserName,
+			"iconUrl":  users[i].HeadPortraitUrl,
+		}
+	}
+	fmt.Println(respUsers)
+	return responseOKWithData(gin.H{
+		"data": respUsers,
+	})
 }
 
 func logoutUser(SessionId string) responseBody {
+	if SessionId == "" {
+		return responseNormalError("请先登录")
+	}
 	err := db.RemoveSessionId(SessionId)
 	if err != nil {
 		return responseInternalServerError(err)

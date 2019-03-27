@@ -50,6 +50,6 @@ func initRouter() {
 
 	// school start
 	r.GET("/school/article", schoolGetArticle)
-	r.GET("/school/articles")
+	r.GET("/school/articles", schoolGetArticleList)
 	// school end
 }
