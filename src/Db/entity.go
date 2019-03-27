@@ -56,6 +56,7 @@ type ArticleComment struct {
 	ThumbsUpCount int    `gorm:"not null;default:'0'"`
 	User          User
 	UserID        int
+	Article       Article
 	ArticleID     int
 }
 

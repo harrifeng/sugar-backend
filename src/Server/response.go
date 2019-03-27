@@ -36,11 +36,12 @@ func responseNormalError(errorMessage string) responseBody {
 }
 
 func responseOKWithData(data interface{}) responseBody {
-	dataMap := data.(gin.H)
-	dataMap["code"] = 0
 	return responseBody{
 		Status: http.StatusOK,
-		Data:   dataMap,
+		Data: gin.H{
+			"code": 0,
+			"data": data,
+		},
 	}
 }
 

@@ -2,6 +2,8 @@ package server
 
 import (
 	"github.com/gin-gonic/gin"
+	"html/template"
+	"net/http"
 	"strconv"
 )
 
@@ -127,8 +129,15 @@ func schoolGetArticle(c *gin.Context) {
 }
 
 func schoolGetArticlePage(c *gin.Context) {
-	//ArticleId:=c.Query("article_id")
-
+	ArticleId := c.Param("id")
+	content, err := getArticlePage(ArticleId)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.HTML(http.StatusOK, "article.tmpl", gin.H{
+		"content": template.HTML(content),
+	})
 }
 
 func schoolGetArticleList(c *gin.Context) {
@@ -136,5 +145,61 @@ func schoolGetArticleList(c *gin.Context) {
 	BeginId := c.Query("begin_id")
 	NeedNumber := c.Query("need_number")
 	resp := getArticleList(SessionId, BeginId, NeedNumber)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func schoolPublishArticleComment(c *gin.Context) {
+	SessionId := c.PostForm("session_id")
+	ArticleId := c.Param("id")
+	Content := c.PostForm("content")
+	resp := createArticleComment(SessionId, ArticleId, Content)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func schoolGetArticleCommentList(c *gin.Context) {
+	SessionId := c.Query("session_id")
+	ArticleId := c.Param("id")
+	BeginId := c.Query("begin_id")
+	NeedNumber := c.Query("need_number")
+	resp := getArticleCommentList(SessionId, ArticleId, BeginId, NeedNumber)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func schoolSearchArticle(c *gin.Context) {
+	SessionId := c.Query("session_id")
+	SearchContent := c.Query("content")
+	BeginId := c.Query("begin_id")
+	NeedNumber := c.Query("need_number")
+	resp := getSearchArticleList(SessionId, SearchContent, BeginId, NeedNumber)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func schoolGetUserCollectedArticleList(c *gin.Context) {
+	SessionId := c.Query("session_id")
+	BeginId := c.Query("begin_id")
+	NeedNumber := c.Query("need_number")
+	resp := getUserCollectedArticleList(SessionId, BeginId, NeedNumber)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func schoolGetUserArticleCommentList(c *gin.Context) {
+	SessionId := c.Query("session_id")
+	BeginId := c.Query("begin_id")
+	NeedNumber := c.Query("need_number")
+	resp := getUserArticleCommentList(SessionId, BeginId, NeedNumber)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func schoolCollectArticle(c *gin.Context) {
+	SessionId := c.PostForm("session_id")
+	ArticleId := c.PostForm("article_id")
+	resp := addCollectedArticle(SessionId, ArticleId)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func schoolCancelCollectArticle(c *gin.Context) {
+	SessionId := c.PostForm("session_id")
+	ArticleId := c.PostForm("article_id")
+	resp := removeCollectedArticle(SessionId, ArticleId)
 	c.JSON(resp.Status, resp.Data)
 }

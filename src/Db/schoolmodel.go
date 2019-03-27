@@ -54,7 +54,8 @@ func GetArticleCommentListFromArticleId(ArticleId string, BeginId string, NeedNu
 	articleId, _ := strconv.Atoi(ArticleId)
 	beginId, _ := strconv.Atoi(BeginId)
 	needNumber, _ := strconv.Atoi(NeedNumber)
-	err := mysqlDb.Where(&ArticleComment{ArticleID: articleId}).Offset(beginId).Limit(needNumber).Find(&comments).Error
+	err := mysqlDb.Preload("User").Where(&ArticleComment{ArticleID: articleId}).
+		Offset(beginId).Limit(needNumber).Find(&comments).Error
 	return comments, err
 }
 
@@ -63,7 +64,7 @@ func GetArticleCommentListFromUserId(UserId string, BeginId string, NeedNumber s
 	userId, _ := strconv.Atoi(UserId)
 	beginId, _ := strconv.Atoi(BeginId)
 	needNumber, _ := strconv.Atoi(NeedNumber)
-	err := mysqlDb.Where(&ArticleComment{UserID: userId}).Offset(beginId).Limit(needNumber).Find(&comments).Error
+	err := mysqlDb.Preload("Article").Where(&ArticleComment{UserID: userId}).Offset(beginId).Limit(needNumber).Find(&comments).Error
 	return comments, err
 }
 
@@ -112,4 +113,20 @@ func GetUserCollectedArticleList(UserId string, BeginId string, NeedNumber strin
 	needNumber, _ := strconv.Atoi(NeedNumber)
 	err = mysqlDb.Model(&user).Offset(beginId).Limit(needNumber).Related(&articles, "CollectedArticles").Error
 	return articles, err
+}
+
+func GetUserCollectedArticleCount(UserId string) (int, error) {
+	user, err := GetUserFromUserId(UserId)
+	if err != nil {
+		return 0, err
+	}
+	count := mysqlDb.Model(&user).Association("CollectedArticles").Count()
+	return count, nil
+}
+
+func GetUserArticleCommentCount(UserId string) (int, error) {
+	userId, _ := strconv.Atoi(UserId)
+	var count int
+	err := mysqlDb.Model(&ArticleComment{}).Where(&ArticleComment{UserID: userId}).Count(&count).Error
+	return count, err
 }

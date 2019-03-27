@@ -16,16 +16,7 @@ func urlsRoot(c *gin.Context) {
 }
 
 func initRouter() {
-	if gin.Mode() == "debug" {
-		//test start
-		r.GET("/test/db/init", initDb)
-		r.GET("/test/db/create", createNewTestUser)
-		r.GET("/test/db/article/init", initArticle)
-		//test url end
-	}
-
 	r.GET("/", urlsRoot)
-
 	// account start
 	r.GET("/accounts/code", accountSendVerificationCode)
 	r.POST("/accounts/create", accountRegister)
@@ -49,7 +40,15 @@ func initRouter() {
 	// bbs end
 
 	// school start
+	r.GET("/school/article/:id", schoolGetArticlePage)
 	r.GET("/school/article", schoolGetArticle)
 	r.GET("/school/articles", schoolGetArticleList)
+	r.POST("/school/article/:id/comment", schoolPublishArticleComment)
+	r.GET("/school/article/:id/comments", schoolGetArticleCommentList)
+	r.GET("/school/articles/search", schoolSearchArticle)
+	r.GET("/school/articles/user-collected", schoolGetUserCollectedArticleList)
+	r.GET("/school/articles/user-comments", schoolGetUserArticleCommentList)
+	r.POST("/school/articles/user-collect", schoolCollectArticle)
+	r.POST("/school/articles/user-cancel-collect", schoolCancelCollectArticle)
 	// school end
 }

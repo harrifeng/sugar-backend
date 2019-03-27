@@ -278,9 +278,7 @@ func getUserFollowingList(SessionId string, BeginId string, NeedNumber string) r
 			"iconUrl":  users[i].HeadPortraitUrl,
 		}
 	}
-	return responseOKWithData(gin.H{
-		"data": respUsers,
-	})
+	return responseOKWithData(respUsers)
 }
 
 func getUserFollowerList(SessionId string, BeginId string, NeedNumber string) responseBody {
@@ -301,9 +299,7 @@ func getUserFollowerList(SessionId string, BeginId string, NeedNumber string) re
 		}
 	}
 	fmt.Println(respUsers)
-	return responseOKWithData(gin.H{
-		"data": respUsers,
-	})
+	return responseOKWithData(respUsers)
 }
 
 func logoutUser(SessionId string) responseBody {
