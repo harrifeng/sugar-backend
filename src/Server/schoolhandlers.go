@@ -1,15 +1,11 @@
 package server
 
-import (
-	"db"
-)
-
 func getArticle(SessionId string, ArticleId string) responseBody {
-	Article, err := db.GetArticleFromArticleId(ArticleId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	return responseOKWithHtml(Article.Content)
+	//Article, err := db.GetArticleFromArticleId(ArticleId)
+	//if err != nil {
+	//	return responseInternalServerError(err)
+	//}
+	return responseBody{}
 }
 
 //func getArticleList(SessionId string,BeginId string,NeedNumber string) responseBody{

@@ -31,8 +31,8 @@ func AddTopicLordReply(UserId string, TopicId string, Content string) error {
 	var topicTmp Topic
 	topicId, _ := strconv.Atoi(TopicId)
 	mysqlDb.First(&topicTmp, topicId)
-	mysqlDb.Model(&topicTmp).Association("LordReplies").Append(topicLordReply)
-	return nil
+	err = mysqlDb.Model(&topicTmp).Association("LordReplies").Append(topicLordReply).Error
+	return err
 }
 
 func AddTopicLayerReply(UserId string, TopicLordReplyId string, Content string) error {
@@ -47,22 +47,22 @@ func AddTopicLayerReply(UserId string, TopicLordReplyId string, Content string) 
 	var topicLordReplyTmp TopicLordReply
 	topicLordReplyId, _ := strconv.Atoi(TopicLordReplyId)
 	mysqlDb.First(&topicLordReplyTmp, topicLordReplyId)
-	mysqlDb.Model(&topicLordReplyTmp).Association("LayerReplies").Append(topicLayerReply)
-	return nil
+	err = mysqlDb.Model(&topicLordReplyTmp).Association("LayerReplies").Append(topicLayerReply).Error
+	return err
 }
 
 func GetTopicFromTopicId(TopicId string) (Topic, error) {
 	var topic Topic
 	topicId, _ := strconv.Atoi(TopicId)
-	mysqlDb.First(&topic, topicId)
-	return topic, nil
+	err := mysqlDb.First(&topic, topicId).Error
+	return topic, err
 }
 
 func GetTopicLordReplyFromTopicLordReplyId(TopicLordReplyId string) (TopicLordReply, error) {
 	var topicLordReply TopicLordReply
 	topicLordReplyId, _ := strconv.Atoi(TopicLordReplyId)
-	mysqlDb.First(&topicLordReply, topicLordReplyId)
-	return topicLordReply, nil
+	err := mysqlDb.First(&topicLordReply, topicLordReplyId).Error
+	return topicLordReply, err
 }
 
 func GetTopicLordReplyFromTopicId(TopicId string, BeginId string, NeedNumber string) ([]TopicLordReply, error) {
@@ -73,8 +73,9 @@ func GetTopicLordReplyFromTopicId(TopicId string, BeginId string, NeedNumber str
 	}
 	beginId, _ := strconv.Atoi(BeginId)
 	needNumber, _ := strconv.Atoi(NeedNumber)
-	mysqlDb.Model(&topic).Offset(beginId).Limit(needNumber).Related(&topicLordReplies, "LordReplies")
-	return topicLordReplies, nil
+	err = mysqlDb.Model(&topic).Offset(beginId).Limit(needNumber).
+		Related(&topicLordReplies, "LordReplies").Error
+	return topicLordReplies, err
 }
 
 func GetTopicLayerReplyFromTopicLordReplyId(TopicLordReplyId string, BeginId string, NeedNumber string) ([]TopicLayerReply, error) {
@@ -85,8 +86,9 @@ func GetTopicLayerReplyFromTopicLordReplyId(TopicLordReplyId string, BeginId str
 	}
 	beginId, _ := strconv.Atoi(BeginId)
 	needNumber, _ := strconv.Atoi(NeedNumber)
-	mysqlDb.Model(&topicLordReply).Offset(beginId).Limit(needNumber).Related(&topicLayerReplies, "LayerReplies")
-	return topicLayerReplies, nil
+	err = mysqlDb.Model(&topicLordReply).Offset(beginId).Limit(needNumber).
+		Related(&topicLayerReplies, "LayerReplies").Error
+	return topicLayerReplies, err
 }
 
 func RemoveTopic(TopicId string) error {
@@ -113,8 +115,8 @@ func AddUserCollectedTopic(UserId string, TopicId string) error {
 	topicId, _ := strconv.Atoi(TopicId)
 	var topic Topic
 	mysqlDb.First(&topic, topicId)
-	mysqlDb.Model(&user).Association("CollectedTopics").Append(topic)
-	return nil
+	err = mysqlDb.Model(&user).Association("CollectedTopics").Append(topic).Error
+	return err
 }
 
 func RemoveUserCollectedTopic(UserId string, TopicId string) error {
@@ -125,17 +127,17 @@ func RemoveUserCollectedTopic(UserId string, TopicId string) error {
 	topicId, _ := strconv.Atoi(TopicId)
 	var topic Topic
 	mysqlDb.First(&topic, topicId)
-	mysqlDb.Model(&user).Association("CollectedTopics").Delete(topic)
-	return nil
+	err = mysqlDb.Model(&user).Association("CollectedTopics").Delete(topic).Error
+	return err
 }
 
 func GetSearchTopicList(SearchContent string, BeginId string, NeedNumber string) ([]Topic, error) {
 	var topics []Topic
 	beginId, _ := strconv.Atoi(BeginId)
 	needNumber, _ := strconv.Atoi(NeedNumber)
-	mysqlDb.Where("title LIKE ?",
-		fmt.Sprintf("%%%s%%", SearchContent)).Offset(beginId).Limit(needNumber).Find(&topics)
-	return topics, nil
+	err := mysqlDb.Where("title LIKE ?",
+		fmt.Sprintf("%%%s%%", SearchContent)).Offset(beginId).Limit(needNumber).Find(&topics).Error
+	return topics, err
 }
 
 func GetUserCollectedTopicList(UserId string, BeginId string, NeedNumber string) ([]Topic, error) {
@@ -146,8 +148,8 @@ func GetUserCollectedTopicList(UserId string, BeginId string, NeedNumber string)
 	}
 	beginId, _ := strconv.Atoi(BeginId)
 	needNumber, _ := strconv.Atoi(NeedNumber)
-	mysqlDb.Model(&user).Offset(beginId).Limit(needNumber).Related(&topics, "CollectedTopics")
-	return topics, nil
+	err = mysqlDb.Model(&user).Offset(beginId).Limit(needNumber).Related(&topics, "CollectedTopics").Error
+	return topics, err
 }
 
 func GetUserPublishedTopicList(UserId string, BeginId string, NeedNumber string) ([]Topic, error) {
@@ -155,19 +157,19 @@ func GetUserPublishedTopicList(UserId string, BeginId string, NeedNumber string)
 	userId, _ := strconv.Atoi(UserId)
 	beginId, _ := strconv.Atoi(BeginId)
 	needNumber, _ := strconv.Atoi(NeedNumber)
-	mysqlDb.Where(&Topic{UserID: userId}).Offset(beginId).Limit(needNumber).Find(&topics)
-	return topics, nil
+	err := mysqlDb.Where(&Topic{UserID: userId}).Offset(beginId).Limit(needNumber).Find(&topics).Error
+	return topics, err
 }
 
 func GetUserReplyList(UserId string, BeginId string, NeedNumber string) ([]UserReply, error) {
 	var replies []UserReply
 	beginId, _ := strconv.Atoi(BeginId)
 	needNumber, _ := strconv.Atoi(NeedNumber)
-	mysqlDb.Raw(
+	err := mysqlDb.Raw(
 		`(select content,user_id,thumbs_up_count,topic_id,NULL as topic_lord_reply_id from topic_lord_replies
 	where user_id=?)
 	union all
 	(select content,user_id,thumbs_up_count,NULL as topic_id,topic_lord_reply_id from topic_layer_replies
-		where user_id=?)`, UserId, UserId).Offset(beginId).Limit(needNumber).Scan(&replies)
-	return replies, nil
+		where user_id=?)`, UserId, UserId).Offset(beginId).Limit(needNumber).Scan(&replies).Error
+	return replies, err
 }

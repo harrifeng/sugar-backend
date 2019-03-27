@@ -24,6 +24,7 @@ func InitRedis() *redis.Pool {
 		IdleTimeout: 240 * time.Second,
 		Dial:        func() (redis.Conn, error) { return redis.Dial("tcp", RedisHost) },
 	}
+
 	return redisPool
 }
 

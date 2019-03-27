@@ -29,8 +29,8 @@ func GetArticleList(BeginId string, NeedNumber string) ([]Article, error) {
 	var articles []Article
 	beginId, _ := strconv.Atoi(BeginId)
 	needNumber, _ := strconv.Atoi(NeedNumber)
-	mysqlDb.Offset(beginId).Limit(needNumber).Find(&articles)
-	return articles, nil
+	err := mysqlDb.Offset(beginId).Limit(needNumber).Find(&articles).Error
+	return articles, err
 }
 
 func AddArticleComment(UserId string, ArticleId string, Content string) error {
@@ -45,8 +45,8 @@ func AddArticleComment(UserId string, ArticleId string, Content string) error {
 	var articleTmp Article
 	articleId, _ := strconv.Atoi(ArticleId)
 	mysqlDb.First(&articleTmp, articleId)
-	mysqlDb.Model(&articleTmp).Association("ArticleComments").Append(articleComment)
-	return nil
+	err = mysqlDb.Model(&articleTmp).Association("ArticleComments").Append(articleComment).Error
+	return err
 }
 
 func GetArticleCommentListFromArticleId(ArticleId string, BeginId string, NeedNumber string) ([]ArticleComment, error) {
@@ -54,8 +54,8 @@ func GetArticleCommentListFromArticleId(ArticleId string, BeginId string, NeedNu
 	articleId, _ := strconv.Atoi(ArticleId)
 	beginId, _ := strconv.Atoi(BeginId)
 	needNumber, _ := strconv.Atoi(NeedNumber)
-	mysqlDb.Where(&ArticleComment{ArticleID: articleId}).Offset(beginId).Limit(needNumber).Find(&comments)
-	return comments, nil
+	err := mysqlDb.Where(&ArticleComment{ArticleID: articleId}).Offset(beginId).Limit(needNumber).Find(&comments).Error
+	return comments, err
 }
 
 func GetArticleCommentListFromUserId(UserId string, BeginId string, NeedNumber string) ([]ArticleComment, error) {
@@ -63,17 +63,17 @@ func GetArticleCommentListFromUserId(UserId string, BeginId string, NeedNumber s
 	userId, _ := strconv.Atoi(UserId)
 	beginId, _ := strconv.Atoi(BeginId)
 	needNumber, _ := strconv.Atoi(NeedNumber)
-	mysqlDb.Where(&ArticleComment{UserID: userId}).Offset(beginId).Limit(needNumber).Find(&comments)
-	return comments, nil
+	err := mysqlDb.Where(&ArticleComment{UserID: userId}).Offset(beginId).Limit(needNumber).Find(&comments).Error
+	return comments, err
 }
 
 func GetSearchArticleList(SearchContent string, BeginId string, NeedNumber string) ([]Article, error) {
 	var articles []Article
 	beginId, _ := strconv.Atoi(BeginId)
 	needNumber, _ := strconv.Atoi(NeedNumber)
-	mysqlDb.Where("title LIKE ?",
-		fmt.Sprintf("%%%s%%", SearchContent)).Offset(beginId).Limit(needNumber).Find(&articles)
-	return articles, nil
+	err := mysqlDb.Where("title LIKE ?",
+		fmt.Sprintf("%%%s%%", SearchContent)).Offset(beginId).Limit(needNumber).Find(&articles).Error
+	return articles, err
 }
 
 func AddUserCollectedArticle(UserId string, ArticleId string) error {
@@ -85,8 +85,8 @@ func AddUserCollectedArticle(UserId string, ArticleId string) error {
 	if err != nil {
 		return err
 	}
-	mysqlDb.Model(&user).Association("CollectedArticles").Append(article)
-	return nil
+	err = mysqlDb.Model(&user).Association("CollectedArticles").Append(article).Error
+	return err
 }
 
 func RemoveUserCollectedArticle(UserId string, ArticleId string) error {
@@ -98,8 +98,8 @@ func RemoveUserCollectedArticle(UserId string, ArticleId string) error {
 	if err != nil {
 		return err
 	}
-	mysqlDb.Model(&user).Association("CollectedArticles").Delete(article)
-	return nil
+	err = mysqlDb.Model(&user).Association("CollectedArticles").Delete(article).Error
+	return err
 }
 
 func GetUserCollectedArticleList(UserId string, BeginId string, NeedNumber string) ([]Article, error) {
@@ -110,6 +110,6 @@ func GetUserCollectedArticleList(UserId string, BeginId string, NeedNumber strin
 	}
 	beginId, _ := strconv.Atoi(BeginId)
 	needNumber, _ := strconv.Atoi(NeedNumber)
-	mysqlDb.Model(&user).Offset(beginId).Limit(needNumber).Related(&articles, "CollectedArticles")
-	return articles, nil
+	err = mysqlDb.Model(&user).Offset(beginId).Limit(needNumber).Related(&articles, "CollectedArticles").Error
+	return articles, err
 }

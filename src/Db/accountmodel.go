@@ -51,8 +51,8 @@ func GetPrivacySettingFromUserId(UserId string) (UserPrivacySetting, error) {
 		return UserPrivacySetting{}, err
 	}
 	var privacySetting UserPrivacySetting
-	mysqlDb.Model(&user).Association("UserPrivacySetting").Find(&privacySetting)
-	return privacySetting, nil
+	err = mysqlDb.Model(&user).Association("UserPrivacySetting").Find(&privacySetting).Error
+	return privacySetting, err
 }
 
 func AlterUserPrivacySettingFromUserId(UserId string, ShowPhoneNumber bool, ShowGender bool,
@@ -62,7 +62,10 @@ func AlterUserPrivacySettingFromUserId(UserId string, ShowPhoneNumber bool, Show
 		return err
 	}
 	var privacySetting UserPrivacySetting
-	mysqlDb.Model(&user).Association("UserPrivacySetting").Find(&privacySetting)
+	err = mysqlDb.Model(&user).Association("UserPrivacySetting").Find(&privacySetting).Error
+	if err != nil {
+		return err
+	}
 	privacySetting.ShowPhoneNumber = ShowPhoneNumber
 	privacySetting.ShowGender = ShowGender
 	privacySetting.ShowAge = ShowAge
@@ -70,8 +73,8 @@ func AlterUserPrivacySettingFromUserId(UserId string, ShowPhoneNumber bool, Show
 	privacySetting.ShowWeight = ShowWeight
 	privacySetting.ShowArea = ShowArea
 	privacySetting.ShowJob = ShowJob
-	mysqlDb.Model(&user).Association("UserPrivacySetting").Replace(&privacySetting)
-	return nil
+	err = mysqlDb.Model(&user).Association("UserPrivacySetting").Replace(&privacySetting).Error
+	return err
 }
 
 func AlterUserPasswordFromPhoneNumber(PhoneNumber string, NewPassword string) error {
@@ -81,8 +84,8 @@ func AlterUserPasswordFromPhoneNumber(PhoneNumber string, NewPassword string) er
 		return err
 	}
 	user.Password = NewPassword
-	mysqlDb.Save(&user)
-	return nil
+	err = mysqlDb.Save(&user).Error
+	return err
 }
 
 func AlterUserInformationFromUserId(UserId string, UserName string, Gender string, Height float64,
@@ -100,8 +103,8 @@ func AlterUserInformationFromUserId(UserId string, UserName string, Gender strin
 	user.Area = Area
 	user.Job = Job
 	user.Age = Age
-	mysqlDb.Save(&user)
-	return nil
+	err = mysqlDb.Save(&user).Error
+	return err
 }
 
 func AddUserFollowing(UserId string, TargetUserId string) error {
@@ -120,26 +123,28 @@ func AddUserFollowing(UserId string, TargetUserId string) error {
 		return err
 	}
 	tx.Model(&user2).Association("FollowerUsers").Append(&user2To)
-	tx.Commit()
-	return nil
+	err = tx.Commit().Error
+	return err
 }
 
 func RemoveUserFollowing(UserId string, TargetUserId string) error {
-	var user User
-	mysqlDb.Preload("FollowingUsers").First(&user, UserId)
-	userTo, err := GetUserFromUserId(TargetUserId)
+	var user1, user2 User
+	tx := mysqlDb.Begin()
+	tx.Preload("FollowingUsers").First(&user1, UserId)
+	user1To, err := GetUserFromUserId(TargetUserId)
 	if err != nil {
 		return err
 	}
-	mysqlDb.Model(&user).Association("FollowingUsers").Delete(&userTo)
+	tx.Model(&user1).Association("FollowingUsers").Delete(&user1To)
 
-	mysqlDb.Preload("FollowerUsers").First(&user, TargetUserId)
-	userTo, err = GetUserFromUserId(UserId)
+	tx.Preload("FollowerUsers").First(&user2, TargetUserId)
+	user2To, err := GetUserFromUserId(UserId)
 	if err != nil {
 		return err
 	}
-	mysqlDb.Model(&user).Association("FollowerUsers").Delete(&userTo)
-	return nil
+	tx.Model(&user2).Association("FollowerUsers").Delete(&user2To)
+	err = tx.Commit().Error
+	return err
 }
 
 func GetUserFollowerList(UserId string, BeginId string, NeedNumber string) ([]User, error) {
@@ -148,8 +153,8 @@ func GetUserFollowerList(UserId string, BeginId string, NeedNumber string) ([]Us
 	var users []User
 	beginId, _ := strconv.Atoi(BeginId)
 	needNumber, _ := strconv.Atoi(NeedNumber)
-	mysqlDb.Model(&user).Offset(beginId).Limit(needNumber).Related(&users, "FollowerUsers")
-	return users, nil
+	err := mysqlDb.Model(&user).Offset(beginId).Limit(needNumber).Related(&users, "FollowerUsers").Error
+	return users, err
 }
 
 func GetUserFollowingList(UserId string, BeginId string, NeedNumber string) ([]User, error) {
@@ -158,6 +163,6 @@ func GetUserFollowingList(UserId string, BeginId string, NeedNumber string) ([]U
 	var users []User
 	beginId, _ := strconv.Atoi(BeginId)
 	needNumber, _ := strconv.Atoi(NeedNumber)
-	mysqlDb.Model(&user).Offset(beginId).Limit(needNumber).Related(&users, "FollowingUsers")
-	return users, nil
+	err := mysqlDb.Model(&user).Offset(beginId).Limit(needNumber).Related(&users, "FollowingUsers").Error
+	return users, err
 }

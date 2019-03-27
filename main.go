@@ -31,6 +31,6 @@ func main() {
 		}
 
 	}()
-	//server.Start()
-	server.DatabaseTest()
+	server.Start()
+	//server.DatabaseTest()
 }

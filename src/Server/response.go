@@ -5,6 +5,12 @@ import (
 	"net/http"
 )
 
+type responseSimpleUser struct {
+	followId uint
+	username string
+	iconUrl  string
+}
+
 type responseBody struct {
 	Status int
 	Data   interface{}
@@ -35,13 +41,6 @@ func responseOKWithData(data interface{}) responseBody {
 	return responseBody{
 		Status: http.StatusOK,
 		Data:   dataMap,
-	}
-}
-
-func responseOKWithHtml(data string) responseBody {
-	return responseBody{
-		Status: http.StatusOK,
-		Data:   data,
 	}
 }
 
