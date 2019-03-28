@@ -117,10 +117,6 @@ func accountIgnoreUser(c *gin.Context) {
 	c.JSON(resp.Status, resp.Data)
 }
 
-func bbsPublishTopic(c *gin.Context) {
-
-}
-
 func schoolGetArticle(c *gin.Context) {
 	SessionId := c.Query("session_id")
 	ArticleId := c.Query("article_id")
@@ -201,5 +197,50 @@ func schoolCancelCollectArticle(c *gin.Context) {
 	SessionId := c.PostForm("session_id")
 	ArticleId := c.PostForm("article_id")
 	resp := removeCollectedArticle(SessionId, ArticleId)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func bbsPublishTopic(c *gin.Context) {
+	SessionId := c.PostForm("session_id")
+	Content := c.PostForm("content")
+	resp := publishTopic(SessionId, Content)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func bbsPublishTopicLordReply(c *gin.Context) {
+	SessionId := c.PostForm("session_id")
+	TopicId := c.PostForm("topic_id")
+	Content := c.PostForm("content")
+	resp := publishTopicLordReply(SessionId, TopicId, Content)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func bbsPublishTopicLayerReply(c *gin.Context) {
+	SessionId := c.PostForm("session_id")
+	TopicLordReplyId := c.PostForm("topic_lord_reply_id")
+	Content := c.PostForm("content")
+	resp := publishTopicLayerReply(SessionId, TopicLordReplyId, Content)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func bbsRemoveTopic(c *gin.Context) {
+	SessionId := c.PostForm("session_id")
+	TopicId := c.PostForm("topic_id")
+	resp := removeTopic(SessionId, TopicId)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func bbsRemoveTopicLordReply(c *gin.Context) {
+	SessionId := c.PostForm("session_id")
+	TopicLordReplyId := c.PostForm("topic_lord_reply_id")
+	resp := removeTopicLordReply(SessionId, TopicLordReplyId)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func bbsGetLatestTopicList(c *gin.Context) {
+	SessionId := c.PostForm("session_id")
+	TopicList := c.PostForm("topic_id_list")
+	NeedNumber := c.PostForm("need_number")
+	resp := getLatestTopicList(SessionId, TopicList, NeedNumber)
 	c.JSON(resp.Status, resp.Data)
 }

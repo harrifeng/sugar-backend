@@ -110,6 +110,11 @@ func AlterUserInformationFromUserId(UserId string, UserName string, Gender strin
 func AddUserFollowing(UserId string, TargetUserId string) error {
 	var user1, user2 User
 	tx := mysqlDb.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
 	tx.Preload("FollowingUsers").First(&user1, UserId)
 	user1To, err := GetUserFromUserId(TargetUserId)
 	if err != nil {
@@ -123,13 +128,17 @@ func AddUserFollowing(UserId string, TargetUserId string) error {
 		return err
 	}
 	tx.Model(&user2).Association("FollowerUsers").Append(&user2To)
-	err = tx.Commit().Error
-	return err
+	return tx.Commit().Error
 }
 
 func RemoveUserFollowing(UserId string, TargetUserId string) error {
 	var user1, user2 User
 	tx := mysqlDb.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
 	tx.Preload("FollowingUsers").First(&user1, UserId)
 	user1To, err := GetUserFromUserId(TargetUserId)
 	if err != nil {

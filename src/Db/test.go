@@ -38,14 +38,16 @@ func InitAllArticle() {
 }
 
 func InitUser() {
-	for i := 0; i < 100; i++ {
+	for i := 1; i <= 100; i++ {
 		_ = CreateNewUser(utils.RandPhoneNumber(), "0c152176187ce61c9614c072e1a1e2f7")
+		_ = AlterUserInformationFromUserId(strconv.Itoa(i), utils.RandUserName(),
+			utils.RandGender(), 0, 0, "", "", 15)
 		fmt.Printf("user.%d created successfully!\n ", i)
 	}
 }
 
 func IninArticleComment() {
-	for i := 0; i <= 1000; i++ {
+	for i := 1; i <= 1000; i++ {
 		userId := rand.Intn(10) + 1
 		articleId := rand.Intn(100) + 1
 		_ = AddArticleComment(strconv.Itoa(userId), strconv.Itoa(articleId), utils.RandWords())

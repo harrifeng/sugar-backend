@@ -4,6 +4,7 @@ import (
 	"db"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"utils"
 )
 
 //WARNING
@@ -53,7 +54,7 @@ func getArticleList(SessionId string, BeginId string, NeedNumber string) respons
 		respArticles[i] = gin.H{
 			"articleId":   articles[i].ID,
 			"title":       articles[i].Title,
-			"content":     articles[i].Content[:40],
+			"content":     utils.StringCut(articles[i].Content, 40),
 			"articleTime": articles[i].CreatedAt,
 			"imgUrl":      articles[i].CoverImageUrl,
 			"views":       articles[i].ReadCount,
@@ -130,7 +131,7 @@ func getSearchArticleList(SessionId string, SearchContent string, BeginId string
 		respArticles[i] = gin.H{
 			"articleId":   articles[i].ID,
 			"title":       articles[i].Title,
-			"content":     articles[i].Content[:40],
+			"content":     utils.StringCut(articles[i].Content, 40),
 			"articleTime": articles[i].CreatedAt,
 			"imgUrl":      articles[i].CoverImageUrl,
 			"views":       articles[i].ReadCount,
@@ -163,7 +164,7 @@ func getUserCollectedArticleList(SessionId string, BeginId string, NeedNumber st
 		respArticles[i] = gin.H{
 			"articleId": articles[i].ID,
 			"title":     articles[i].Title,
-			"content":   articles[i].Content[:40],
+			"content":   utils.StringCut(articles[i].Content, 40),
 		}
 	}
 	return responseOKWithData(gin.H{

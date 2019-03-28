@@ -34,9 +34,12 @@ func initRouter() {
 	// account end
 
 	// bbs start
-	r.POST("/bbs/topic/publish")
-	r.POST("/bbs/topic/lord-reply/publish")
-	r.POST("/bbs/topic/layer-reply/publish")
+	r.POST("/bbs/topic/publish", bbsPublishTopic)
+	r.POST("/bbs/topic/lord-reply/publish", bbsPublishTopicLordReply)
+	r.POST("/bbs/topic/layer-reply/publish", bbsPublishTopicLayerReply)
+	r.POST("/bbs/topic/remove", bbsRemoveTopic)
+	r.POST("/bbs/topic/lord-reply/remove", bbsRemoveTopicLordReply)
+	r.POST("/bbs/topics", bbsGetLatestTopicList)
 	// bbs end
 
 	// school start

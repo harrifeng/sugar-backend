@@ -262,3 +262,15 @@ func RandWords() string {
 	index := rand.Intn(len(textGroups))
 	return textGroups[index]
 }
+
+func RandUserName() string {
+	return RandWords()
+}
+
+func RandGender() string {
+	x := rand.Intn(2)
+	if x == 0 {
+		return "男"
+	}
+	return "女"
+}

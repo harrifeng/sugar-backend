@@ -6,10 +6,10 @@ type User struct {
 	gorm.Model
 
 	// User Basic data
-	UserName    string
+	UserName    string `gorm:"type:text;"`
 	PhoneNumber string `gorm:"unique;not null"`
 	Password    string `gorm:"not null"`
-	Gender      string
+	Gender      string `gorm:"type:text;"`
 	Age         int
 
 	// User Account data
