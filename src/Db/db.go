@@ -10,19 +10,27 @@ import (
 
 var mysqlDb *gorm.DB
 var redisPool *redis.Pool
+var mysqlConfig *MysqlConfiguration
+var redisConfig *RedisConfiguration
 
 func mysqlLinkString() string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		MysqlUserName, MysqlPassword, MysqlHost, MysqlPort, MysqlBbName)
+	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		mysqlConfig.User, mysqlConfig.Password, mysqlConfig.Host, mysqlConfig.Port, mysqlConfig.DatabaseName)
+}
+
+func InitConfiguration(MysqlConfig *MysqlConfiguration, RedisConfig *RedisConfiguration) {
+	mysqlConfig = MysqlConfig
+	redisConfig = RedisConfig
 }
 
 func InitRedis() *redis.Pool {
+	redisHost := fmt.Sprintf("%s:%d", redisConfig.Host, redisConfig.Port)
 	redisPool = &redis.Pool{
 		MaxIdle:     3,
 		MaxActive:   500,
 		Wait:        true,
 		IdleTimeout: 240 * time.Second,
-		Dial:        func() (redis.Conn, error) { return redis.Dial("tcp", RedisHost) },
+		Dial:        func() (redis.Conn, error) { return redis.Dial("tcp", redisHost) },
 	}
 
 	return redisPool

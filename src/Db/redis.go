@@ -107,11 +107,11 @@ func GetNowVerificationCode(PhoneNumber string) (string, error) {
 }
 
 func SetNewVerificationCode(PhoneNumber string, Code string) error {
-	return setKeyToValueLimitTime(phoneNumberToCodeKey(PhoneNumber), Code, VerificationCodeLimitedTime)
+	return setKeyToValueLimitTime(phoneNumberToCodeKey(PhoneNumber), Code, redisConfig.VerificationCodeLimitedTime)
 }
 
 func SetNewSessionId(SessionId string, PhoneNumber string) error {
-	return setKeyToValueLimitTime(SessionIdToSessionIdKey(SessionId), PhoneNumber, SessionIdLimitedTime)
+	return setKeyToValueLimitTime(SessionIdToSessionIdKey(SessionId), PhoneNumber, redisConfig.SessionIdLimitedTime)
 }
 
 func RemoveSessionId(SessionId string) error {
