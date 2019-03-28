@@ -1,6 +1,9 @@
 package db
 
-import "github.com/jinzhu/gorm"
+import (
+	"github.com/jinzhu/gorm"
+	"time"
+)
 
 type User struct {
 	gorm.Model
@@ -20,6 +23,9 @@ type User struct {
 	FollowerUsers        []*User   `gorm:"many2many:user_follower_ships;association_jointable_foreignkey:follower_user_id"`
 	CollectedArticles    []Article `gorm:"many2many:user_collected_article"`
 	CollectedTopics      []Topic   `gorm:"many2many:user_collected_topic"`
+	BloodRecords         []BloodRecord
+	HealthRecords        []HealthRecord
+	FamilyMembers        []FamilyMember
 	UserPrivacySetting   UserPrivacySetting
 	UserPrivacySettingID uint
 
@@ -94,4 +100,30 @@ type UserReply struct {
 	ThumbsUpCount    int
 	TopicID          uint
 	TopicLordReplyID uint
+}
+
+type BloodRecord struct {
+	Level      string
+	RecordTime string
+	RecordDate time.Time `gorm:"type:date;"`
+	User       User
+	UserID     uint
+}
+
+type HealthRecord struct {
+	Insulin       string
+	SportTime     string
+	Weight        string
+	BloodPressure string
+	RecordTime    string
+	RecordDate    time.Time `gorm:"type:date;"`
+	User          User
+	UserID        uint
+}
+
+type FamilyMember struct {
+	PhoneNumber string
+	Call        string
+	User        User
+	UserID      uint
 }
