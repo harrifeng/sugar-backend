@@ -136,3 +136,46 @@ func getLatestTopicList(SessionId string, TopicListString string, NeedNumber str
 	}
 	return responseOKWithData(respTopics)
 }
+
+func getTopic(SessionId string, TopicId string) responseBody {
+	if SessionId == "" {
+		return responseNormalError("请先登录")
+	}
+	userId, err := db.GetNowSessionId(SessionId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	if userId == "" {
+		return responseNormalError("请先登录")
+	}
+	topic, err := db.GetTopicFromTopicId(TopicId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	collected, err := db.CheckUserCollectedTopic(userId, TopicId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	return responseOKWithData(gin.H{
+		"userId":    topic.UserID,
+		"username":  topic.User.UserName,
+		"iconUrl":   topic.User.HeadPortraitUrl,
+		"topicTime": topic.CreatedAt,
+		"favorite":  collected,
+		"likes":     topic.ThumbsUpCount,
+		"content":   topic.Content,
+	})
+}
+
+func getTopicLordReplyList(SessionId string, TopicId string, BeginFloor string, NeedNumber string) responseBody {
+	if SessionId == "" {
+		return responseNormalError("请先登录")
+	}
+	userId, err := db.GetNowSessionId(SessionId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	if userId == "" {
+		return responseNormalError("请先登录")
+	}
+}

@@ -240,3 +240,15 @@ func GetTopicReplyCount(TopicId string) (int, error) {
 	}
 	return count, nil
 }
+
+func CheckUserCollectedTopic(UserId string, TopicId string) (bool, error) {
+	user, err := GetUserFromUserId(UserId)
+	if err != nil {
+		return false, err
+	}
+	var topics []Topic
+	var topic Topic
+	topicId, _ := strconv.Atoi(TopicId)
+	exist := mysqlDb.Model(&user).Related(&topics, "CollectedTopics").First(&topic, topicId).RecordNotFound()
+	return exist, nil
+}

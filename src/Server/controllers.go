@@ -244,3 +244,9 @@ func bbsGetLatestTopicList(c *gin.Context) {
 	resp := getLatestTopicList(SessionId, TopicList, NeedNumber)
 	c.JSON(resp.Status, resp.Data)
 }
+
+func bbsGetTopic(c *gin.Context) {
+	SessionId := c.Query("session_id")
+	TopicId := c.Query("topic_id")
+
+}
