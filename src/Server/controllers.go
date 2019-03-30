@@ -272,25 +272,39 @@ func bbsGetTopicLayerReplyList(c *gin.Context) {
 }
 
 func bbsValueTopic(c *gin.Context) {
-	SessionId := c.Query("session_id")
-	TopicId := c.Query("topic_id")
-	Value := c.Query("value")
+	SessionId := c.PostForm("session_id")
+	TopicId := c.PostForm("topic_id")
+	Value := c.PostForm("value")
 	resp := valueTopic(SessionId, TopicId, Value)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func bbsValueTopicLordReply(c *gin.Context) {
-	SessionId := c.Query("session_id")
-	TopicLordReplyId := c.Query("topic_lord_reply_id")
-	Value := c.Query("value")
+	SessionId := c.PostForm("session_id")
+	TopicLordReplyId := c.PostForm("topic_lord_reply_id")
+	Value := c.PostForm("value")
 	resp := valueTopicLordReply(SessionId, TopicLordReplyId, Value)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func bbsValueTopicLayerReply(c *gin.Context) {
-	SessionId := c.Query("session_id")
-	TopicLayerReplyId := c.Query("topic_layer_reply_id")
-	Value := c.Query("value")
+	SessionId := c.PostForm("session_id")
+	TopicLayerReplyId := c.PostForm("topic_layer_reply_id")
+	Value := c.PostForm("value")
 	resp := valueTopicLayerReply(SessionId, TopicLayerReplyId, Value)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func bbsCollectTopic(c *gin.Context) {
+	SessionId := c.PostForm("session_id")
+	TopicId := c.PostForm("topic_id")
+	resp := addCollectedTopic(SessionId, TopicId)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func bbsCancelCollectTopic(c *gin.Context) {
+	SessionId := c.PostForm("session_id")
+	TopicId := c.PostForm("topic_id")
+	resp := removeCollectedTopic(SessionId, TopicId)
 	c.JSON(resp.Status, resp.Data)
 }

@@ -46,6 +46,8 @@ func initRouter() {
 	r.POST("/bbs/topic/value", bbsValueTopic)
 	r.POST("bbs/topic/lord-reply", bbsValueTopicLordReply)
 	r.POST("bbs/topic/layer-reply", bbsValueTopicLayerReply)
+	r.POST("/bbs/topic/user-collect", bbsCollectTopic)
+	r.POST("/bbs/topic/user-cancel-collect", bbsCancelCollectTopic)
 
 	// bbs end
 

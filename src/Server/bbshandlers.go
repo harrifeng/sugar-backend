@@ -284,3 +284,39 @@ func valueTopicLayerReply(SessionId string, TopicLayerReplyId string, Value stri
 	}
 	return responseOK()
 }
+
+func addCollectedTopic(SessionId string, TopicId string) responseBody {
+	if SessionId == "" {
+		return responseNormalError("请先登录")
+	}
+	userId, err := db.GetNowSessionId(SessionId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	if userId == "" {
+		return responseNormalError("请先登录")
+	}
+	err = db.AddUserCollectedTopic(userId, TopicId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	return responseOK()
+}
+
+func removeCollectedTopic(SessionId string, TopicId string) responseBody {
+	if SessionId == "" {
+		return responseNormalError("请先登录")
+	}
+	userId, err := db.GetNowSessionId(SessionId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	if userId == "" {
+		return responseNormalError("请先登录")
+	}
+	err = db.RemoveUserCollectedTopic(userId, TopicId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	return responseOK()
+}
