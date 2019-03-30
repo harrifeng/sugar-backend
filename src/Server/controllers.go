@@ -270,3 +270,27 @@ func bbsGetTopicLayerReplyList(c *gin.Context) {
 	resp := getTopicLayerReplyList(SessionId, TopicLordReplyId, BeginFloor, NeedNumber)
 	c.JSON(resp.Status, resp.Data)
 }
+
+func bbsValueTopic(c *gin.Context) {
+	SessionId := c.Query("session_id")
+	TopicId := c.Query("topic_id")
+	Value := c.Query("value")
+	resp := valueTopic(SessionId, TopicId, Value)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func bbsValueTopicLordReply(c *gin.Context) {
+	SessionId := c.Query("session_id")
+	TopicLordReplyId := c.Query("topic_lord_reply_id")
+	Value := c.Query("value")
+	resp := valueTopicLordReply(SessionId, TopicLordReplyId, Value)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func bbsValueTopicLayerReply(c *gin.Context) {
+	SessionId := c.Query("session_id")
+	TopicLayerReplyId := c.Query("topic_layer_reply_id")
+	Value := c.Query("value")
+	resp := valueTopicLayerReply(SessionId, TopicLayerReplyId, Value)
+	c.JSON(resp.Status, resp.Data)
+}

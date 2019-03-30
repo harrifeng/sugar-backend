@@ -230,3 +230,57 @@ func getTopicLayerReplyList(SessionId string, TopicLordReplyId string, BeginFloo
 	}
 	return responseOKWithData(respReplies)
 }
+
+func valueTopic(SessionId string, TopicId string, Value string) responseBody {
+	if SessionId == "" {
+		return responseNormalError("请先登录")
+	}
+	userId, err := db.GetNowSessionId(SessionId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	if userId == "" {
+		return responseNormalError("请先登录")
+	}
+	err = db.ValueTopic(TopicId, Value)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	return responseOK()
+}
+
+func valueTopicLordReply(SessionId string, TopicLordReplyId string, Value string) responseBody {
+	if SessionId == "" {
+		return responseNormalError("请先登录")
+	}
+	userId, err := db.GetNowSessionId(SessionId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	if userId == "" {
+		return responseNormalError("请先登录")
+	}
+	err = db.ValueTopicLordReply(TopicLordReplyId, Value)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	return responseOK()
+}
+
+func valueTopicLayerReply(SessionId string, TopicLayerReplyId string, Value string) responseBody {
+	if SessionId == "" {
+		return responseNormalError("请先登录")
+	}
+	userId, err := db.GetNowSessionId(SessionId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	if userId == "" {
+		return responseNormalError("请先登录")
+	}
+	err = db.ValueTopicLayerReply(TopicLayerReplyId, Value)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	return responseOK()
+}

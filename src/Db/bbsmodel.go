@@ -106,6 +106,13 @@ func GetTopicLordReplyFromTopicLordReplyId(TopicLordReplyId string) (TopicLordRe
 	return topicLordReply, err
 }
 
+func GetTopicLayerReplyFromTopicLayerReplyId(TopicLayerReplyId string) (TopicLayerReply, error) {
+	var topicLayerReply TopicLayerReply
+	topicLayerReplyId, _ := strconv.Atoi(TopicLayerReplyId)
+	err := mysqlDb.First(&topicLayerReply, topicLayerReplyId).Error
+	return topicLayerReply, err
+}
+
 func GetTopicLordReplyListFromTopicId(TopicId string, BeginId string, NeedNumber string) ([]TopicLordReply, error) {
 	var topicLordReplies []TopicLordReply
 	topic, err := GetTopicFromTopicId(TopicId)
@@ -273,4 +280,34 @@ func GetTopicLayerReplyList(TopicLordReplyId string, BeginId string, NeedNumber 
 	err = mysqlDb.Model(&topicLordReply).Preload("User").
 		Related(&topiclayerreplies, "LayerReplies").Offset(beginId).Limit(needNumber).Error
 	return topiclayerreplies, err
+}
+
+func ValueTopic(TopicId string, Value string) error {
+	topic, err := GetTopicFromTopicId(TopicId)
+	if err != nil {
+		return err
+	}
+	value, _ := strconv.Atoi(Value)
+	topic.ThumbsUpCount += value
+	return mysqlDb.Save(&topic).Error
+}
+
+func ValueTopicLordReply(TopicLordReplyId string, Value string) error {
+	topicLordReply, err := GetTopicLordReplyFromTopicLordReplyId(TopicLordReplyId)
+	if err != nil {
+		return err
+	}
+	value, _ := strconv.Atoi(Value)
+	topicLordReply.ThumbsUpCount += value
+	return mysqlDb.Save(&topicLordReply).Error
+}
+
+func ValueTopicLayerReply(TopicLayerReplyId string, Value string) error {
+	topicLayerReply, err := GetTopicLayerReplyFromTopicLayerReplyId(TopicLayerReplyId)
+	if err != nil {
+		return err
+	}
+	value, _ := strconv.Atoi(Value)
+	topicLayerReply.ThumbsUpCount += value
+	return mysqlDb.Save(&topicLayerReply).Error
 }
