@@ -308,3 +308,36 @@ func bbsCancelCollectTopic(c *gin.Context) {
 	resp := removeCollectedTopic(SessionId, TopicId)
 	c.JSON(resp.Status, resp.Data)
 }
+
+func bbsSearchTopic(c *gin.Context) {
+	SessionId := c.Query("session_id")
+	SearchContent := c.Query("search_content")
+	BeginId := c.Query("begin_id")
+	NeedNumber := c.Query("need_number")
+	resp := getSearchTopicList(SessionId, SearchContent, BeginId, NeedNumber)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func bbsGetUserCollectedTopicList(c *gin.Context) {
+	SessionId := c.Query("session_id")
+	BeginId := c.Query("begin_id")
+	NeedNumber := c.Query("need_number")
+	resp := getUserCollectedTopicList(SessionId, BeginId, NeedNumber)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func bbsGetUserPublishedTopicList(c *gin.Context) {
+	SessionId := c.Query("session_id")
+	BeginId := c.Query("begin_id")
+	NeedNumber := c.Query("need_number")
+	resp := getUserPublishedTopicList(SessionId, BeginId, NeedNumber)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func bbsGetUserTopicReplyList(c *gin.Context) {
+	SessionId := c.Query("session_id")
+	BeginId := c.Query("begin_id")
+	NeedNumber := c.Query("need_number")
+	resp := getUserReplyList(SessionId, BeginId, NeedNumber)
+	c.JSON(resp.Status, resp.Data)
+}

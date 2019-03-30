@@ -76,11 +76,12 @@ type ArticleComment struct {
 
 type Topic struct {
 	gorm.Model
-	Content       string `gorm:"not null;type:text"`
-	User          User
-	UserID        int
-	ThumbsUpCount int `gorm:"not null;default:'0'"`
-	LordReplies   []TopicLordReply
+	Content         string `gorm:"not null;type:text"`
+	User            User
+	UserID          int
+	ThumbsUpCount   int `gorm:"not null;default:'0'"`
+	LordReplies     []TopicLordReply
+	CollectingUsers []User
 }
 
 type TopicLordReply struct {
@@ -102,15 +103,8 @@ type TopicLayerReply struct {
 	TopicLordReplyID uint
 }
 
-type UserReply struct {
-	Content          string
-	UserId           int
-	ThumbsUpCount    int
-	TopicID          uint
-	TopicLordReplyID uint
-}
-
 type BloodRecord struct {
+	gorm.Model
 	Level      string
 	RecordTime string
 	RecordDate time.Time `gorm:"type:date;"`
@@ -119,6 +113,7 @@ type BloodRecord struct {
 }
 
 type HealthRecord struct {
+	gorm.Model
 	Insulin       string
 	SportTime     string
 	Weight        string
@@ -130,8 +125,18 @@ type HealthRecord struct {
 }
 
 type FamilyMember struct {
+	gorm.Model
 	PhoneNumber string
 	Call        string
 	User        User
 	UserID      uint
+}
+
+type UserReply struct {
+	gorm.Model
+	Content          string
+	UserId           int
+	ThumbsUpCount    int
+	TopicID          uint
+	TopicLordReplyID uint
 }

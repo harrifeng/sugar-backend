@@ -189,10 +189,11 @@ func InitTopicLayerReplyTest() {
 }
 
 func GetUserReplyListTest() {
-	replies, err := GetUserReplyList("33", "0", "4")
+	replies, count, err := GetUserReplyList("33", "0", "4")
 	if err != nil {
 		fmt.Println(err)
 	}
+	fmt.Println(count)
 	for _, reply := range replies {
 		fmt.Println(reply)
 	}

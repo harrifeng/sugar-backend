@@ -189,38 +189,49 @@ func GetSearchTopicList(SearchContent string, BeginId string, NeedNumber string)
 	return topics, err
 }
 
-func GetUserCollectedTopicList(UserId string, BeginId string, NeedNumber string) ([]Topic, error) {
+func GetUserCollectedTopicList(UserId string, BeginId string, NeedNumber string) ([]Topic, int, error) {
 	var topics []Topic
 	user, err := GetUserFromUserId(UserId)
 	if err != nil {
-		return topics, err
+		return topics, 0, err
 	}
 	beginId, _ := strconv.Atoi(BeginId)
 	needNumber, _ := strconv.Atoi(NeedNumber)
 	err = mysqlDb.Model(&user).Offset(beginId).Limit(needNumber).Related(&topics, "CollectedTopics").Error
-	return topics, err
+	if err != nil {
+		return topics, 0, err
+	}
+	count := mysqlDb.Model(&user).Association("CollectedTopics").Count()
+	return topics, count, err
 }
 
-func GetUserPublishedTopicList(UserId string, BeginId string, NeedNumber string) ([]Topic, error) {
+func GetUserPublishedTopicList(UserId string, BeginId string, NeedNumber string) ([]Topic, int, error) {
 	var topics []Topic
 	userId, _ := strconv.Atoi(UserId)
 	beginId, _ := strconv.Atoi(BeginId)
 	needNumber, _ := strconv.Atoi(NeedNumber)
-	err := mysqlDb.Where(&Topic{UserID: userId}).Offset(beginId).Limit(needNumber).Find(&topics).Error
-	return topics, err
+	err := mysqlDb.Preload("CollectingUsers").Where(&Topic{UserID: userId}).
+		Offset(beginId).Limit(needNumber).Find(&topics).Error
+	if err != nil {
+		return topics, 0, err
+	}
+	var count int
+	err = mysqlDb.Where(&Topic{UserID: userId}).Count(&count).Error
+	return topics, count, err
 }
 
-func GetUserReplyList(UserId string, BeginId string, NeedNumber string) ([]UserReply, error) {
+func GetUserReplyList(UserId string, BeginId string, NeedNumber string) ([]UserReply, int, error) {
 	var replies []UserReply
 	beginId, _ := strconv.Atoi(BeginId)
 	needNumber, _ := strconv.Atoi(NeedNumber)
+	var count int
 	err := mysqlDb.Raw(
 		`(select content,user_id,thumbs_up_count,topic_id,NULL as topic_lord_reply_id from topic_lord_replies
 	where user_id=?)
 	union all
 	(select content,user_id,thumbs_up_count,NULL as topic_id,topic_lord_reply_id from topic_layer_replies
-		where user_id=?)`, UserId, UserId).Offset(beginId).Limit(needNumber).Scan(&replies).Error
-	return replies, err
+		where user_id=?)`, UserId, UserId).Count(&count).Offset(beginId).Limit(needNumber).Scan(&replies).Error
+	return replies, count, err
 }
 
 func GetLatestTopicList(TopicList []string, NeedNumber string) ([]Topic, error) {
@@ -269,19 +280,6 @@ func GetTopicLayerReplyCountFromTopicLordReply(TopicLordReplyId string) (int, er
 	return count, nil
 }
 
-func GetTopicLayerReplyList(TopicLordReplyId string, BeginId string, NeedNumber string) ([]TopicLayerReply, error) {
-	var topiclayerreplies []TopicLayerReply
-	topicLordReply, err := GetTopicLordReplyFromTopicLordReplyId(TopicLordReplyId)
-	if err != nil {
-		return topiclayerreplies, err
-	}
-	beginId, _ := strconv.Atoi(BeginId)
-	needNumber, _ := strconv.Atoi(NeedNumber)
-	err = mysqlDb.Model(&topicLordReply).Preload("User").
-		Related(&topiclayerreplies, "LayerReplies").Offset(beginId).Limit(needNumber).Error
-	return topiclayerreplies, err
-}
-
 func ValueTopic(TopicId string, Value string) error {
 	topic, err := GetTopicFromTopicId(TopicId)
 	if err != nil {
@@ -310,4 +308,18 @@ func ValueTopicLayerReply(TopicLayerReplyId string, Value string) error {
 	value, _ := strconv.Atoi(Value)
 	topicLayerReply.ThumbsUpCount += value
 	return mysqlDb.Save(&topicLayerReply).Error
+}
+
+func GetTopicLordReplyFloor(TopicLordReplyId string) (int, error) {
+	topicLordReply, err := GetTopicLordReplyFromTopicLordReplyId(TopicLordReplyId)
+	if err != nil {
+		return 0, err
+	}
+	topicId := strconv.Itoa(int(topicLordReply.TopicID))
+	topic, err := GetTopicFromTopicId(topicId)
+	var topicLordRelies []TopicLordReply
+	err = mysqlDb.Unscoped().Model(&topic).Related(&topicLordRelies, "LordReplies").
+		Where("id <= ?", TopicLordReplyId).Error
+	return len(topicLordRelies), err
+
 }

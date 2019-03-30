@@ -3,6 +3,7 @@ package server
 import (
 	"db"
 	"encoding/json"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"strconv"
 	"utils"
@@ -212,7 +213,7 @@ func getTopicLayerReplyList(SessionId string, TopicLordReplyId string, BeginFloo
 	if userId == "" {
 		return responseNormalError("请先登录")
 	}
-	topicLayerReplies, err := db.GetTopicLayerReplyList(TopicLordReplyId, BeginFloor, NeedNumber)
+	topicLayerReplies, err := db.GetTopicLayerReplyListFromTopicLordReplyId(TopicLordReplyId, BeginFloor, NeedNumber)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
@@ -319,4 +320,171 @@ func removeCollectedTopic(SessionId string, TopicId string) responseBody {
 		return responseInternalServerError(err)
 	}
 	return responseOK()
+}
+
+func getSearchTopicList(SessionId string, SearchContent string, BeginId string, NeedNumber string) responseBody {
+	if SessionId == "" {
+		return responseNormalError("请先登录")
+	}
+	userId, err := db.GetNowSessionId(SessionId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	if userId == "" {
+		return responseNormalError("请先登录")
+	}
+	topics, err := db.GetSearchTopicList(SearchContent, BeginId, NeedNumber)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	respTopics := make([]gin.H, len(topics))
+	for i, topic := range topics {
+		respTopics[i] = gin.H{
+			"topicId":  topic.ID,
+			"userId":   topic.UserID,
+			"username": topic.User.UserName,
+			"iconUrl":  topic.User.HeadPortraitUrl,
+			"lastTime": topic.UpdatedAt,
+			"content":  utils.StringCut(topic.Content, 40),
+		}
+	}
+	return responseOKWithData(respTopics)
+}
+
+func getUserCollectedTopicList(SessionId string, BeginId string, NeedNumber string) responseBody {
+	if SessionId == "" {
+		return responseNormalError("请先登录")
+	}
+	userId, err := db.GetNowSessionId(SessionId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	if userId == "" {
+		return responseNormalError("请先登录")
+	}
+	topics, count, err := db.GetUserCollectedTopicList(userId, BeginId, NeedNumber)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	respTopics := make([]gin.H, len(topics))
+	for i, topic := range topics {
+		replyCount, err := db.GetTopicReplyCount(strconv.Itoa(int(topic.ID)))
+		if err != nil {
+			return responseInternalServerError(err)
+		}
+		respTopics[i] = gin.H{
+			"topicId":    topic.ID,
+			"userId":     topic.UserID,
+			"username":   topic.User.UserName,
+			"iconUrl":    topic.User.HeadPortraitUrl,
+			"topicTime":  topic.CreatedAt,
+			"content":    utils.StringCut(topic.Content, 40),
+			"likes":      topic.ThumbsUpCount,
+			"replyCount": replyCount,
+		}
+	}
+	return responseOKWithData(gin.H{
+		"data":  respTopics,
+		"total": count,
+	})
+}
+
+func getUserPublishedTopicList(SessionId string, BeginId string, NeedNumber string) responseBody {
+	if SessionId == "" {
+		return responseNormalError("请先登录")
+	}
+	userId, err := db.GetNowSessionId(SessionId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	if userId == "" {
+		return responseNormalError("请先登录")
+	}
+	topics, count, err := db.GetUserPublishedTopicList(userId, BeginId, NeedNumber)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	respTopics := make([]gin.H, len(topics))
+	for i, topic := range topics {
+		replyCount, err := db.GetTopicReplyCount(strconv.Itoa(int(topic.ID)))
+		if err != nil {
+			return responseInternalServerError(err)
+		}
+		respTopics[i] = gin.H{
+			"topicId":     topic.ID,
+			"userId":      topic.UserID,
+			"username":    topic.User.UserName,
+			"iconUrl":     topic.User.HeadPortraitUrl,
+			"topicTime":   topic.CreatedAt,
+			"content":     utils.StringCut(topic.Content, 40),
+			"likes":       topic.ThumbsUpCount,
+			"replyCount":  replyCount,
+			"favoriteNum": len(topic.CollectingUsers),
+		}
+	}
+	return responseOKWithData(gin.H{
+		"data":  respTopics,
+		"total": count,
+	})
+}
+
+func getUserReplyList(SessionId string, BeginId string, NeedNumber string) responseBody {
+	if SessionId == "" {
+		return responseNormalError("请先登录")
+	}
+	userId, err := db.GetNowSessionId(SessionId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	if userId == "" {
+		return responseNormalError("请先登录")
+	}
+	replies, count, err := db.GetUserReplyList(userId, BeginId, NeedNumber)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	respReplies := make([]gin.H, len(replies))
+	for i, reply := range replies {
+		if reply.TopicID == 0 && reply.TopicLordReplyID != 0 {
+			topicLordReply, err := db.GetTopicLordReplyFromTopicLordReplyId(strconv.Itoa(int(reply.TopicLordReplyID)))
+			if err != nil {
+				return responseInternalServerError(err)
+			}
+			floor, err := db.GetTopicLordReplyFloor(strconv.Itoa(int(reply.TopicLordReplyID)))
+			if err != nil {
+				return responseInternalServerError(err)
+			}
+			respReplies[i] = gin.H{
+				"type":            "subreply",
+				"subreplyId":      reply.ID,
+				"replyId":         reply.TopicLordReplyID,
+				"topicId":         topicLordReply.TopicID,
+				"time":            reply.CreatedAt,
+				"subreplyContent": reply.Content,
+				"replyContent":    topicLordReply.Content,
+				"likes":           reply.ThumbsUpCount,
+				"floor":           floor,
+			}
+		} else if reply.TopicID != 0 && reply.TopicLordReplyID == 0 {
+			topic, err := db.GetTopicFromTopicId(strconv.Itoa(int(reply.TopicID)))
+			if err != nil {
+				return responseInternalServerError(err)
+			}
+			respReplies[i] = gin.H{
+				"type":         "reply",
+				"replyId":      reply.ID,
+				"topicId":      reply.TopicID,
+				"time":         reply.CreatedAt,
+				"replyContent": reply.Content,
+				"topicContent": topic.Content,
+				"likes":        reply.ThumbsUpCount,
+			}
+		} else {
+			return responseInternalServerError(errors.New("invalid reply"))
+		}
+	}
+	return responseOKWithData(gin.H{
+		"data":  respReplies,
+		"total": count,
+	})
 }
