@@ -13,6 +13,7 @@ class SendMessageHandler(tornado.web.RequestHandler):
         ssender = SmsSingleSender(config.appid, config.appkey)
         params = [code, "3"]
         try:
+            print("try sending message[%s->%s]" % (code,phone_number))
             result = ssender.send_with_param(86, phone_number,
                                              config.template_id, params, sign=config.sms_sign, extend="",
                                              ext="")

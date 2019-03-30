@@ -2,13 +2,19 @@ package db
 
 import (
 	"errors"
+	"fmt"
+	"math/rand"
 	"strconv"
 )
 
-func CreateNewUser(PhoneNumber string, Password string) error {
+func CreateNewUser(PhoneNumber string, UserName string, Password string) error {
+	imageNumber := rand.Intn(35) + 10
+	HeadPictureUrl := fmt.Sprintf("/static/userImg/usertile%d.jpg", imageNumber)
 	user := User{
-		PhoneNumber: PhoneNumber,
-		Password:    Password,
+		PhoneNumber:     PhoneNumber,
+		Password:        Password,
+		UserName:        UserName,
+		HeadPortraitUrl: HeadPictureUrl,
 		UserPrivacySetting: UserPrivacySetting{
 			ShowPhoneNumber: true,
 			ShowGender:      true,

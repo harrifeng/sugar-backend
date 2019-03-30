@@ -16,8 +16,9 @@ func accountSendVerificationCode(c *gin.Context) {
 func accountRegister(c *gin.Context) {
 	PhoneNumber := c.PostForm("phone_number")
 	Password := c.PostForm("password")
+	UserName := c.PostForm("username")
 	Code := c.PostForm("code")
-	resp := registerNewUser(PhoneNumber, Password, Code)
+	resp := registerNewUser(PhoneNumber, Password, UserName, Code)
 	c.JSON(resp.Status, resp.Data)
 }
 
@@ -146,7 +147,7 @@ func schoolGetArticleList(c *gin.Context) {
 
 func schoolPublishArticleComment(c *gin.Context) {
 	SessionId := c.PostForm("session_id")
-	ArticleId := c.Param("id")
+	ArticleId := c.PostForm("id")
 	Content := c.PostForm("content")
 	resp := createArticleComment(SessionId, ArticleId, Content)
 	c.JSON(resp.Status, resp.Data)
@@ -154,7 +155,7 @@ func schoolPublishArticleComment(c *gin.Context) {
 
 func schoolGetArticleCommentList(c *gin.Context) {
 	SessionId := c.Query("session_id")
-	ArticleId := c.Param("id")
+	ArticleId := c.Query("id")
 	BeginId := c.Query("begin_id")
 	NeedNumber := c.Query("need_number")
 	resp := getArticleCommentList(SessionId, ArticleId, BeginId, NeedNumber)
@@ -248,5 +249,24 @@ func bbsGetLatestTopicList(c *gin.Context) {
 func bbsGetTopic(c *gin.Context) {
 	SessionId := c.Query("session_id")
 	TopicId := c.Query("topic_id")
+	resp := getTopic(SessionId, TopicId)
+	c.JSON(resp.Status, resp.Data)
+}
 
+func bbsGetTopicLordReplyList(c *gin.Context) {
+	SessionId := c.Query("session_id")
+	TopicId := c.Query("topic_id")
+	BeginFloor := c.Query("begin_floor")
+	NeedNumber := c.Query("need_number")
+	resp := getTopicLordReplyList(SessionId, TopicId, BeginFloor, NeedNumber)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func bbsGetTopicLayerReplyList(c *gin.Context) {
+	SessionId := c.Query("session_id")
+	TopicLordReplyId := c.Query("topic_lord_reply_id")
+	BeginFloor := c.Query("begin_floor")
+	NeedNumber := c.Query("need_number")
+	resp := getTopicLayerReplyList(SessionId, TopicLordReplyId, BeginFloor, NeedNumber)
+	c.JSON(resp.Status, resp.Data)
 }

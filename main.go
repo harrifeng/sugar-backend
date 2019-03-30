@@ -79,6 +79,7 @@ func runServer() {
 		}
 
 	}()
+
 	server.Start()
 	//server.DatabaseTest()
 }

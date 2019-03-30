@@ -19,7 +19,7 @@ func initRouter() {
 	r.GET("/", urlsRoot)
 	// account start
 	r.GET("/accounts/code", accountSendVerificationCode)
-	r.POST("/accounts/create", accountRegister)
+	r.POST("/accounts/register", accountRegister)
 	r.GET("/accounts/login", accountLogin)
 	r.POST("/accounts/alter", accountAlterInformation)
 	r.GET("/accounts/info", accountGetUserInformation)
@@ -40,14 +40,18 @@ func initRouter() {
 	r.POST("/bbs/topic/remove", bbsRemoveTopic)
 	r.POST("/bbs/topic/lord-reply/remove", bbsRemoveTopicLordReply)
 	r.POST("/bbs/topics", bbsGetLatestTopicList)
+	r.GET("/bbs/topic", bbsGetTopic)
+	r.GET("/bbs/topic/lord-reply", bbsGetTopicLordReplyList)
+	r.GET("/bbs/topic/layer-reply", bbsGetTopicLayerReplyList)
+
 	// bbs end
 
 	// school start
-	r.GET("/school/article/:id", schoolGetArticlePage)
+	r.GET("/school/article-page/:id", schoolGetArticlePage)
 	r.GET("/school/article", schoolGetArticle)
 	r.GET("/school/articles", schoolGetArticleList)
-	r.POST("/school/article/:id/comment", schoolPublishArticleComment)
-	r.GET("/school/article/:id/comments", schoolGetArticleCommentList)
+	r.POST("/school/article/comment", schoolPublishArticleComment)
+	r.GET("/school/article/comments", schoolGetArticleCommentList)
 	r.GET("/school/articles/search", schoolSearchArticle)
 	r.GET("/school/articles/user-collected", schoolGetUserCollectedArticleList)
 	r.GET("/school/articles/user-comments", schoolGetUserArticleCommentList)

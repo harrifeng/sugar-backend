@@ -53,7 +53,7 @@ func sendVerificationCode(PhoneNumber string) responseBody {
 
 }
 
-func registerNewUser(PhoneNumber string, Password string, Code string) responseBody {
+func registerNewUser(PhoneNumber string, Password string, UserName string, Code string) responseBody {
 	if PhoneNumber == "" {
 		return responseNormalError("手机号码不能为空")
 	}
@@ -70,7 +70,7 @@ func registerNewUser(PhoneNumber string, Password string, Code string) responseB
 	if !codeCheck {
 		return responseNormalError("验证码错误或已失效")
 	}
-	err = db.CreateNewUser(PhoneNumber, Password)
+	err = db.CreateNewUser(PhoneNumber, UserName, Password)
 	if err != nil {
 		return responseNormalError("用户已经存在")
 	}
@@ -111,6 +111,7 @@ func loginUser(PhoneNumber string, Password string) responseBody {
 		"iconUrl":    user.HeadPortraitUrl,
 		"exp":        user.Exp,
 		"level":      user.Level,
+		"isCheck":    1,
 	})
 }
 

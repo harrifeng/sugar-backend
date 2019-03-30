@@ -178,4 +178,55 @@ func getTopicLordReplyList(SessionId string, TopicId string, BeginFloor string, 
 	if userId == "" {
 		return responseNormalError("请先登录")
 	}
+	topicLordReplies, err := db.GetTopicLordReplyListFromTopicId(TopicId, BeginFloor, NeedNumber)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	respReplies := make([]gin.H, len(topicLordReplies))
+	beginFloor, _ := strconv.Atoi(BeginFloor)
+	for i, reply := range topicLordReplies {
+		count, _ := db.GetTopicLayerReplyCountFromTopicLordReply(strconv.Itoa(int(reply.ID)))
+		respReplies[i] = gin.H{
+			"replyId":   reply.ID,
+			"floor":     beginFloor + i + 1,
+			"userId":    reply.User.ID,
+			"username":  reply.User.UserName,
+			"iconUrl":   reply.User.HeadPortraitUrl,
+			"replyTime": reply.CreatedAt,
+			"likes":     reply.ThumbsUpCount,
+			"content":   reply.Content,
+			"comNumber": count,
+		}
+	}
+	return responseOKWithData(respReplies)
+}
+
+func getTopicLayerReplyList(SessionId string, TopicLordReplyId string, BeginFloor string, NeedNumber string) responseBody {
+	if SessionId == "" {
+		return responseNormalError("请先登录")
+	}
+	userId, err := db.GetNowSessionId(SessionId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	if userId == "" {
+		return responseNormalError("请先登录")
+	}
+	topicLayerReplies, err := db.GetTopicLayerReplyList(TopicLordReplyId, BeginFloor, NeedNumber)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	respReplies := make([]gin.H, len(topicLayerReplies))
+	for i, reply := range topicLayerReplies {
+		respReplies[i] = gin.H{
+			"subreplyId":   reply.ID,
+			"userId":       reply.UserID,
+			"iconUrl":      reply.User.HeadPortraitUrl,
+			"username":     reply.User.UserName,
+			"content":      reply.Content,
+			"subreplyTime": reply.CreatedAt,
+			"likes":        reply.ThumbsUpCount,
+		}
+	}
+	return responseOKWithData(respReplies)
 }

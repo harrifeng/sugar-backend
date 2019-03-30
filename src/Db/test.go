@@ -39,9 +39,7 @@ func InitAllArticle() {
 
 func InitUser() {
 	for i := 1; i <= 100; i++ {
-		_ = CreateNewUser(utils.RandPhoneNumber(), "0c152176187ce61c9614c072e1a1e2f7")
-		_ = AlterUserInformationFromUserId(strconv.Itoa(i), utils.RandUserName(),
-			utils.RandGender(), 0, 0, "", "", 15)
+		_ = CreateNewUser(utils.RandPhoneNumber(), utils.RandUserName(), "0c152176187ce61c9614c072e1a1e2f7")
 		fmt.Printf("user.%d created successfully!\n ", i)
 	}
 }
@@ -63,6 +61,7 @@ func AutoCreateTableTest() {
 	mysqlDb.AutoMigrate(&TopicLordReply{})
 	mysqlDb.AutoMigrate(&TopicLayerReply{})
 	mysqlDb.AutoMigrate(&UserPrivacySetting{})
+	mysqlDb.AutoMigrate(&UserCheckIn{})
 	fmt.Printf("tables created successfully!\n ")
 }
 

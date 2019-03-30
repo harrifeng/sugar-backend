@@ -114,7 +114,7 @@ func GetTopicLordReplyListFromTopicId(TopicId string, BeginId string, NeedNumber
 	}
 	beginId, _ := strconv.Atoi(BeginId)
 	needNumber, _ := strconv.Atoi(NeedNumber)
-	err = mysqlDb.Model(&topic).Offset(beginId).Limit(needNumber).
+	err = mysqlDb.Model(&topic).Preload("User").Offset(beginId).Limit(needNumber).
 		Related(&topicLordReplies, "LordReplies").Error
 	return topicLordReplies, err
 }
@@ -251,4 +251,26 @@ func CheckUserCollectedTopic(UserId string, TopicId string) (bool, error) {
 	topicId, _ := strconv.Atoi(TopicId)
 	exist := mysqlDb.Model(&user).Related(&topics, "CollectedTopics").First(&topic, topicId).RecordNotFound()
 	return exist, nil
+}
+
+func GetTopicLayerReplyCountFromTopicLordReply(TopicLordReplyId string) (int, error) {
+	topicLordReply, err := GetTopicLordReplyFromTopicLordReplyId(TopicLordReplyId)
+	if err != nil {
+		return 0, err
+	}
+	count := mysqlDb.Model(&topicLordReply).Association("LayerReplies").Count()
+	return count, nil
+}
+
+func GetTopicLayerReplyList(TopicLordReplyId string, BeginId string, NeedNumber string) ([]TopicLayerReply, error) {
+	var topiclayerreplies []TopicLayerReply
+	topicLordReply, err := GetTopicLordReplyFromTopicLordReplyId(TopicLordReplyId)
+	if err != nil {
+		return topiclayerreplies, err
+	}
+	beginId, _ := strconv.Atoi(BeginId)
+	needNumber, _ := strconv.Atoi(NeedNumber)
+	err = mysqlDb.Model(&topicLordReply).Preload("User").
+		Related(&topiclayerreplies, "LayerReplies").Offset(beginId).Limit(needNumber).Error
+	return topiclayerreplies, err
 }

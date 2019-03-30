@@ -26,6 +26,7 @@ type User struct {
 	BloodRecords         []BloodRecord
 	HealthRecords        []HealthRecord
 	FamilyMembers        []FamilyMember
+	CheckIns             []UserCheckIn
 	UserPrivacySetting   UserPrivacySetting
 	UserPrivacySettingID uint
 
@@ -34,6 +35,13 @@ type User struct {
 	Weight float64
 	Area   string
 	Job    string
+}
+
+type UserCheckIn struct {
+	gorm.Model
+	CheckTime time.Time
+	User      User
+	UserID    uint
 }
 
 type UserPrivacySetting struct {
