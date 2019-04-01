@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"html/template"
 	"net/http"
@@ -76,13 +77,22 @@ func accountGetUserPrivacySetting(c *gin.Context) {
 
 func accountAlterUserPrivacySetting(c *gin.Context) {
 	SessionId := c.PostForm("session_id")
-	ShowPhoneNumber := c.PostForm("show_phone_number") == "1"
-	ShowGender := c.PostForm("show_gender") == "1"
-	ShowAge := c.PostForm("show_age") == "1"
-	ShowHeight := c.PostForm("show_height") == "1"
-	ShowWeight := c.PostForm("show_weight") == "1"
-	ShowArea := c.PostForm("show_area") == "1"
-	ShowJob := c.PostForm("show_job") == "1"
+	ShowPhoneNumber := c.PostForm("show_phone_number") == "true"
+	ShowGender := c.PostForm("show_gender") == "true"
+	ShowAge := c.PostForm("show_age") == "true"
+	ShowHeight := c.PostForm("show_height") == "true"
+	ShowWeight := c.PostForm("show_weight") == "true"
+	ShowArea := c.PostForm("show_area") == "true"
+	ShowJob := c.PostForm("show_job") == "true"
+	fmt.Println("----------")
+	fmt.Println(ShowPhoneNumber)
+	fmt.Println(ShowGender)
+	fmt.Println(ShowAge)
+	fmt.Println(ShowJob)
+	fmt.Println(ShowArea)
+	fmt.Println(ShowHeight)
+	fmt.Println(ShowWeight)
+	fmt.Println("----------")
 	resp := alterUserPrivacy(SessionId, ShowPhoneNumber, ShowGender,
 		ShowAge, ShowHeight, ShowWeight, ShowArea, ShowJob)
 	c.JSON(resp.Status, resp.Data)
@@ -147,7 +157,7 @@ func schoolGetArticleList(c *gin.Context) {
 
 func schoolPublishArticleComment(c *gin.Context) {
 	SessionId := c.PostForm("session_id")
-	ArticleId := c.PostForm("id")
+	ArticleId := c.PostForm("article_id")
 	Content := c.PostForm("content")
 	resp := createArticleComment(SessionId, ArticleId, Content)
 	c.JSON(resp.Status, resp.Data)
@@ -155,7 +165,7 @@ func schoolPublishArticleComment(c *gin.Context) {
 
 func schoolGetArticleCommentList(c *gin.Context) {
 	SessionId := c.Query("session_id")
-	ArticleId := c.Query("id")
+	ArticleId := c.Query("article_id")
 	BeginId := c.Query("begin_id")
 	NeedNumber := c.Query("need_number")
 	resp := getArticleCommentList(SessionId, ArticleId, BeginId, NeedNumber)

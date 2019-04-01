@@ -205,13 +205,13 @@ func getUserPrivacySetting(SessionId string) responseBody {
 	}
 	privacySetting, err := db.GetPrivacySettingFromUserId(userId)
 	return responseOKWithData(gin.H{
-		"ShowPhoneNumber": privacySetting.ShowPhoneNumber,
-		"ShowGender":      privacySetting.ShowGender,
-		"ShowAge":         privacySetting.ShowAge,
-		"ShowHeight":      privacySetting.ShowHeight,
-		"ShowWeight":      privacySetting.ShowWeight,
-		"ShowArea":        privacySetting.ShowArea,
-		"ShowJob":         privacySetting.ShowJob,
+		"showPhone":  privacySetting.ShowPhoneNumber,
+		"showGender": privacySetting.ShowGender,
+		"showAge":    privacySetting.ShowAge,
+		"showHeight": privacySetting.ShowHeight,
+		"showWeight": privacySetting.ShowWeight,
+		"showArea":   privacySetting.ShowArea,
+		"showJob":    privacySetting.ShowJob,
 	})
 }
 
@@ -270,7 +270,7 @@ func getUserFollowingList(SessionId string, BeginId string, NeedNumber string) r
 	if err != nil {
 		return responseInternalServerError(err)
 	}
-	users, err := db.GetUserFollowingList(userId, BeginId, NeedNumber)
+	users, count, err := db.GetUserFollowingList(userId, BeginId, NeedNumber)
 	respUsers := make([]gin.H, len(users))
 	for i := 0; i < len(users); i++ {
 		respUsers[i] = gin.H{
@@ -279,7 +279,10 @@ func getUserFollowingList(SessionId string, BeginId string, NeedNumber string) r
 			"iconUrl":  users[i].HeadPortraitUrl,
 		}
 	}
-	return responseOKWithData(respUsers)
+	return responseOKWithData(gin.H{
+		"data":  respUsers,
+		"total": count,
+	})
 }
 
 func getUserFollowerList(SessionId string, BeginId string, NeedNumber string) responseBody {
@@ -290,17 +293,19 @@ func getUserFollowerList(SessionId string, BeginId string, NeedNumber string) re
 	if err != nil {
 		return responseInternalServerError(err)
 	}
-	users, err := db.GetUserFollowerList(userId, BeginId, NeedNumber)
+	users, count, err := db.GetUserFollowerList(userId, BeginId, NeedNumber)
 	respUsers := make([]gin.H, len(users))
 	for i := 0; i < len(users); i++ {
 		respUsers[i] = gin.H{
-			"followId": users[i].ID,
-			"username": users[i].UserName,
-			"iconUrl":  users[i].HeadPortraitUrl,
+			"followMeId": users[i].ID,
+			"username":   users[i].UserName,
+			"iconUrl":    users[i].HeadPortraitUrl,
 		}
 	}
-	fmt.Println(respUsers)
-	return responseOKWithData(respUsers)
+	return responseOKWithData(gin.H{
+		"data":  respUsers,
+		"total": count,
+	})
 }
 
 func logoutUser(SessionId string) responseBody {

@@ -3,14 +3,14 @@ package server
 import "db"
 
 func DatabaseTest() {
-	db.AutoCreateTableTest()
-	db.InitAllArticle()
-	db.InitUser()
-	db.IninArticleComment()
+	//db.AutoCreateTableTest()
+	//db.InitAllArticle()
+	//db.InitUser()
+	//db.IninArticleComment()
 	db.UserFollowTest()
-	db.InitTopicTest()
-	db.InitTopicLordReplyTest()
-	db.InitTopicLayerReplyTest()
+	//db.InitTopicTest()
+	//db.InitTopicLordReplyTest()
+	//db.InitTopicLayerReplyTest()
 	//db.GetUserReplyListTest()
 	//db.GetUserFollowerListTest()
 	//db.GetUserFollowingListTest()

@@ -67,8 +67,14 @@ func AlterUserPrivacySettingFromUserId(UserId string, ShowPhoneNumber bool, Show
 	if err != nil {
 		return err
 	}
+	tx := mysqlDb.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
 	var privacySetting UserPrivacySetting
-	err = mysqlDb.Model(&user).Association("UserPrivacySetting").Find(&privacySetting).Error
+	err = tx.Model(&user).Association("UserPrivacySetting").Find(&privacySetting).Error
 	if err != nil {
 		return err
 	}
@@ -79,8 +85,11 @@ func AlterUserPrivacySettingFromUserId(UserId string, ShowPhoneNumber bool, Show
 	privacySetting.ShowWeight = ShowWeight
 	privacySetting.ShowArea = ShowArea
 	privacySetting.ShowJob = ShowJob
-	err = mysqlDb.Model(&user).Association("UserPrivacySetting").Replace(&privacySetting).Error
-	return err
+	err = tx.Model(&user).Association("UserPrivacySetting").Replace(&privacySetting).Error
+	if err != nil {
+		return err
+	}
+	return tx.Commit().Error
 }
 
 func AlterUserPasswordFromPhoneNumber(PhoneNumber string, NewPassword string) error {
@@ -162,22 +171,24 @@ func RemoveUserFollowing(UserId string, TargetUserId string) error {
 	return err
 }
 
-func GetUserFollowerList(UserId string, BeginId string, NeedNumber string) ([]User, error) {
+func GetUserFollowerList(UserId string, BeginId string, NeedNumber string) ([]User, int, error) {
 	var user User
 	mysqlDb.Preload("FollowerUsers").First(&user, UserId)
 	var users []User
 	beginId, _ := strconv.Atoi(BeginId)
 	needNumber, _ := strconv.Atoi(NeedNumber)
 	err := mysqlDb.Model(&user).Offset(beginId).Limit(needNumber).Related(&users, "FollowerUsers").Error
-	return users, err
+	count := mysqlDb.Model(&user).Association("FollowerUsers").Count()
+	return users, count, err
 }
 
-func GetUserFollowingList(UserId string, BeginId string, NeedNumber string) ([]User, error) {
+func GetUserFollowingList(UserId string, BeginId string, NeedNumber string) ([]User, int, error) {
 	var user User
 	mysqlDb.Preload("FollowingUsers").First(&user, UserId)
 	var users []User
 	beginId, _ := strconv.Atoi(BeginId)
 	needNumber, _ := strconv.Atoi(NeedNumber)
 	err := mysqlDb.Model(&user).Offset(beginId).Limit(needNumber).Related(&users, "FollowingUsers").Error
-	return users, err
+	count := mysqlDb.Model(&user).Association("FollowingUsers").Count()
+	return users, count, err
 }

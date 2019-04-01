@@ -67,47 +67,49 @@ func AutoCreateTableTest() {
 
 func UserFollowTest() {
 	_ = AddUserFollowing("1", "2")
-	_ = AddUserFollowing("1", "5")
-	_ = AddUserFollowing("1", "6")
+	_ = AddUserFollowing("103", "5")
+	_ = AddUserFollowing("103", "6")
 	_ = AddUserFollowing("1", "3")
-	_ = AddUserFollowing("1", "8")
+	_ = AddUserFollowing("103", "8")
 	_ = AddUserFollowing("1", "12")
 	_ = AddUserFollowing("1", "56")
 	_ = AddUserFollowing("2", "4")
 	_ = AddUserFollowing("2", "66")
 	_ = AddUserFollowing("2", "23")
-	_ = AddUserFollowing("2", "1")
+	_ = AddUserFollowing("2", "103")
 	_ = AddUserFollowing("3", "8")
-	_ = AddUserFollowing("3", "21")
+	_ = AddUserFollowing("3", "103")
 	_ = AddUserFollowing("3", "78")
 	_ = AddUserFollowing("3", "4")
 	_ = AddUserFollowing("3", "1")
 	_ = AddUserFollowing("3", "9")
 	_ = AddUserFollowing("3", "7")
 	_ = AddUserFollowing("3", "2")
-	_ = AddUserFollowing("7", "3")
+	_ = AddUserFollowing("7", "103")
 	_ = AddUserFollowing("7", "2")
-	_ = AddUserFollowing("8", "2")
+	_ = AddUserFollowing("8", "103")
 	fmt.Println("user relation pairs created successfully!")
 }
 
 func GetUserFollowerListTest() {
-	users, err := GetUserFollowerList("2", "0", "1")
+	users, total, err := GetUserFollowerList("2", "0", "1")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+	fmt.Printf("total:%d\n", total)
 	for _, user := range users {
 		fmt.Println(user.ID)
 	}
 }
 
 func GetUserFollowingListTest() {
-	users, err := GetUserFollowingList("2", "1", "2")
+	users, total, err := GetUserFollowingList("2", "1", "2")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+	fmt.Printf("total:%d\n", total)
 	for _, user := range users {
 		fmt.Println(user.ID)
 	}

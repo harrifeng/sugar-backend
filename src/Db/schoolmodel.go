@@ -130,3 +130,22 @@ func GetUserArticleCommentCount(UserId string) (int, error) {
 	err := mysqlDb.Model(&ArticleComment{}).Where(&ArticleComment{UserID: userId}).Count(&count).Error
 	return count, err
 }
+
+func GetArticleCommentCount(ArticleId string) (int, error) {
+	articleId, _ := strconv.Atoi(ArticleId)
+	var count int
+	err := mysqlDb.Model(&ArticleComment{}).Where(&ArticleComment{ArticleID: articleId}).Count(&count).Error
+	return count, err
+}
+
+func CheckUserCollectedArticle(UserId string, ArticleId string) (bool, error) {
+	user, err := GetUserFromUserId(UserId)
+	if err != nil {
+		return false, err
+	}
+	var articles []Article
+	exist := mysqlDb.Model(&user).Where("article_id = ?", ArticleId).
+		Related(&articles, "CollectedArticles").RecordNotFound()
+	//fmt.Println(!exist)
+	return !exist, nil
+}

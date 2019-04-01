@@ -23,9 +23,18 @@ func getArticle(SessionId string, ArticleId string) responseBody {
 	if err != nil {
 		return responseInternalServerError(err)
 	}
+	collected, err := db.CheckUserCollectedArticle(userId, ArticleId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	count, err := db.GetArticleCommentCount(ArticleId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
 	return responseOKWithData(gin.H{
-		"title":      article.Title,
-		"contentUrl": fmt.Sprintf("/article/%d", article.ID),
+		"contentUrl": fmt.Sprintf("/school/article-page/%d", article.ID),
+		"collected":  collected,
+		"comNumber":  count,
 	})
 }
 
@@ -60,9 +69,7 @@ func getArticleList(SessionId string, BeginId string, NeedNumber string) respons
 			"views":       articles[i].ReadCount,
 		}
 	}
-	return responseOKWithData(gin.H{
-		"data": respArticles,
-	})
+	return responseOKWithData(respArticles)
 }
 
 func createArticleComment(SessionId string, ArticleId string, Content string) responseBody {
@@ -97,7 +104,6 @@ func getArticleCommentList(SessionId string, ArticleId string, BeginId string, N
 	comments, err := db.GetArticleCommentListFromArticleId(ArticleId, BeginId, NeedNumber)
 	respComments := make([]gin.H, len(comments))
 	for i := 0; i < len(comments); i++ {
-		fmt.Println(comments[i].User)
 		respComments[i] = gin.H{
 			"commentId":   comments[i].ID,
 			"content":     comments[i].Content,
