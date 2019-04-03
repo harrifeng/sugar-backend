@@ -168,3 +168,12 @@ func ValueArticleComment(ArticleCommentId string, Value string) error {
 	articleComment.ThumbsUpCount += value
 	return mysqlDb.Save(&articleComment).Error
 }
+
+func AddArticleReadCount(ArticleId string)error{
+	article,err:=GetArticleFromArticleId(ArticleId)
+	if err!=nil{
+		return err
+	}
+	article.ReadCount++
+	return mysqlDb.Save(&article).Error
+}

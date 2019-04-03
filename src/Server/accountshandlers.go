@@ -105,7 +105,7 @@ func loginUser(PhoneNumber string, Password string) responseBody {
 		}
 	}
 	return responseOKWithData(gin.H{
-		"userId":     userId,
+		"userId":     user.ID,
 		"session_id": sessionId,
 		"username":   user.UserName,
 		"iconUrl":    user.HeadPortraitUrl,
@@ -131,7 +131,7 @@ func alterUserInformation(SessionId string, UserName string, Gender string, Heig
 	return responseOK()
 }
 
-func getUserInformationFromUserId(SessionId string, TargetUserId string) responseBody {
+func getUserInformationFromUserId(SessionId string, OtherUserId string) responseBody {
 	if SessionId == "" {
 		return responseNormalError("请先登录")
 	}
@@ -142,10 +142,11 @@ func getUserInformationFromUserId(SessionId string, TargetUserId string) respons
 	if UserId == "" {
 		return responseNormalError("请先登录")
 	}
-	user, err := db.GetUserFromUserId(TargetUserId)
+	user, err := db.GetUserFromUserId(OtherUserId)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
+	following,err:=db.CheckUserFollowingOtherUser(UserId,OtherUserId)
 	return responseOKWithData(gin.H{
 		"username": user.UserName,
 		"iconUrl":  user.HeadPortraitUrl,
@@ -157,6 +158,7 @@ func getUserInformationFromUserId(SessionId string, TargetUserId string) respons
 		"weight":   user.Weight,
 		"exp":      user.Exp,
 		"level":    user.Level,
+		"isFollow": following,
 	})
 }
 

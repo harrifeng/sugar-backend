@@ -24,4 +24,5 @@ config.go
 config.py
 venv
 data
+__pycache__
 

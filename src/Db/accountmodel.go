@@ -192,3 +192,13 @@ func GetUserFollowingList(UserId string, BeginId string, NeedNumber string) ([]U
 	count := mysqlDb.Model(&user).Association("FollowingUsers").Count()
 	return users, count, err
 }
+
+func CheckUserFollowingOtherUser(UserId string,OtherUserId string)(bool,error){
+	var recordCount int
+	err :=mysqlDb.Table("user_following_ships").
+		Where("user_id = ? and following_user_id = ?",UserId,OtherUserId).Count(&recordCount).Error
+	if err!=nil{
+		return false,err
+	}
+	return recordCount > 0,nil
+}

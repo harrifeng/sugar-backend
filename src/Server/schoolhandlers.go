@@ -31,6 +31,10 @@ func getArticle(SessionId string, ArticleId string) responseBody {
 	if err != nil {
 		return responseInternalServerError(err)
 	}
+	err = db.AddArticleReadCount(ArticleId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
 	return responseOKWithData(gin.H{
 		"contentUrl": fmt.Sprintf("/school/article-page/%d", article.ID),
 		"collected":  collected,
