@@ -257,9 +257,9 @@ func bbsRemoveTopicLordReply(c *gin.Context) {
 }
 
 func bbsGetLatestTopicList(c *gin.Context) {
-	SessionId := c.PostForm("session_id")
-	TopicList := c.PostForm("topic_id_list")
-	NeedNumber := c.PostForm("need_number")
+	SessionId := c.Query("session_id")
+	TopicList := c.Query("topic_id_list")
+	NeedNumber := c.Query("need_number")
 	resp := getLatestTopicList(SessionId, TopicList, NeedNumber)
 	c.JSON(resp.Status, resp.Data)
 }
@@ -329,7 +329,7 @@ func bbsCancelCollectTopic(c *gin.Context) {
 
 func bbsSearchTopic(c *gin.Context) {
 	SessionId := c.Query("session_id")
-	SearchContent := c.Query("search_content")
+	SearchContent := c.Query("content")
 	BeginId := c.Query("begin_id")
 	NeedNumber := c.Query("need_number")
 	resp := getSearchTopicList(SessionId, SearchContent, BeginId, NeedNumber)

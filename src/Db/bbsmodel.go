@@ -95,7 +95,7 @@ func AddTopicLayerReply(UserId string, TopicLordReplyId string, Content string) 
 func GetTopicFromTopicId(TopicId string) (Topic, error) {
 	var topic Topic
 	topicId, _ := strconv.Atoi(TopicId)
-	err := mysqlDb.First(&topic, topicId).Error
+	err := mysqlDb.Preload("User").First(&topic, topicId).Error
 	return topic, err
 }
 
@@ -135,7 +135,7 @@ func GetTopicLayerReplyListFromTopicLordReplyId(TopicLordReplyId string, BeginId
 	}
 	beginId, _ := strconv.Atoi(BeginId)
 	needNumber, _ := strconv.Atoi(NeedNumber)
-	err = mysqlDb.Model(&topicLordReply).Offset(beginId).Limit(needNumber).
+	err = mysqlDb.Model(&topicLordReply).Preload("User").Offset(beginId).Limit(needNumber).
 		Related(&topicLayerReplies, "LayerReplies").Error
 	return topicLayerReplies, err
 }
@@ -184,7 +184,7 @@ func GetSearchTopicList(SearchContent string, BeginId string, NeedNumber string)
 	var topics []Topic
 	beginId, _ := strconv.Atoi(BeginId)
 	needNumber, _ := strconv.Atoi(NeedNumber)
-	err := mysqlDb.Where("title LIKE ?",
+	err := mysqlDb.Where("content LIKE ?",
 		fmt.Sprintf("%%%s%%", SearchContent)).Offset(beginId).Limit(needNumber).Find(&topics).Error
 	return topics, err
 }

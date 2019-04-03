@@ -39,7 +39,7 @@ func initRouter() {
 	r.POST("/bbs/topic/layer-reply/publish", bbsPublishTopicLayerReply)
 	r.POST("/bbs/topic/remove", bbsRemoveTopic)
 	r.POST("/bbs/topic/lord-reply/remove", bbsRemoveTopicLordReply)
-	r.POST("/bbs/topics", bbsGetLatestTopicList)
+	r.GET("/bbs/topics", bbsGetLatestTopicList)
 	r.GET("/bbs/topic", bbsGetTopic)
 	r.GET("/bbs/topic/lord-reply", bbsGetTopicLordReplyList)
 	r.GET("/bbs/topic/layer-reply", bbsGetTopicLayerReplyList)
