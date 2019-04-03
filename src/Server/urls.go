@@ -66,5 +66,6 @@ func initRouter() {
 	r.GET("/school/articles/user-comments", schoolGetUserArticleCommentList)
 	r.POST("/school/articles/user-collect", schoolCollectArticle)
 	r.POST("/school/articles/user-cancel-collect", schoolCancelCollectArticle)
+	r.POST("/school/article/comments/value", schoolValueArticle)
 	// school end
 }

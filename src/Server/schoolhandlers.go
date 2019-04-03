@@ -250,3 +250,21 @@ func removeCollectedArticle(SessionId string, ArticleId string) responseBody {
 	}
 	return responseOK()
 }
+
+func valueArticleComment(SessionId string, ArticleCommentId string, Value string) responseBody {
+	if SessionId == "" {
+		return responseNormalError("请先登录")
+	}
+	userId, err := db.GetNowSessionId(SessionId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	if userId == "" {
+		return responseNormalError("请先登录")
+	}
+	err = db.ValueArticleComment(ArticleCommentId, Value)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	return responseOK()
+}

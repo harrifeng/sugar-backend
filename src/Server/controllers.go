@@ -211,6 +211,14 @@ func schoolCancelCollectArticle(c *gin.Context) {
 	c.JSON(resp.Status, resp.Data)
 }
 
+func schoolValueArticle(c *gin.Context) {
+	SessionId := c.PostForm("session_id")
+	ArticleCommentId := c.PostForm("article_comment_id")
+	Value := c.PostForm("value")
+	resp := valueArticleComment(SessionId, ArticleCommentId, Value)
+	c.JSON(resp.Status, resp.Data)
+}
+
 func bbsPublishTopic(c *gin.Context) {
 	SessionId := c.PostForm("session_id")
 	Content := c.PostForm("content")

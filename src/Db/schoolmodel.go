@@ -149,3 +149,22 @@ func CheckUserCollectedArticle(UserId string, ArticleId string) (bool, error) {
 	//fmt.Println(!exist)
 	return !exist, nil
 }
+
+func getArticleCommentFromArticleCommentId(ArticleCommentId string) (ArticleComment, error) {
+	var articleCommentTmp ArticleComment
+	articleCommentId, _ := strconv.Atoi(ArticleCommentId)
+	if mysqlDb.First(&articleCommentTmp, articleCommentId).RecordNotFound() {
+		return articleCommentTmp, errors.New("this article comment has not existed")
+	}
+	return articleCommentTmp, nil
+}
+
+func ValueArticleComment(ArticleCommentId string, Value string) error {
+	articleComment, err := getArticleCommentFromArticleCommentId(ArticleCommentId)
+	if err != nil {
+		return err
+	}
+	value, _ := strconv.Atoi(Value)
+	articleComment.ThumbsUpCount += value
+	return mysqlDb.Save(&articleComment).Error
+}

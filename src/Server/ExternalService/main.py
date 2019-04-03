@@ -14,6 +14,8 @@ def make_server():
 
 if __name__ == '__main__':
     app = make_server()
-    app.listen(7799)
+    port = 7799
+    app.listen(port)
+    print("server running on 127.0.0.1:%d" % port)
     tornado.ioloop.IOLoop.current().start()
 
