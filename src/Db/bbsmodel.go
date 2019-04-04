@@ -260,15 +260,10 @@ func GetTopicReplyCount(TopicId string) (int, error) {
 }
 
 func CheckUserCollectedTopic(UserId string, TopicId string) (bool, error) {
-	user, err := GetUserFromUserId(UserId)
-	if err != nil {
-		return false, err
-	}
-	var topics []Topic
-	var topic Topic
-	topicId, _ := strconv.Atoi(TopicId)
-	exist := mysqlDb.Model(&user).Related(&topics, "CollectedTopics").First(&topic, topicId).RecordNotFound()
-	return exist, nil
+	var count int
+	err:=mysqlDb.Table("user_collected_topic").
+		Where("user_id=? and topic_id=?",UserId,TopicId).Count(&count).Error
+	return count>0, err
 }
 
 func GetTopicLayerReplyCountFromTopicLordReply(TopicLordReplyId string) (int, error) {

@@ -139,15 +139,10 @@ func GetArticleCommentCount(ArticleId string) (int, error) {
 }
 
 func CheckUserCollectedArticle(UserId string, ArticleId string) (bool, error) {
-	user, err := GetUserFromUserId(UserId)
-	if err != nil {
-		return false, err
-	}
-	var articles []Article
-	exist := mysqlDb.Model(&user).Where("article_id = ?", ArticleId).
-		Related(&articles, "CollectedArticles").RecordNotFound()
-	//fmt.Println(!exist)
-	return !exist, nil
+	var count int
+	err := mysqlDb.Table("user_collected_article").
+		Where("user_id=? and article_id=?", UserId,ArticleId).Count(&count).Error
+	return count>0, err
 }
 
 func getArticleCommentFromArticleCommentId(ArticleCommentId string) (ArticleComment, error) {

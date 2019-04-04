@@ -81,7 +81,6 @@ type Topic struct {
 	UserID          int
 	ThumbsUpCount   int `gorm:"not null;default:'0'"`
 	LordReplies     []TopicLordReply
-	CollectingUsers []User
 }
 
 type TopicLordReply struct {
