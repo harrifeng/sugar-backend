@@ -41,3 +41,18 @@ func InitMysql() (*gorm.DB, error) {
 	mysqlDb, err = gorm.Open("mysql", mysqlLinkString())
 	return mysqlDb, err
 }
+
+func Transction(mission func(*gorm.DB)error) error {
+	tx := mysqlDb.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+	err := mission(tx)
+	if err!=nil{
+		tx.Rollback()
+		return err
+	}
+	return tx.Commit().Error
+}

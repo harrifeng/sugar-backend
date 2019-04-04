@@ -111,7 +111,8 @@ func GetUserCollectedArticleList(UserId string, BeginId string, NeedNumber strin
 	}
 	beginId, _ := strconv.Atoi(BeginId)
 	needNumber, _ := strconv.Atoi(NeedNumber)
-	err = mysqlDb.Model(&user).Offset(beginId).Limit(needNumber).Related(&articles, "CollectedArticles").Error
+	err = mysqlDb.Model(&user).Offset(beginId).Limit(needNumber).
+		Related(&articles, "CollectedArticles").Error
 	return articles, err
 }
 

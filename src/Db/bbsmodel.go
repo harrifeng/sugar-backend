@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"github.com/jinzhu/gorm"
 	"strconv"
 	"time"
 )
@@ -31,26 +32,16 @@ func AddTopicLordReply(UserId string, TopicId string, Content string) error {
 	}
 	var topicTmp Topic
 	topicId, _ := strconv.Atoi(TopicId)
-	mysqlDb.First(&topicTmp, topicId)
-	tx := mysqlDb.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
+
+	return Transction(func(db *gorm.DB) error {
+		db.First(&topicTmp, topicId)
+		err = db.Model(&topicTmp).Association("LordReplies").Append(topicLordReply).Error
+		if err != nil {
+			return err
 		}
-	}()
-	err = tx.Model(&topicTmp).Association("LordReplies").Append(topicLordReply).Error
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-	topicTmp.UpdatedAt = time.Now()
-	err = tx.Save(&topicTmp).Error
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-	err = tx.Commit().Error
-	return err
+		topicTmp.UpdatedAt = time.Now()
+		return  db.Save(&topicTmp).Error
+	})
 }
 
 func AddTopicLayerReply(UserId string, TopicLordReplyId string, Content string) error {
@@ -72,24 +63,17 @@ func AddTopicLayerReply(UserId string, TopicLordReplyId string, Content string) 
 	if err != nil {
 		return err
 	}
-	tx := mysqlDb.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
+	return Transction(func(db *gorm.DB) error {
+		err = db.Model(&topicLordReplyTmp).Association("LayerReplies").Append(topicLayerReply).Error
+		if err != nil {
+			return err
 		}
-	}()
-	err = tx.Model(&topicLordReplyTmp).Association("LayerReplies").Append(topicLayerReply).Error
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-	err = tx.Save(&topic).Error
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-	err = tx.Commit().Error
-	return err
+		err = db.Save(&topic).Error
+		if err != nil {
+			return err
+		}
+		return db.Commit().Error
+	})
 }
 
 func GetTopicFromTopicId(TopicId string) (Topic, error) {
@@ -252,7 +236,8 @@ func GetTopicReplyCount(TopicId string) (int, error) {
 		return 0, err
 	}
 	var topicLordReplies []TopicLordReply
-	count := mysqlDb.Preload("LayerReplies").Model(&topic).Association("LordReplies").Find(&topicLordReplies).Count()
+	count := mysqlDb.Preload("LayerReplies").Model(&topic).
+		Association("LordReplies").Find(&topicLordReplies).Count()
 	for _, topic := range topicLordReplies {
 		count += len(topic.LayerReplies)
 	}

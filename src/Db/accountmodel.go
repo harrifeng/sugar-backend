@@ -3,18 +3,19 @@ package db
 import (
 	"errors"
 	"fmt"
+	"github.com/jinzhu/gorm"
 	"math/rand"
 	"strconv"
 )
 
 func CreateNewUser(PhoneNumber string, UserName string, Password string) error {
 	imageNumber := rand.Intn(35) + 10
-	HeadPictureUrl := fmt.Sprintf("/static/userImg/usertile%d.jpg", imageNumber)
+	headPictureUrl := fmt.Sprintf("/static/userImg/usertile%d.jpg", imageNumber)
 	user := User{
 		PhoneNumber:     PhoneNumber,
 		Password:        Password,
 		UserName:        UserName,
-		HeadPortraitUrl: HeadPictureUrl,
+		HeadPortraitUrl: headPictureUrl,
 		UserPrivacySetting: UserPrivacySetting{
 			ShowPhoneNumber: true,
 			ShowGender:      true,
@@ -67,14 +68,8 @@ func AlterUserPrivacySettingFromUserId(UserId string, ShowPhoneNumber bool, Show
 	if err != nil {
 		return err
 	}
-	tx := mysqlDb.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
 	var privacySetting UserPrivacySetting
-	err = tx.Model(&user).Association("UserPrivacySetting").Find(&privacySetting).Error
+	err = mysqlDb.Model(&user).Association("UserPrivacySetting").Find(&privacySetting).Error
 	if err != nil {
 		return err
 	}
@@ -85,11 +80,8 @@ func AlterUserPrivacySettingFromUserId(UserId string, ShowPhoneNumber bool, Show
 	privacySetting.ShowWeight = ShowWeight
 	privacySetting.ShowArea = ShowArea
 	privacySetting.ShowJob = ShowJob
-	err = tx.Model(&user).Association("UserPrivacySetting").Replace(&privacySetting).Error
-	if err != nil {
-		return err
-	}
-	return tx.Commit().Error
+	err = mysqlDb.Model(&user).Association("UserPrivacySetting").Replace(&privacySetting).Error
+	return err
 }
 
 func AlterUserPasswordFromPhoneNumber(PhoneNumber string, NewPassword string) error {
@@ -123,52 +115,43 @@ func AlterUserInformationFromUserId(UserId string, UserName string, Gender strin
 }
 
 func AddUserFollowing(UserId string, TargetUserId string) error {
-	var user1, user2 User
-	tx := mysqlDb.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
+	return  Transction(func(db *gorm.DB) error {
+		var user1, user2 User
+		db.Preload("FollowingUsers").First(&user1, UserId)
+		user1To, err := GetUserFromUserId(TargetUserId)
+		if err != nil {
+			return err
 		}
-	}()
-	tx.Preload("FollowingUsers").First(&user1, UserId)
-	user1To, err := GetUserFromUserId(TargetUserId)
-	if err != nil {
-		return err
-	}
-	tx.Model(&user1).Association("FollowingUsers").Append(&user1To)
+		db.Model(&user1).Association("FollowingUsers").Append(&user1To)
 
-	tx.Preload("FollowerUsers").First(&user2, TargetUserId)
-	user2To, err := GetUserFromUserId(UserId)
-	if err != nil {
-		return err
-	}
-	tx.Model(&user2).Association("FollowerUsers").Append(&user2To)
-	return tx.Commit().Error
+		db.Preload("FollowerUsers").First(&user2, TargetUserId)
+		user2To, err := GetUserFromUserId(UserId)
+		if err != nil {
+			return err
+		}
+		db.Model(&user2).Association("FollowerUsers").Append(&user2To)
+		return nil
+	})
 }
 
 func RemoveUserFollowing(UserId string, TargetUserId string) error {
-	var user1, user2 User
-	tx := mysqlDb.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
+	return  Transction(func(db *gorm.DB) error {
+		var user1, user2 User
+		db.Preload("FollowingUsers").First(&user1, UserId)
+		user1To, err := GetUserFromUserId(TargetUserId)
+		if err != nil {
+			return err
 		}
-	}()
-	tx.Preload("FollowingUsers").First(&user1, UserId)
-	user1To, err := GetUserFromUserId(TargetUserId)
-	if err != nil {
-		return err
-	}
-	tx.Model(&user1).Association("FollowingUsers").Delete(&user1To)
+		db.Model(&user1).Association("FollowingUsers").Delete(&user1To)
 
-	tx.Preload("FollowerUsers").First(&user2, TargetUserId)
-	user2To, err := GetUserFromUserId(UserId)
-	if err != nil {
-		return err
-	}
-	tx.Model(&user2).Association("FollowerUsers").Delete(&user2To)
-	err = tx.Commit().Error
-	return err
+		db.Preload("FollowerUsers").First(&user2, TargetUserId)
+		user2To, err := GetUserFromUserId(UserId)
+		if err != nil {
+			return err
+		}
+		db.Model(&user2).Association("FollowerUsers").Delete(&user2To)
+		return nil
+	})
 }
 
 func GetUserFollowerList(UserId string, BeginId string, NeedNumber string) ([]User, int, error) {
@@ -197,8 +180,5 @@ func CheckUserFollowingOtherUser(UserId string,OtherUserId string)(bool,error){
 	var recordCount int
 	err :=mysqlDb.Table("user_following_ships").
 		Where("user_id = ? and following_user_id = ?",UserId,OtherUserId).Count(&recordCount).Error
-	if err!=nil{
-		return false,err
-	}
-	return recordCount > 0,nil
+	return recordCount > 0,err
 }
