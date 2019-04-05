@@ -7,7 +7,7 @@ import (
 	"utils"
 )
 
-//WARNING
+// 获取单个文章信息
 func getArticle(SessionId string, ArticleId string) responseBody {
 	if SessionId == "" {
 		return responseNormalError("请先登录")
@@ -42,6 +42,7 @@ func getArticle(SessionId string, ArticleId string) responseBody {
 	})
 }
 
+// 获取文章HTML页面
 func getArticlePage(ArticleId string) (string, error) {
 	article, err := db.GetArticleFromArticleId(ArticleId)
 	if err != nil {
@@ -50,6 +51,7 @@ func getArticlePage(ArticleId string) (string, error) {
 	return article.Content, err
 }
 
+// 获取文章列表
 func getArticleList(SessionId string, BeginId string, NeedNumber string) responseBody {
 	if SessionId == "" {
 		return responseNormalError("请先登录")
@@ -76,6 +78,7 @@ func getArticleList(SessionId string, BeginId string, NeedNumber string) respons
 	return responseOKWithData(respArticles)
 }
 
+// 创建文章评论
 func createArticleComment(SessionId string, ArticleId string, Content string) responseBody {
 	if SessionId == "" {
 		return responseNormalError("请先登录")
@@ -94,6 +97,7 @@ func createArticleComment(SessionId string, ArticleId string, Content string) re
 	return responseOK()
 }
 
+// 获取文章的评论列表
 func getArticleCommentList(SessionId string, ArticleId string, BeginId string, NeedNumber string) responseBody {
 	if SessionId == "" {
 		return responseNormalError("请先登录")
