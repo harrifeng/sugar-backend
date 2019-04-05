@@ -12,8 +12,8 @@ import (
 	"utils"
 )
 
-func sendVerificationCode(PhoneNumber string) responseBody {
-	nowCode, err := db.GetNowVerificationCode(PhoneNumber)
+func sendVerificationCode(phoneNumber string) responseBody {
+	nowCode, err := db.GetNowVerificationCode(phoneNumber)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
@@ -24,7 +24,7 @@ func sendVerificationCode(PhoneNumber string) responseBody {
 		code = utils.RandCode()
 	}
 	url := fmt.Sprintf("http://127.0.0.1:7799/send_message?phone_number=%s&code=%s",
-		PhoneNumber, code)
+		phoneNumber, code)
 	resp, err := http.Get(url)
 
 	if err != nil {
@@ -42,7 +42,7 @@ func sendVerificationCode(PhoneNumber string) responseBody {
 		return responseInternalServerError(err)
 	}
 	if body[0] == 'o' {
-		err := db.SetNewVerificationCode(PhoneNumber, code)
+		err := db.SetNewVerificationCode(phoneNumber, code)
 		if err != nil {
 			return responseInternalServerError(err)
 		} else {
@@ -53,45 +53,45 @@ func sendVerificationCode(PhoneNumber string) responseBody {
 
 }
 
-func registerNewUser(PhoneNumber string, Password string, UserName string, Code string) responseBody {
-	if PhoneNumber == "" {
+func registerNewUser(phoneNumber string, password string, userName string, code string) responseBody {
+	if phoneNumber == "" {
 		return responseNormalError("手机号码不能为空")
 	}
-	if Password == "" {
+	if password == "" {
 		return responseNormalError("密码不能为空")
 	}
-	if Code == "" {
+	if code == "" {
 		return responseNormalError("验证码不能为空")
 	}
-	codeCheck, err := db.CheckPhoneCodeCorrection(PhoneNumber, Code)
+	codeCheck, err := db.CheckPhoneCodeCorrection(phoneNumber, code)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
 	if !codeCheck {
 		return responseNormalError("验证码错误或已失效")
 	}
-	err = db.CreateNewUser(PhoneNumber, UserName, Password)
+	err = db.CreateNewUser(phoneNumber, userName, password)
 	if err != nil {
 		return responseNormalError("用户已经存在")
 	}
 	return responseOK()
 }
 
-func loginUser(PhoneNumber string, Password string) responseBody {
-	if PhoneNumber == "" {
+func loginUser(phoneNumber string, password string) responseBody {
+	if phoneNumber == "" {
 		return responseNormalError("手机号码不能为空")
 	}
-	if Password == "" {
+	if password == "" {
 		return responseNormalError("密码不能为空")
 	}
-	user, err := db.GetUserFromPhoneNumber(PhoneNumber)
+	user, err := db.GetUserFromPhoneNumber(phoneNumber)
 	if err != nil {
 		return responseNormalError("用户不存在")
 	}
-	if user.Password != Password {
+	if user.Password != password {
 		return responseNormalError("密码错误")
 	}
-	sessionId, err := db.GetNowSessionId(PhoneNumber)
+	sessionId, err := db.GetNowSessionId(phoneNumber)
 	var userId string
 	if err != nil {
 		return responseInternalServerError(err)
@@ -115,38 +115,40 @@ func loginUser(PhoneNumber string, Password string) responseBody {
 	})
 }
 
-func alterUserInformation(SessionId string, UserName string, Gender string, Height float64,
-	Weight float64, Area string, Job string, Age int) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	err = db.AlterUserInformationFromUserId(userId, UserName, Gender, Height, Weight, Area, Job, Age)
+func alterUserInformation(userId int, userName string, gender string, height float64,
+	weight float64, area string, job string, age int) responseBody {
+	err := db.AlterUserInformationFromUserId(userId, userName, gender, height, weight, area, job, age)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
 	return responseOK()
 }
 
-func getUserInformationFromUserId(SessionId string, OtherUserId string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	UserId, err := db.GetNowSessionId(SessionId)
+func getUserInfoFromUserId(userId int)responseBody{
+	user, err := db.GetUserFromUserId(userId)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
-	if UserId == "" {
-		return responseNormalError("请先登录")
-	}
-	user, err := db.GetUserFromUserId(OtherUserId)
+	return responseOKWithData(gin.H{
+		"username": user.UserName,
+		"iconUrl":  user.HeadPortraitUrl,
+		"age":      user.Age,
+		"gender":   user.Gender,
+		"job":      user.Job,
+		"area":     user.Area,
+		"height":   user.Height,
+		"weight":   user.Weight,
+		"exp":      user.Exp,
+		"level":    user.Level,
+	})
+}
+
+func getOtherUserInformationFromOtherUserId(userId int, otherUserId int) responseBody {
+	user, err := db.GetUserFromUserId(otherUserId)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
-	following, err := db.CheckUserFollowingOtherUser(UserId, OtherUserId)
+	following, err := db.CheckUserFollowingOtherUser(userId, otherUserId)
 	return responseOKWithData(gin.H{
 		"username": user.UserName,
 		"iconUrl":  user.HeadPortraitUrl,
@@ -162,50 +164,36 @@ func getUserInformationFromUserId(SessionId string, OtherUserId string) response
 	})
 }
 
-func getUserInformationFromSessionId(SessionId string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	return getUserInformationFromUserId(SessionId, userId)
-}
 
-func alterPassword(PhoneNumber string, Code string, NewPassword string) responseBody {
-	if PhoneNumber == "" {
+func alterPassword(phoneNumber string, code string, newPassword string) responseBody {
+	if phoneNumber == "" {
 		return responseNormalError("手机号码不能为空")
 	}
-	if NewPassword == "" {
+	if newPassword == "" {
 		return responseNormalError("新密码不能为空")
 	}
-	if Code == "" {
+	if code == "" {
 		return responseNormalError("验证码不能为空")
 	}
-	codeCheck, err := db.CheckPhoneCodeCorrection(PhoneNumber, Code)
+	codeCheck, err := db.CheckPhoneCodeCorrection(phoneNumber, code)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
 	if !codeCheck {
 		return responseNormalError("验证码错误或已失效")
 	}
-	err = db.AlterUserPasswordFromPhoneNumber(PhoneNumber, NewPassword)
+	err = db.AlterUserPasswordFromPhoneNumber(phoneNumber, newPassword)
 	if err != nil {
 		return responseNormalError("用户不存在")
 	}
 	return responseOK()
 }
 
-func getUserPrivacySetting(SessionId string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
+func getUserPrivacySetting(userId int) responseBody {
+	privacySetting, err := db.GetPrivacySettingFromUserId(userId)
+	if err!=nil{
 		return responseInternalServerError(err)
 	}
-	privacySetting, err := db.GetPrivacySettingFromUserId(userId)
 	return responseOKWithData(gin.H{
 		"showPhone":  privacySetting.ShowPhoneNumber,
 		"showGender": privacySetting.ShowGender,
@@ -217,62 +205,37 @@ func getUserPrivacySetting(SessionId string) responseBody {
 	})
 }
 
-func alterUserPrivacy(SessionId string, ShowPhoneNumber bool, ShowGender bool, ShowAge bool,
-	ShowHeight bool, ShowWeight bool, ShowArea bool, ShowJob bool) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	err = db.AlterUserPrivacySettingFromUserId(userId, ShowPhoneNumber, ShowGender, ShowAge,
-		ShowHeight, ShowWeight, ShowArea, ShowJob)
+func alterUserPrivacy(userId int, showPhoneNumber bool, showGender bool, showAge bool,
+	showHeight bool, showWeight bool, showArea bool, showJob bool) responseBody {
+	err := db.AlterUserPrivacySettingFromUserId(userId, showPhoneNumber, showGender, showAge,
+		showHeight, showWeight, showArea, showJob)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
 	return responseOK()
 }
 
-func followUser(SessionId string, TargetUserId string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	err = db.AddUserFollowing(userId, TargetUserId)
+func followUser(userId int, targetUserId int) responseBody {
+	err := db.AddUserFollowing(userId, targetUserId)
 	if err != nil {
 		responseInternalServerError(err)
 	}
 	return responseOK()
 }
 
-func ignoreUser(SessionId string, TargetUserId string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	err = db.RemoveUserFollowing(userId, TargetUserId)
+func ignoreUser(userId int, targetUserId int) responseBody {
+	err := db.RemoveUserFollowing(userId, targetUserId)
 	if err != nil {
 		responseInternalServerError(err)
 	}
 	return responseOK()
 }
 
-func getUserFollowingList(SessionId string, BeginId string, NeedNumber string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
+func getUserFollowingList(userId int, beginId int, needNumber int) responseBody {
+	users, count, err := db.GetUserFollowingList(userId, beginId, needNumber)
+	if err!=nil{
 		return responseInternalServerError(err)
 	}
-	users, count, err := db.GetUserFollowingList(userId, BeginId, NeedNumber)
 	respUsers := make([]gin.H, len(users))
 	for i := 0; i < len(users); i++ {
 		respUsers[i] = gin.H{
@@ -287,15 +250,11 @@ func getUserFollowingList(SessionId string, BeginId string, NeedNumber string) r
 	})
 }
 
-func getUserFollowerList(SessionId string, BeginId string, NeedNumber string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
+func getUserFollowerList(userId int, beginId int, needNumber int) responseBody {
+	users, count, err := db.GetUserFollowerList(userId, beginId, needNumber)
+	if err!=nil{
 		return responseInternalServerError(err)
 	}
-	users, count, err := db.GetUserFollowerList(userId, BeginId, NeedNumber)
 	respUsers := make([]gin.H, len(users))
 	for i := 0; i < len(users); i++ {
 		respUsers[i] = gin.H{

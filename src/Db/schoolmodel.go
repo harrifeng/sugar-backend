@@ -4,90 +4,78 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
-	"strconv"
 )
 
-func AddNewArticle(Title string, Content string,PlainContent string) error {
+func AddNewArticle(title string, content string, plainContent string) error {
 	imageNum := rand.Intn(155) + 1
-	coverImageUrl := fmt.Sprintf("/static/articleImg/%d.jpg",imageNum)
+	coverImageUrl := fmt.Sprintf("/static/articleImg/%d.jpg", imageNum)
 	article := Article{
-		Title:   Title,
-		Content: Content,
-		PlainContent:PlainContent,
-		CoverImageUrl:coverImageUrl,
+		Title:         title,
+		Content:       content,
+		PlainContent:  plainContent,
+		CoverImageUrl: coverImageUrl,
 	}
 	mysqlDb.Create(&article)
 	mysqlDb.Save(&article)
 	return nil
 }
 
-func GetArticleFromArticleId(ArticleId string) (Article, error) {
+func GetArticleFromArticleId(articleId int) (Article, error) {
 	var articleTmp Article
-	articleId, _ := strconv.Atoi(ArticleId)
 	if mysqlDb.First(&articleTmp, articleId).RecordNotFound() {
 		return articleTmp, errors.New("this article has not existed")
 	}
 	return articleTmp, nil
 }
 
-func GetArticleList(BeginId string, NeedNumber string) ([]Article, error) {
+func GetArticleList(beginId int, needNumber int) ([]Article, error) {
 	var articles []Article
-	beginId, _ := strconv.Atoi(BeginId)
-	needNumber, _ := strconv.Atoi(NeedNumber)
 	err := mysqlDb.Offset(beginId).Limit(needNumber).Find(&articles).Error
 	return articles, err
 }
 
-func AddArticleComment(UserId string, ArticleId string, Content string) error {
-	user, err := GetUserFromUserId(UserId)
+func AddArticleComment(userId int, articleId int, content string) error {
+	user, err := GetUserFromUserId(userId)
 	if err != nil {
 		return err
 	}
 	articleComment := ArticleComment{
-		Content: Content,
+		Content: content,
 		User:    user,
 	}
 	var articleTmp Article
-	articleId, _ := strconv.Atoi(ArticleId)
 	mysqlDb.First(&articleTmp, articleId)
 	err = mysqlDb.Model(&articleTmp).Association("ArticleComments").Append(articleComment).Error
 	return err
 }
 
-func GetArticleCommentListFromArticleId(ArticleId string, BeginId string, NeedNumber string) ([]ArticleComment, error) {
+func GetArticleCommentListFromArticleId(articleId int, beginId int, needNumber int) ([]ArticleComment, error) {
 	var comments []ArticleComment
-	articleId, _ := strconv.Atoi(ArticleId)
-	beginId, _ := strconv.Atoi(BeginId)
-	needNumber, _ := strconv.Atoi(NeedNumber)
 	err := mysqlDb.Preload("User").Where(&ArticleComment{ArticleID: articleId}).
 		Offset(beginId).Limit(needNumber).Find(&comments).Error
 	return comments, err
 }
 
-func GetArticleCommentListFromUserId(UserId string, BeginId string, NeedNumber string) ([]ArticleComment, error) {
+func GetArticleCommentListFromUserId(userId int, beginId int, needNumber int) ([]ArticleComment, error) {
 	var comments []ArticleComment
-	userId, _ := strconv.Atoi(UserId)
-	beginId, _ := strconv.Atoi(BeginId)
-	needNumber, _ := strconv.Atoi(NeedNumber)
-	err := mysqlDb.Preload("Article").Where(&ArticleComment{UserID: userId}).Offset(beginId).Limit(needNumber).Find(&comments).Error
+	err := mysqlDb.Preload("Article").Where(&ArticleComment{UserID: userId}).
+		Offset(beginId).Limit(needNumber).Find(&comments).Error
 	return comments, err
 }
 
-func GetSearchArticleList(SearchContent string, BeginId string, NeedNumber string) ([]Article, error) {
+func GetSearchArticleList(searchContent string, beginId int, needNumber int) ([]Article, error) {
 	var articles []Article
-	beginId, _ := strconv.Atoi(BeginId)
-	needNumber, _ := strconv.Atoi(NeedNumber)
 	err := mysqlDb.Where("title LIKE ?",
-		fmt.Sprintf("%%%s%%", SearchContent)).Offset(beginId).Limit(needNumber).Find(&articles).Error
+		fmt.Sprintf("%%%s%%", searchContent)).Offset(beginId).Limit(needNumber).Find(&articles).Error
 	return articles, err
 }
 
-func AddUserCollectedArticle(UserId string, ArticleId string) error {
-	user, err := GetUserFromUserId(UserId)
+func AddUserCollectedArticle(userId int, articleId int) error {
+	user, err := GetUserFromUserId(userId)
 	if err != nil {
 		return err
 	}
-	article, err := GetArticleFromArticleId(ArticleId)
+	article, err := GetArticleFromArticleId(articleId)
 	if err != nil {
 		return err
 	}
@@ -95,12 +83,12 @@ func AddUserCollectedArticle(UserId string, ArticleId string) error {
 	return err
 }
 
-func RemoveUserCollectedArticle(UserId string, ArticleId string) error {
-	user, err := GetUserFromUserId(UserId)
+func RemoveUserCollectedArticle(userId int, articleId int) error {
+	user, err := GetUserFromUserId(userId)
 	if err != nil {
 		return err
 	}
-	article, err := GetArticleFromArticleId(ArticleId)
+	article, err := GetArticleFromArticleId(articleId)
 	if err != nil {
 		return err
 	}
@@ -108,21 +96,19 @@ func RemoveUserCollectedArticle(UserId string, ArticleId string) error {
 	return err
 }
 
-func GetUserCollectedArticleList(UserId string, BeginId string, NeedNumber string) ([]Article, error) {
+func GetUserCollectedArticleList(userId int, beginId int, needNumber int) ([]Article, error) {
 	var articles []Article
-	user, err := GetUserFromUserId(UserId)
+	user, err := GetUserFromUserId(userId)
 	if err != nil {
 		return articles, err
 	}
-	beginId, _ := strconv.Atoi(BeginId)
-	needNumber, _ := strconv.Atoi(NeedNumber)
 	err = mysqlDb.Model(&user).Offset(beginId).Limit(needNumber).
 		Related(&articles, "CollectedArticles").Error
 	return articles, err
 }
 
-func GetUserCollectedArticleCount(UserId string) (int, error) {
-	user, err := GetUserFromUserId(UserId)
+func GetUserCollectedArticleCount(userId int) (int, error) {
+	user, err := GetUserFromUserId(userId)
 	if err != nil {
 		return 0, err
 	}
@@ -130,48 +116,44 @@ func GetUserCollectedArticleCount(UserId string) (int, error) {
 	return count, nil
 }
 
-func GetUserArticleCommentCount(UserId string) (int, error) {
-	userId, _ := strconv.Atoi(UserId)
+func GetUserArticleCommentCount(userId int) (int, error) {
 	var count int
 	err := mysqlDb.Model(&ArticleComment{}).Where(&ArticleComment{UserID: userId}).Count(&count).Error
 	return count, err
 }
 
-func GetArticleCommentCount(ArticleId string) (int, error) {
-	articleId, _ := strconv.Atoi(ArticleId)
+func GetArticleCommentCount(articleId int) (int, error) {
 	var count int
 	err := mysqlDb.Model(&ArticleComment{}).Where(&ArticleComment{ArticleID: articleId}).Count(&count).Error
 	return count, err
 }
 
-func CheckUserCollectedArticle(UserId string, ArticleId string) (bool, error) {
+func CheckUserCollectedArticle(userId int, articleId int) (bool, error) {
 	var count int
 	err := mysqlDb.Table("user_collected_article").
-		Where("user_id=? and article_id=?", UserId, ArticleId).Count(&count).Error
+		Where("user_id=? and article_id=?", userId, articleId).Count(&count).Error
 	return count > 0, err
 }
 
-func getArticleCommentFromArticleCommentId(ArticleCommentId string) (ArticleComment, error) {
+func getArticleCommentFromArticleCommentId(articleCommentId int) (ArticleComment, error) {
 	var articleCommentTmp ArticleComment
-	articleCommentId, _ := strconv.Atoi(ArticleCommentId)
 	if mysqlDb.First(&articleCommentTmp, articleCommentId).RecordNotFound() {
 		return articleCommentTmp, errors.New("this article comment has not existed")
 	}
 	return articleCommentTmp, nil
 }
 
-func ValueArticleComment(ArticleCommentId string, Value string) error {
-	articleComment, err := getArticleCommentFromArticleCommentId(ArticleCommentId)
+func ValueArticleComment(articleCommentId int, value int) error {
+	articleComment, err := getArticleCommentFromArticleCommentId(articleCommentId)
 	if err != nil {
 		return err
 	}
-	value, _ := strconv.Atoi(Value)
 	articleComment.ThumbsUpCount += value
 	return mysqlDb.Save(&articleComment).Error
 }
 
-func AddArticleReadCount(ArticleId string) error {
-	article, err := GetArticleFromArticleId(ArticleId)
+func AddArticleReadCount(articleId int) error {
+	article, err := GetArticleFromArticleId(articleId)
 	if err != nil {
 		return err
 	}

@@ -1,18 +1,12 @@
 package server
 
 import (
-	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 func urlsRoot(c *gin.Context) {
-	urls := map[string]string{
-		"GET_code_url": "/code",
-	}
-	j, _ := json.Marshal(urls)
-	r := string(j)
-	c.String(http.StatusOK, r)
+	c.String(http.StatusOK, "loading...")
 }
 
 func initRouter() {
@@ -23,18 +17,19 @@ func initRouter() {
 		accountsGroup.GET("/code", accountSendVerificationCode)
 		accountsGroup.POST("/register", accountRegister)
 		accountsGroup.GET("/login", accountLogin)
-		accountsGroup.POST("/alter", accountAlterInformation)
-		accountsGroup.GET("/info", accountGetUserInformation)
 		accountsGroup.POST("/alter/password", accountAlterPassword)
-		accountsGroup.GET("/privacy", accountGetUserPrivacySetting)
-		accountsGroup.POST("/alter/privacy", accountAlterUserPrivacySetting)
 		accountsGroup.GET("/logout", accountLogout)
-		accountsGroup.GET("/follower", accountGetUserFollowerList)
-		accountsGroup.GET("/following", accountGetUserFollowingList)
-		accountsGroup.POST("/following/follow", accountFollowUser)
-		accountsGroup.POST("/following/ignore", accountIgnoreUser)
+		accountsGroup.POST("/alter", LoginAuth(), accountAlterInformation)
+		accountsGroup.GET("/info", LoginAuth(), accountGetUserInformation)
+		accountsGroup.GET("/privacy",LoginAuth(), accountGetUserPrivacySetting)
+		accountsGroup.POST("/alter/privacy",LoginAuth(), accountAlterUserPrivacySetting)
+		accountsGroup.GET("/follower",LoginAuth(), accountGetUserFollowerList)
+		accountsGroup.GET("/following", LoginAuth(),accountGetUserFollowingList)
+		accountsGroup.POST("/following/follow",LoginAuth(), accountFollowUser)
+		accountsGroup.POST("/following/ignore",LoginAuth(), accountIgnoreUser)
 	}
-	bbsGroup:=r.Group("bbs")
+	bbsGroup := r.Group("bbs")
+	bbsGroup.Use(LoginAuth())
 	{
 		bbsGroup.POST("/topic/publish", bbsPublishTopic)
 		bbsGroup.POST("/topic/lord-reply/publish", bbsPublishTopicLordReply)
@@ -56,6 +51,7 @@ func initRouter() {
 		bbsGroup.GET("/topics/user-replies", bbsGetUserTopicReplyList)
 	}
 	schoolGroup := r.Group("school")
+	schoolGroup.Use(LoginAuth())
 	{
 		schoolGroup.GET("/article-page/:id", schoolGetArticlePage)
 		schoolGroup.GET("/article", schoolGetArticle)

@@ -36,7 +36,7 @@ func accountLogout(c *gin.Context) {
 }
 
 func accountAlterInformation(c *gin.Context) {
-	SessionId := c.PostForm("session_id")
+	userId,_ := c.Get("user_id")
 	UserName := c.PostForm("username")
 	Gender := c.PostForm("gender")
 	Height, _ := strconv.ParseFloat(c.PostForm("height"), 64)
@@ -44,18 +44,19 @@ func accountAlterInformation(c *gin.Context) {
 	Area := c.PostForm("area")
 	Job := c.PostForm("job")
 	Age, _ := strconv.Atoi(c.PostForm("age"))
-	resp := alterUserInformation(SessionId, UserName, Gender, Height, Weight, Area, Job, Age)
+	resp := alterUserInformation(userId.(int), UserName, Gender, Height, Weight, Area, Job, Age)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func accountGetUserInformation(c *gin.Context) {
-	SessionId := c.Query("session_id")
+	userId,_ := c.Get("user_id")
 	OtherUserId := c.Query("other_user_id")
 	var resp responseBody
 	if OtherUserId == "" {
-		resp = getUserInformationFromSessionId(SessionId)
+		resp = getUserInfoFromUserId(userId.(int))
 	} else {
-		resp = getUserInformationFromUserId(SessionId, OtherUserId)
+		otherUserId,_  := strconv.Atoi(OtherUserId)
+		resp = getOtherUserInformationFromOtherUserId(userId.(int), otherUserId)
 	}
 	c.JSON(resp.Status, resp.Data)
 }
@@ -69,13 +70,13 @@ func accountAlterPassword(c *gin.Context) {
 }
 
 func accountGetUserPrivacySetting(c *gin.Context) {
-	SessionId := c.Query("session_id")
-	resp := getUserPrivacySetting(SessionId)
+	userId,_ := c.Get("user_id")
+	resp := getUserPrivacySetting(userId.(int))
 	c.JSON(resp.Status, resp.Data)
 }
 
 func accountAlterUserPrivacySetting(c *gin.Context) {
-	SessionId := c.PostForm("session_id")
+	userId,_ := c.Get("user_id")
 	ShowPhoneNumber := c.PostForm("show_phone_number") == "true"
 	ShowGender := c.PostForm("show_gender") == "true"
 	ShowAge := c.PostForm("show_age") == "true"
@@ -83,51 +84,59 @@ func accountAlterUserPrivacySetting(c *gin.Context) {
 	ShowWeight := c.PostForm("show_weight") == "true"
 	ShowArea := c.PostForm("show_area") == "true"
 	ShowJob := c.PostForm("show_job") == "true"
-	resp := alterUserPrivacy(SessionId, ShowPhoneNumber, ShowGender,
+	resp := alterUserPrivacy(userId.(int), ShowPhoneNumber, ShowGender,
 		ShowAge, ShowHeight, ShowWeight, ShowArea, ShowJob)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func accountGetUserFollowingList(c *gin.Context) {
-	SessionId := c.Query("session_id")
+	userId,_ := c.Get("user_id")
 	BeginId := c.Query("begin_id")
+	beginId ,_ := strconv.Atoi(BeginId)
 	NeedNumber := c.Query("need_number")
-	resp := getUserFollowingList(SessionId, BeginId, NeedNumber)
+	needNumber,_ := strconv.Atoi(NeedNumber)
+	resp := getUserFollowingList(userId.(int), beginId, needNumber)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func accountGetUserFollowerList(c *gin.Context) {
-	SessionId := c.Query("session_id")
+	userId,_ := c.Get("user_id")
 	BeginId := c.Query("begin_id")
+	beginId ,_ := strconv.Atoi(BeginId)
 	NeedNumber := c.Query("need_number")
-	resp := getUserFollowerList(SessionId, BeginId, NeedNumber)
+	needNumber,_ := strconv.Atoi(NeedNumber)
+	resp := getUserFollowerList(userId.(int), beginId, needNumber)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func accountFollowUser(c *gin.Context) {
-	SessionId := c.PostForm("session_id")
-	UserId := c.PostForm("other_user_id")
-	resp := followUser(SessionId, UserId)
+	userId,_ := c.Get("user_id")
+	OtherUserId := c.PostForm("other_user_id")
+	otherUserId,_ := strconv.Atoi(OtherUserId)
+	resp := followUser(userId.(int), otherUserId)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func accountIgnoreUser(c *gin.Context) {
-	SessionId := c.PostForm("session_id")
-	UserId := c.PostForm("other_user_id")
-	resp := ignoreUser(SessionId, UserId)
+	userId,_ := c.Get("user_id")
+	OtherUserId := c.PostForm("other_user_id")
+	otherUserId,_ := strconv.Atoi(OtherUserId)
+	resp := ignoreUser(userId.(int), otherUserId)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func schoolGetArticle(c *gin.Context) {
-	SessionId := c.Query("session_id")
+	userId,_ := c.Get("user_id")
 	ArticleId := c.Query("article_id")
-	resp := getArticle(SessionId, ArticleId)
+	articleId,_ := strconv.Atoi(ArticleId)
+	resp := getArticle(userId.(int), articleId)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func schoolGetArticlePage(c *gin.Context) {
 	ArticleId := c.Param("id")
-	content, err := getArticlePage(ArticleId)
+	articleId,_ := strconv.Atoi(ArticleId)
+	content, err := getArticlePage(articleId)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return
@@ -138,214 +147,245 @@ func schoolGetArticlePage(c *gin.Context) {
 }
 
 func schoolGetArticleList(c *gin.Context) {
-	SessionId := c.Query("session_id")
 	BeginId := c.Query("begin_id")
+	beginId ,_ := strconv.Atoi(BeginId)
 	NeedNumber := c.Query("need_number")
-	resp := getArticleList(SessionId, BeginId, NeedNumber)
+	needNumber,_ := strconv.Atoi(NeedNumber)
+	resp := getArticleList(beginId, needNumber)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func schoolPublishArticleComment(c *gin.Context) {
-	SessionId := c.PostForm("session_id")
+	userId,_ := c.Get("user_id")
 	ArticleId := c.PostForm("article_id")
+	articleId,_ := strconv.Atoi(ArticleId)
 	Content := c.PostForm("content")
-	resp := createArticleComment(SessionId, ArticleId, Content)
+	resp := createArticleComment(userId.(int), articleId, Content)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func schoolGetArticleCommentList(c *gin.Context) {
-	SessionId := c.Query("session_id")
 	ArticleId := c.Query("article_id")
+	articleId,_ := strconv.Atoi(ArticleId)
 	BeginId := c.Query("begin_id")
+	beginId,_ := strconv.Atoi(BeginId)
 	NeedNumber := c.Query("need_number")
-	resp := getArticleCommentList(SessionId, ArticleId, BeginId, NeedNumber)
+	needNumber,_ := strconv.Atoi(NeedNumber)
+	resp := getArticleCommentList(articleId, beginId, needNumber)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func schoolSearchArticle(c *gin.Context) {
-	SessionId := c.Query("session_id")
 	SearchContent := c.Query("content")
 	BeginId := c.Query("begin_id")
+	beginId,_ := strconv.Atoi(BeginId)
 	NeedNumber := c.Query("need_number")
-	resp := getSearchArticleList(SessionId, SearchContent, BeginId, NeedNumber)
+	needNumber,_ := strconv.Atoi(NeedNumber)
+	resp := getSearchArticleList(SearchContent, beginId, needNumber)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func schoolGetUserCollectedArticleList(c *gin.Context) {
-	SessionId := c.Query("session_id")
+	userId,_ := c.Get("user_id")
 	BeginId := c.Query("begin_id")
+	beginId,_ := strconv.Atoi(BeginId)
 	NeedNumber := c.Query("need_number")
-	resp := getUserCollectedArticleList(SessionId, BeginId, NeedNumber)
+	needNumber,_ := strconv.Atoi(NeedNumber)
+	resp := getUserCollectedArticleList(userId.(int),beginId, needNumber)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func schoolGetUserArticleCommentList(c *gin.Context) {
-	SessionId := c.Query("session_id")
+	userId,_ := c.Get("user_id")
 	BeginId := c.Query("begin_id")
+	beginId,_ := strconv.Atoi(BeginId)
 	NeedNumber := c.Query("need_number")
-	resp := getUserArticleCommentList(SessionId, BeginId, NeedNumber)
+	needNumber,_ := strconv.Atoi(NeedNumber)
+	resp := getUserArticleCommentList(userId.(int), beginId, needNumber)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func schoolCollectArticle(c *gin.Context) {
-	SessionId := c.PostForm("session_id")
+	userId,_ := c.Get("user_id")
 	ArticleId := c.PostForm("article_id")
-	resp := addCollectedArticle(SessionId, ArticleId)
+	articleId,_ := strconv.Atoi(ArticleId)
+	resp := addCollectedArticle(userId.(int), articleId)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func schoolCancelCollectArticle(c *gin.Context) {
-	SessionId := c.PostForm("session_id")
+	userId,_ := c.Get("user_id")
 	ArticleId := c.PostForm("article_id")
-	resp := removeCollectedArticle(SessionId, ArticleId)
+	articleId,_ := strconv.Atoi(ArticleId)
+	resp := removeCollectedArticle(userId.(int), articleId)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func schoolValueArticle(c *gin.Context) {
-	SessionId := c.PostForm("session_id")
 	ArticleCommentId := c.PostForm("article_comment_id")
+	articleCommentId,_ := strconv.Atoi(ArticleCommentId)
 	Value := c.PostForm("value")
-	resp := valueArticleComment(SessionId, ArticleCommentId, Value)
+	value,_ := strconv.Atoi(Value)
+	resp := valueArticleComment(articleCommentId, value)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func bbsPublishTopic(c *gin.Context) {
-	SessionId := c.PostForm("session_id")
+	userId,_ := c.Get("user_id")
 	Content := c.PostForm("content")
-	resp := publishTopic(SessionId, Content)
+	resp := publishTopic(userId.(int), Content)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func bbsPublishTopicLordReply(c *gin.Context) {
-	SessionId := c.PostForm("session_id")
+	userId,_ := c.Get("user_id")
 	TopicId := c.PostForm("topic_id")
+	topicId,_ := strconv.Atoi(TopicId)
 	Content := c.PostForm("content")
-	resp := publishTopicLordReply(SessionId, TopicId, Content)
+	resp := publishTopicLordReply(userId.(int),topicId, Content)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func bbsPublishTopicLayerReply(c *gin.Context) {
-	SessionId := c.PostForm("session_id")
+	userId,_ := c.Get("user_id")
 	TopicLordReplyId := c.PostForm("topic_lord_reply_id")
+	topicLordReplyId,_ := strconv.Atoi(TopicLordReplyId)
 	Content := c.PostForm("content")
-	resp := publishTopicLayerReply(SessionId, TopicLordReplyId, Content)
+	resp := publishTopicLayerReply(userId.(int), topicLordReplyId, Content)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func bbsRemoveTopic(c *gin.Context) {
-	SessionId := c.PostForm("session_id")
 	TopicId := c.PostForm("topic_id")
-	resp := removeTopic(SessionId, TopicId)
+	topicId,_ := strconv.Atoi(TopicId)
+	resp := removeTopic(topicId)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func bbsRemoveTopicLordReply(c *gin.Context) {
-	SessionId := c.PostForm("session_id")
 	TopicLordReplyId := c.PostForm("topic_lord_reply_id")
-	resp := removeTopicLordReply(SessionId, TopicLordReplyId)
+	topicLordReplyId,_ := strconv.Atoi(TopicLordReplyId)
+	resp := removeTopicLordReply(topicLordReplyId)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func bbsGetLatestTopicList(c *gin.Context) {
-	SessionId := c.Query("session_id")
 	TopicList := c.Query("topic_id_list")
 	NeedNumber := c.Query("need_number")
-	resp := getLatestTopicList(SessionId, TopicList, NeedNumber)
+	needNumber,_ := strconv.Atoi(NeedNumber)
+	resp := getLatestTopicList(TopicList, needNumber)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func bbsGetTopic(c *gin.Context) {
-	SessionId := c.Query("session_id")
+	userId,_ := c.Get("user_id")
 	TopicId := c.Query("topic_id")
-	resp := getTopic(SessionId, TopicId)
+	topicId,_ := strconv.Atoi(TopicId)
+	resp := getTopic(userId.(int), topicId)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func bbsGetTopicLordReplyList(c *gin.Context) {
-	SessionId := c.Query("session_id")
 	TopicId := c.Query("topic_id")
+	topicId,_ := strconv.Atoi(TopicId)
 	BeginFloor := c.Query("begin_floor")
+	beginFloor,_ := strconv.Atoi(BeginFloor)
 	NeedNumber := c.Query("need_number")
-	resp := getTopicLordReplyList(SessionId, TopicId, BeginFloor, NeedNumber)
+	needNumber,_ := strconv.Atoi(NeedNumber)
+	resp := getTopicLordReplyList(topicId, beginFloor, needNumber)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func bbsGetTopicLayerReplyList(c *gin.Context) {
-	SessionId := c.Query("session_id")
 	TopicLordReplyId := c.Query("topic_lord_reply_id")
+	topicLordReplyId,_ := strconv.Atoi(TopicLordReplyId)
 	BeginFloor := c.Query("begin_floor")
+	beginFloor,_ := strconv.Atoi(BeginFloor)
 	NeedNumber := c.Query("need_number")
-	resp := getTopicLayerReplyList(SessionId, TopicLordReplyId, BeginFloor, NeedNumber)
+	needNumber,_ := strconv.Atoi(NeedNumber)
+	resp := getTopicLayerReplyList(topicLordReplyId, beginFloor, needNumber)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func bbsValueTopic(c *gin.Context) {
-	SessionId := c.PostForm("session_id")
 	TopicId := c.PostForm("topic_id")
+	topicId,_ := strconv.Atoi(TopicId)
 	Value := c.PostForm("value")
-	resp := valueTopic(SessionId, TopicId, Value)
+	value,_ := strconv.Atoi(Value)
+	resp := valueTopic(topicId, value)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func bbsValueTopicLordReply(c *gin.Context) {
-	SessionId := c.PostForm("session_id")
 	TopicLordReplyId := c.PostForm("topic_lord_reply_id")
+	topicLordReplyId,_ := strconv.Atoi(TopicLordReplyId)
 	Value := c.PostForm("value")
-	resp := valueTopicLordReply(SessionId, TopicLordReplyId, Value)
+	value,_ := strconv.Atoi(Value)
+	resp := valueTopicLordReply(topicLordReplyId, value)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func bbsValueTopicLayerReply(c *gin.Context) {
-	SessionId := c.PostForm("session_id")
 	TopicLayerReplyId := c.PostForm("topic_layer_reply_id")
+	topicLayerReplyId,_ := strconv.Atoi(TopicLayerReplyId)
 	Value := c.PostForm("value")
-	resp := valueTopicLayerReply(SessionId, TopicLayerReplyId, Value)
+	value,_ := strconv.Atoi(Value)
+	resp := valueTopicLayerReply(topicLayerReplyId, value)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func bbsCollectTopic(c *gin.Context) {
-	SessionId := c.PostForm("session_id")
+	userId,_ := c.Get("user_id")
 	TopicId := c.PostForm("topic_id")
-	resp := addCollectedTopic(SessionId, TopicId)
+	topicId,_ := strconv.Atoi(TopicId)
+	resp := addCollectedTopic(userId.(int), topicId)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func bbsCancelCollectTopic(c *gin.Context) {
-	SessionId := c.PostForm("session_id")
+	userId,_ := c.Get("user_id")
 	TopicId := c.PostForm("topic_id")
-	resp := removeCollectedTopic(SessionId, TopicId)
+	topicId,_ := strconv.Atoi(TopicId)
+	resp := removeCollectedTopic(userId.(int), topicId)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func bbsSearchTopic(c *gin.Context) {
-	SessionId := c.Query("session_id")
 	SearchContent := c.Query("content")
 	BeginId := c.Query("begin_id")
+	beginId,_ := strconv.Atoi(BeginId)
 	NeedNumber := c.Query("need_number")
-	resp := getSearchTopicList(SessionId, SearchContent, BeginId, NeedNumber)
+	needNumber,_ := strconv.Atoi(NeedNumber)
+	resp := getSearchTopicList(SearchContent, beginId, needNumber)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func bbsGetUserCollectedTopicList(c *gin.Context) {
-	SessionId := c.Query("session_id")
+	userId,_ := c.Get("user_id")
 	BeginId := c.Query("begin_id")
+	beginId,_ := strconv.Atoi(BeginId)
 	NeedNumber := c.Query("need_number")
-	resp := getUserCollectedTopicList(SessionId, BeginId, NeedNumber)
+	needNumber,_ := strconv.Atoi(NeedNumber)
+	resp := getUserCollectedTopicList(userId.(int), beginId, needNumber)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func bbsGetUserPublishedTopicList(c *gin.Context) {
-	SessionId := c.Query("session_id")
+	userId,_ := c.Get("user_id")
 	BeginId := c.Query("begin_id")
+	beginId,_ := strconv.Atoi(BeginId)
 	NeedNumber := c.Query("need_number")
-	resp := getUserPublishedTopicList(SessionId, BeginId, NeedNumber)
+	needNumber,_ := strconv.Atoi(NeedNumber)
+	resp := getUserPublishedTopicList(userId.(int), beginId, needNumber)
 	c.JSON(resp.Status, resp.Data)
 }
 
 func bbsGetUserTopicReplyList(c *gin.Context) {
-	SessionId := c.Query("session_id")
+	userId,_ := c.Get("user_id")
 	BeginId := c.Query("begin_id")
+	beginId,_ := strconv.Atoi(BeginId)
 	NeedNumber := c.Query("need_number")
-	resp := getUserReplyList(SessionId, BeginId, NeedNumber)
+	needNumber,_ := strconv.Atoi(NeedNumber)
+	resp := getUserReplyList(userId.(int), beginId, needNumber)
 	c.JSON(resp.Status, resp.Data)
 }

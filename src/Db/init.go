@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"utils"
 )
@@ -26,9 +25,9 @@ func InitAllArticle() {
 			return
 		}
 		s[len(s)-3] = "plain_articles"
-		plainFile := strings.Join(s,"\\")
-		plainContent,err := ioutil.ReadFile(plainFile)
-		_ = AddNewArticle(title, string(content),string(plainContent))
+		plainFile := strings.Join(s, "\\")
+		plainContent, err := ioutil.ReadFile(plainFile)
+		_ = AddNewArticle(title, string(content), string(plainContent))
 		fmt.Printf("article.%d created successfully!\n ", i)
 	}
 }
@@ -44,7 +43,7 @@ func IninArticleComment() {
 	for i := 1; i <= 1000; i++ {
 		userId := rand.Intn(10) + 1
 		articleId := rand.Intn(100) + 1
-		_ = AddArticleComment(strconv.Itoa(userId), strconv.Itoa(articleId), utils.RandWords())
+		_ = AddArticleComment(userId, articleId, utils.RandWords())
 		fmt.Printf("articleComment.%d created successfully!\n ", i)
 	}
 }
@@ -61,11 +60,10 @@ func AutoCreateTableTest() {
 	fmt.Printf("tables created successfully!\n ")
 }
 
-
 func InitTopicTest() {
 	for i := 1; i <= 500; i++ {
 		userId := rand.Intn(100) + 1
-		_ = AddTopic(strconv.Itoa(userId), utils.RandWords())
+		_ = AddTopic(userId, utils.RandWords())
 		fmt.Printf("topic.%d created successfully!\n", i)
 	}
 }
@@ -74,7 +72,7 @@ func InitTopicLordReplyTest() {
 	for i := 1; i <= 500; i++ {
 		userId := rand.Intn(100) + 1
 		topicId := rand.Intn(100) + 1
-		_ = AddTopicLordReply(strconv.Itoa(userId), strconv.Itoa(topicId), utils.RandWords())
+		_ = AddTopicLordReply(userId, topicId, utils.RandWords())
 		fmt.Printf("topicLordReply.%d created successfully!\n", i)
 	}
 }
@@ -83,13 +81,12 @@ func InitTopicLayerReplyTest() {
 	for i := 1; i <= 500; i++ {
 		userId := rand.Intn(100) + 1
 		topicLordReplyId := rand.Intn(100) + 1
-		_ = AddTopicLayerReply(strconv.Itoa(userId), strconv.Itoa(topicLordReplyId), utils.RandWords())
+		_ = AddTopicLayerReply(userId, topicLordReplyId, utils.RandWords())
 		fmt.Printf("topicLordReply.%d created successfully!\n", i)
 	}
 }
 
-
-func Init(){
+func Init() {
 	AutoCreateTableTest()
 	InitAllArticle()
 	InitUser()

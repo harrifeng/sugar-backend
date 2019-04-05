@@ -9,119 +9,60 @@ import (
 	"utils"
 )
 
-func publishTopic(SessionId string, Content string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
-	err = db.AddTopic(userId, Content)
+func publishTopic(userId int, content string) responseBody {
+	err := db.AddTopic(userId, content)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
 	return responseOK()
 }
 
-func publishTopicLordReply(SessionId string, TopicId string, Content string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
-	err = db.AddTopicLordReply(userId, TopicId, Content)
+func publishTopicLordReply(userId int, topicId int, content string) responseBody {
+	err := db.AddTopicLordReply(userId, topicId, content)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
 	return responseOK()
 }
 
-func publishTopicLayerReply(SessionId string, TopicLordReplyId string, Content string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
-	err = db.AddTopicLayerReply(userId, TopicLordReplyId, Content)
+func publishTopicLayerReply(userId int, topicLordReplyId int, content string) responseBody {
+	err := db.AddTopicLayerReply(userId, topicLordReplyId, content)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
 	return responseOK()
 }
 
-func removeTopic(SessionId string, TopicId string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
-	err = db.RemoveTopic(TopicId)
+func removeTopic(topicId int) responseBody {
+	err := db.RemoveTopic(topicId)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
 	return responseOK()
 }
 
-func removeTopicLordReply(SessionId string, TopicLordReplyId string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
-	err = db.RemoveTopicLordReply(TopicLordReplyId)
+func removeTopicLordReply(topicLordReplyId int) responseBody {
+	err := db.RemoveTopicLordReply(topicLordReplyId)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
 	return responseOK()
 }
 
-func getLatestTopicList(SessionId string, TopicListString string, NeedNumber string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
+// wait to trans[]
+func getLatestTopicList(topicListString string, needNumber int) responseBody {
 	var TopicList []string
-	err = json.Unmarshal([]byte(TopicListString), &TopicList)
+	err := json.Unmarshal([]byte(topicListString), &TopicList)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
-	topics, err := db.GetLatestTopicList(TopicList, NeedNumber)
+	topics, err := db.GetLatestTopicList(TopicList, needNumber)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
 	respTopics := make([]gin.H, len(topics))
 	for i, topic := range topics {
-		count, err := db.GetTopicReplyCount(strconv.Itoa(int(topic.ID)))
+		count, err := db.GetTopicReplyCount(int(topic.ID))
 		if err != nil {
 			return responseInternalServerError(err)
 		}
@@ -138,22 +79,12 @@ func getLatestTopicList(SessionId string, TopicListString string, NeedNumber str
 	return responseOKWithData(respTopics)
 }
 
-func getTopic(SessionId string, TopicId string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
+func getTopic(userId int, topicId int) responseBody {
+	topic, err := db.GetTopicFromTopicId(topicId)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
-	topic, err := db.GetTopicFromTopicId(TopicId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	collected, err := db.CheckUserCollectedTopic(userId, TopicId)
+	collected, err := db.CheckUserCollectedTopic(userId, topicId)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
@@ -168,25 +99,14 @@ func getTopic(SessionId string, TopicId string) responseBody {
 	})
 }
 
-func getTopicLordReplyList(SessionId string, TopicId string, BeginFloor string, NeedNumber string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
-	topicLordReplies, err := db.GetTopicLordReplyListFromTopicId(TopicId, BeginFloor, NeedNumber)
+func getTopicLordReplyList(topicId int, beginFloor int, needNumber int) responseBody {
+	topicLordReplies, err := db.GetTopicLordReplyListFromTopicId(topicId, beginFloor, needNumber)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
 	respReplies := make([]gin.H, len(topicLordReplies))
-	beginFloor, _ := strconv.Atoi(BeginFloor)
 	for i, reply := range topicLordReplies {
-		count, _ := db.GetTopicLayerReplyCountFromTopicLordReply(strconv.Itoa(int(reply.ID)))
+		count, _ := db.GetTopicLayerReplyCountFromTopicLordReply(int(reply.ID))
 		respReplies[i] = gin.H{
 			"replyId":   reply.ID,
 			"floor":     beginFloor + i + 1,
@@ -202,18 +122,8 @@ func getTopicLordReplyList(SessionId string, TopicId string, BeginFloor string, 
 	return responseOKWithData(respReplies)
 }
 
-func getTopicLayerReplyList(SessionId string, TopicLordReplyId string, BeginFloor string, NeedNumber string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
-	topicLayerReplies, err := db.GetTopicLayerReplyListFromTopicLordReplyId(TopicLordReplyId, BeginFloor, NeedNumber)
+func getTopicLayerReplyList(topicLordReplyId int, beginFloor int, needNumber int) responseBody {
+	topicLayerReplies, err := db.GetTopicLayerReplyListFromTopicLordReplyId(topicLordReplyId, beginFloor, needNumber)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
@@ -232,108 +142,48 @@ func getTopicLayerReplyList(SessionId string, TopicLordReplyId string, BeginFloo
 	return responseOKWithData(respReplies)
 }
 
-func valueTopic(SessionId string, TopicId string, Value string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
-	err = db.ValueTopic(TopicId, Value)
+func valueTopic(topicId int, value int) responseBody {
+	err := db.ValueTopic(topicId, value)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
 	return responseOK()
 }
 
-func valueTopicLordReply(SessionId string, TopicLordReplyId string, Value string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
-	err = db.ValueTopicLordReply(TopicLordReplyId, Value)
+func valueTopicLordReply(topicLordReplyId int, value int) responseBody {
+	err := db.ValueTopicLordReply(topicLordReplyId, value)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
 	return responseOK()
 }
 
-func valueTopicLayerReply(SessionId string, TopicLayerReplyId string, Value string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
-	err = db.ValueTopicLayerReply(TopicLayerReplyId, Value)
+func valueTopicLayerReply(topicLayerReplyId int, value int) responseBody {
+	err := db.ValueTopicLayerReply(topicLayerReplyId, value)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
 	return responseOK()
 }
 
-func addCollectedTopic(SessionId string, TopicId string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
-	err = db.AddUserCollectedTopic(userId, TopicId)
+func addCollectedTopic(userId int, topicId int) responseBody {
+	err := db.AddUserCollectedTopic(userId, topicId)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
 	return responseOK()
 }
 
-func removeCollectedTopic(SessionId string, TopicId string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
-	err = db.RemoveUserCollectedTopic(userId, TopicId)
+func removeCollectedTopic(userId int, TopicId int) responseBody {
+	err := db.RemoveUserCollectedTopic(userId, TopicId)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
 	return responseOK()
 }
 
-func getSearchTopicList(SessionId string, SearchContent string, BeginId string, NeedNumber string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
-	topics, err := db.GetSearchTopicList(SearchContent, BeginId, NeedNumber)
+func getSearchTopicList(searchContent string, beginId int, needNumber int) responseBody {
+	topics, err := db.GetSearchTopicList(searchContent, beginId, needNumber)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
@@ -351,18 +201,8 @@ func getSearchTopicList(SessionId string, SearchContent string, BeginId string, 
 	return responseOKWithData(respTopics)
 }
 
-func getUserCollectedTopicList(SessionId string, BeginId string, NeedNumber string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
-	topics, count, err := db.GetUserCollectedTopicList(userId, BeginId, NeedNumber)
+func getUserCollectedTopicList(userId int, beginId int, needNumber int) responseBody {
+	topics, count, err := db.GetUserCollectedTopicList(userId, beginId, needNumber)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
@@ -388,24 +228,14 @@ func getUserCollectedTopicList(SessionId string, BeginId string, NeedNumber stri
 	})
 }
 
-func getUserPublishedTopicList(SessionId string, BeginId string, NeedNumber string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
-	topics, count, err := db.GetUserPublishedTopicList(userId, BeginId, NeedNumber)
+func getUserPublishedTopicList(userId int, beginId int, needNumber int) responseBody {
+	topics, count, err := db.GetUserPublishedTopicList(userId, beginId, needNumber)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
 	respTopics := make([]gin.H, len(topics))
 	for i, topic := range topics {
-		replyCount, err := db.GetTopicReplyCount(strconv.Itoa(int(topic.ID)))
+		replyCount, err := db.GetTopicReplyCount(int(topic.ID))
 		if err != nil {
 			return responseInternalServerError(err)
 		}
@@ -428,29 +258,19 @@ func getUserPublishedTopicList(SessionId string, BeginId string, NeedNumber stri
 	})
 }
 
-func getUserReplyList(SessionId string, BeginId string, NeedNumber string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
-	replies, count, err := db.GetUserReplyList(userId, BeginId, NeedNumber)
+func getUserReplyList(userId int, beginId int, needNumber int) responseBody {
+	replies, count, err := db.GetUserReplyList(userId, beginId, needNumber)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
 	respReplies := make([]gin.H, len(replies))
 	for i, reply := range replies {
 		if reply.TopicLordReplyKey == 0 && reply.TopicLayerReplyKey != 0 {
-			topicLordReply, err := db.GetTopicLordReplyFromTopicLordReplyId(strconv.Itoa(int(reply.FatherID)))
+			topicLordReply, err := db.GetTopicLordReplyFromTopicLordReplyId(int(reply.FatherID))
 			if err != nil {
 				return responseInternalServerError(err)
 			}
-			floor, err := db.GetTopicLordReplyFloor(strconv.Itoa(int(reply.FatherID)))
+			floor, err := db.GetTopicLordReplyFloor(int(reply.FatherID))
 			if err != nil {
 				return responseInternalServerError(err)
 			}
@@ -466,7 +286,7 @@ func getUserReplyList(SessionId string, BeginId string, NeedNumber string) respo
 				"floor":           floor,
 			}
 		} else if reply.TopicLordReplyKey != 0 && reply.TopicLayerReplyKey == 0 {
-			topic, err := db.GetTopicFromTopicId(strconv.Itoa(int(reply.FatherID)))
+			topic, err := db.GetTopicFromTopicId(int(reply.FatherID))
 			if err != nil {
 				return responseInternalServerError(err)
 			}

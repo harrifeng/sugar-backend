@@ -8,30 +8,20 @@ import (
 )
 
 // 获取单个文章信息
-func getArticle(SessionId string, ArticleId string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
+func getArticle(userId int, articleId int) responseBody {
+	article, err := db.GetArticleFromArticleId(articleId)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
-	article, err := db.GetArticleFromArticleId(ArticleId)
+	collected, err := db.CheckUserCollectedArticle(userId, articleId)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
-	collected, err := db.CheckUserCollectedArticle(userId, ArticleId)
+	count, err := db.GetArticleCommentCount(articleId)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
-	count, err := db.GetArticleCommentCount(ArticleId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	err = db.AddArticleReadCount(ArticleId)
+	err = db.AddArticleReadCount(articleId)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
@@ -43,8 +33,8 @@ func getArticle(SessionId string, ArticleId string) responseBody {
 }
 
 // 获取文章HTML页面
-func getArticlePage(ArticleId string) (string, error) {
-	article, err := db.GetArticleFromArticleId(ArticleId)
+func getArticlePage(articleId int) (string, error) {
+	article, err := db.GetArticleFromArticleId(articleId)
 	if err != nil {
 		return "", err
 	}
@@ -52,15 +42,8 @@ func getArticlePage(ArticleId string) (string, error) {
 }
 
 // 获取文章列表
-func getArticleList(SessionId string, BeginId string, NeedNumber string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
-	articles, err := db.GetArticleList(BeginId, NeedNumber)
+func getArticleList(beginId int, needNumber int) responseBody {
+	articles, err := db.GetArticleList(beginId, needNumber)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
@@ -79,18 +62,8 @@ func getArticleList(SessionId string, BeginId string, NeedNumber string) respons
 }
 
 // 创建文章评论
-func createArticleComment(SessionId string, ArticleId string, Content string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
-	err = db.AddArticleComment(userId, ArticleId, Content)
+func createArticleComment(userId int, articleId int, content string) responseBody {
+	err := db.AddArticleComment(userId, articleId, content)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
@@ -98,18 +71,11 @@ func createArticleComment(SessionId string, ArticleId string, Content string) re
 }
 
 // 获取文章的评论列表
-func getArticleCommentList(SessionId string, ArticleId string, BeginId string, NeedNumber string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
+func getArticleCommentList(articleId int, beginId int, needNumber int) responseBody {
+	comments, err := db.GetArticleCommentListFromArticleId(articleId, beginId, needNumber)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
-	comments, err := db.GetArticleCommentListFromArticleId(ArticleId, BeginId, NeedNumber)
 	respComments := make([]gin.H, len(comments))
 	for i := 0; i < len(comments); i++ {
 		respComments[i] = gin.H{
@@ -125,21 +91,14 @@ func getArticleCommentList(SessionId string, ArticleId string, BeginId string, N
 	return responseOKWithData(respComments)
 }
 
-func getSearchArticleList(SessionId string, SearchContent string, BeginId string, NeedNumber string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
+func getSearchArticleList(searchContent string, beginId int, needNumber int) responseBody {
+	if searchContent == "" {
+		return responseNormalError("关键词不能为空")
 	}
-	userId, err := db.GetNowSessionId(SessionId)
+	articles, err := db.GetSearchArticleList(searchContent, beginId, needNumber)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
-	if SearchContent == "" {
-		return responseNormalError("关键词不能为空")
-	}
-	articles, err := db.GetSearchArticleList(SearchContent, BeginId, NeedNumber)
 	respArticles := make([]gin.H, len(articles))
 	for i := 0; i < len(articles); i++ {
 		respArticles[i] = gin.H{
@@ -154,18 +113,8 @@ func getSearchArticleList(SessionId string, SearchContent string, BeginId string
 	return responseOKWithData(respArticles)
 }
 
-func getUserCollectedArticleList(SessionId string, BeginId string, NeedNumber string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
-	articles, err := db.GetUserCollectedArticleList(userId, BeginId, NeedNumber)
+func getUserCollectedArticleList(userId int, beginId int, needNumber int) responseBody {
+	articles, err := db.GetUserCollectedArticleList(userId, beginId, needNumber)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
@@ -187,18 +136,8 @@ func getUserCollectedArticleList(SessionId string, BeginId string, NeedNumber st
 	})
 }
 
-func getUserArticleCommentList(SessionId string, BeginId string, NeedNumber string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
-	comments, err := db.GetArticleCommentListFromUserId(userId, BeginId, NeedNumber)
+func getUserArticleCommentList(userId int, beginId int, needNumber int) responseBody {
+	comments, err := db.GetArticleCommentListFromUserId(userId, beginId, needNumber)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
@@ -223,54 +162,24 @@ func getUserArticleCommentList(SessionId string, BeginId string, NeedNumber stri
 	})
 }
 
-func addCollectedArticle(SessionId string, ArticleId string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
-	err = db.AddUserCollectedArticle(userId, ArticleId)
+func addCollectedArticle(userId int, articleId int) responseBody {
+	err := db.AddUserCollectedArticle(userId, articleId)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
 	return responseOK()
 }
 
-func removeCollectedArticle(SessionId string, ArticleId string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
-	err = db.RemoveUserCollectedArticle(userId, ArticleId)
+func removeCollectedArticle(userId int, articleId int) responseBody {
+	err := db.RemoveUserCollectedArticle(userId, articleId)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
 	return responseOK()
 }
 
-func valueArticleComment(SessionId string, ArticleCommentId string, Value string) responseBody {
-	if SessionId == "" {
-		return responseNormalError("请先登录")
-	}
-	userId, err := db.GetNowSessionId(SessionId)
-	if err != nil {
-		return responseInternalServerError(err)
-	}
-	if userId == "" {
-		return responseNormalError("请先登录")
-	}
-	err = db.ValueArticleComment(ArticleCommentId, Value)
+func valueArticleComment(articleCommentId int, value int) responseBody {
+	err := db.ValueArticleComment(articleCommentId, value)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
