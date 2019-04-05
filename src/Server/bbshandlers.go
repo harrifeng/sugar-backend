@@ -368,19 +368,18 @@ func getUserCollectedTopicList(SessionId string, BeginId string, NeedNumber stri
 	}
 	respTopics := make([]gin.H, len(topics))
 	for i, topic := range topics {
-		replyCount, err := db.GetTopicReplyCount(strconv.Itoa(int(topic.ID)))
+		lastFloor, err := db.GetLastFloorFromTopicId(strconv.Itoa(int(topic.ID)))
 		if err != nil {
 			return responseInternalServerError(err)
 		}
 		respTopics[i] = gin.H{
-			"topicId":    topic.ID,
-			"userId":     topic.UserID,
-			"username":   topic.User.UserName,
-			"iconUrl":    topic.User.HeadPortraitUrl,
-			"topicTime":  topic.CreatedAt,
-			"content":    utils.StringCut(topic.Content, 40),
-			"likes":      topic.ThumbsUpCount,
-			"replyCount": replyCount,
+			"topicId":   topic.ID,
+			"userId":    topic.UserID,
+			"username":  topic.User.UserName,
+			"iconUrl":   topic.User.HeadPortraitUrl,
+			"topicTime": topic.CreatedAt,
+			"content":   utils.StringCut(topic.Content, 40),
+			"lastFloor": lastFloor,
 		}
 	}
 	return responseOKWithData(gin.H{
@@ -410,6 +409,7 @@ func getUserPublishedTopicList(SessionId string, BeginId string, NeedNumber stri
 		if err != nil {
 			return responseInternalServerError(err)
 		}
+		collectingCount, err := db.GetTopicCollectingUserCount(strconv.Itoa(int(topic.ID)))
 		respTopics[i] = gin.H{
 			"topicId":     topic.ID,
 			"userId":      topic.UserID,
@@ -419,7 +419,7 @@ func getUserPublishedTopicList(SessionId string, BeginId string, NeedNumber stri
 			"content":     utils.StringCut(topic.Content, 40),
 			"likes":       topic.ThumbsUpCount,
 			"replyCount":  replyCount,
-			"favoriteNum": len(topic.CollectingUsers),
+			"favoriteNum": collectingCount,
 		}
 	}
 	return responseOKWithData(gin.H{
@@ -445,19 +445,19 @@ func getUserReplyList(SessionId string, BeginId string, NeedNumber string) respo
 	}
 	respReplies := make([]gin.H, len(replies))
 	for i, reply := range replies {
-		if reply.TopicID == 0 && reply.TopicLordReplyID != 0 {
-			topicLordReply, err := db.GetTopicLordReplyFromTopicLordReplyId(strconv.Itoa(int(reply.TopicLordReplyID)))
+		if reply.TopicLordReplyKey == 0 && reply.TopicLayerReplyKey != 0 {
+			topicLordReply, err := db.GetTopicLordReplyFromTopicLordReplyId(strconv.Itoa(int(reply.FatherID)))
 			if err != nil {
 				return responseInternalServerError(err)
 			}
-			floor, err := db.GetTopicLordReplyFloor(strconv.Itoa(int(reply.TopicLordReplyID)))
+			floor, err := db.GetTopicLordReplyFloor(strconv.Itoa(int(reply.FatherID)))
 			if err != nil {
 				return responseInternalServerError(err)
 			}
 			respReplies[i] = gin.H{
 				"type":            "subreply",
-				"subreplyId":      reply.ID,
-				"replyId":         reply.TopicLordReplyID,
+				"subreplyId":      reply.TopicLayerReplyKey,
+				"replyId":         reply.FatherID,
 				"topicId":         topicLordReply.TopicID,
 				"time":            reply.CreatedAt,
 				"subreplyContent": reply.Content,
@@ -465,15 +465,15 @@ func getUserReplyList(SessionId string, BeginId string, NeedNumber string) respo
 				"likes":           reply.ThumbsUpCount,
 				"floor":           floor,
 			}
-		} else if reply.TopicID != 0 && reply.TopicLordReplyID == 0 {
-			topic, err := db.GetTopicFromTopicId(strconv.Itoa(int(reply.TopicID)))
+		} else if reply.TopicLordReplyKey != 0 && reply.TopicLayerReplyKey == 0 {
+			topic, err := db.GetTopicFromTopicId(strconv.Itoa(int(reply.FatherID)))
 			if err != nil {
 				return responseInternalServerError(err)
 			}
 			respReplies[i] = gin.H{
 				"type":         "reply",
-				"replyId":      reply.ID,
-				"topicId":      reply.TopicID,
+				"replyId":      reply.TopicLordReplyKey,
+				"topicId":      reply.FatherID,
 				"time":         reply.CreatedAt,
 				"replyContent": reply.Content,
 				"topicContent": topic.Content,

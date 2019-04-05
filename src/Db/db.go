@@ -42,7 +42,7 @@ func InitMysql() (*gorm.DB, error) {
 	return mysqlDb, err
 }
 
-func Transction(mission func(*gorm.DB)error) error {
+func Transaction(mission func(*gorm.DB) error) error {
 	tx := mysqlDb.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -50,7 +50,7 @@ func Transction(mission func(*gorm.DB)error) error {
 		}
 	}()
 	err := mission(tx)
-	if err!=nil{
+	if err != nil {
 		tx.Rollback()
 		return err
 	}

@@ -115,7 +115,7 @@ func AlterUserInformationFromUserId(UserId string, UserName string, Gender strin
 }
 
 func AddUserFollowing(UserId string, TargetUserId string) error {
-	return  Transction(func(db *gorm.DB) error {
+	return Transaction(func(db *gorm.DB) error {
 		var user1, user2 User
 		db.Preload("FollowingUsers").First(&user1, UserId)
 		user1To, err := GetUserFromUserId(TargetUserId)
@@ -135,7 +135,7 @@ func AddUserFollowing(UserId string, TargetUserId string) error {
 }
 
 func RemoveUserFollowing(UserId string, TargetUserId string) error {
-	return  Transction(func(db *gorm.DB) error {
+	return Transaction(func(db *gorm.DB) error {
 		var user1, user2 User
 		db.Preload("FollowingUsers").First(&user1, UserId)
 		user1To, err := GetUserFromUserId(TargetUserId)
@@ -176,9 +176,9 @@ func GetUserFollowingList(UserId string, BeginId string, NeedNumber string) ([]U
 	return users, count, err
 }
 
-func CheckUserFollowingOtherUser(UserId string,OtherUserId string)(bool,error){
+func CheckUserFollowingOtherUser(UserId string, OtherUserId string) (bool, error) {
 	var recordCount int
-	err :=mysqlDb.Table("user_following_ships").
-		Where("user_id = ? and following_user_id = ?",UserId,OtherUserId).Count(&recordCount).Error
-	return recordCount > 0,err
+	err := mysqlDb.Table("user_following_ships").
+		Where("user_id = ? and following_user_id = ?", UserId, OtherUserId).Count(&recordCount).Error
+	return recordCount > 0, err
 }

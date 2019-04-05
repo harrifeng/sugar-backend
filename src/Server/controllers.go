@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"html/template"
 	"net/http"
@@ -84,15 +83,6 @@ func accountAlterUserPrivacySetting(c *gin.Context) {
 	ShowWeight := c.PostForm("show_weight") == "true"
 	ShowArea := c.PostForm("show_area") == "true"
 	ShowJob := c.PostForm("show_job") == "true"
-	fmt.Println("----------")
-	fmt.Println(ShowPhoneNumber)
-	fmt.Println(ShowGender)
-	fmt.Println(ShowAge)
-	fmt.Println(ShowJob)
-	fmt.Println(ShowArea)
-	fmt.Println(ShowHeight)
-	fmt.Println(ShowWeight)
-	fmt.Println("----------")
 	resp := alterUserPrivacy(SessionId, ShowPhoneNumber, ShowGender,
 		ShowAge, ShowHeight, ShowWeight, ShowArea, ShowJob)
 	c.JSON(resp.Status, resp.Data)

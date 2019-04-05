@@ -3,13 +3,18 @@ package db
 import (
 	"errors"
 	"fmt"
+	"math/rand"
 	"strconv"
 )
 
-func AddNewArticle(Title string, Content string) error {
+func AddNewArticle(Title string, Content string,PlainContent string) error {
+	imageNum := rand.Intn(155) + 1
+	coverImageUrl := fmt.Sprintf("/static/articleImg/%d.jpg",imageNum)
 	article := Article{
 		Title:   Title,
 		Content: Content,
+		PlainContent:PlainContent,
+		CoverImageUrl:coverImageUrl,
 	}
 	mysqlDb.Create(&article)
 	mysqlDb.Save(&article)
@@ -142,8 +147,8 @@ func GetArticleCommentCount(ArticleId string) (int, error) {
 func CheckUserCollectedArticle(UserId string, ArticleId string) (bool, error) {
 	var count int
 	err := mysqlDb.Table("user_collected_article").
-		Where("user_id=? and article_id=?", UserId,ArticleId).Count(&count).Error
-	return count>0, err
+		Where("user_id=? and article_id=?", UserId, ArticleId).Count(&count).Error
+	return count > 0, err
 }
 
 func getArticleCommentFromArticleCommentId(ArticleCommentId string) (ArticleComment, error) {
@@ -165,9 +170,9 @@ func ValueArticleComment(ArticleCommentId string, Value string) error {
 	return mysqlDb.Save(&articleComment).Error
 }
 
-func AddArticleReadCount(ArticleId string)error{
-	article,err:=GetArticleFromArticleId(ArticleId)
-	if err!=nil{
+func AddArticleReadCount(ArticleId string) error {
+	article, err := GetArticleFromArticleId(ArticleId)
+	if err != nil {
 		return err
 	}
 	article.ReadCount++

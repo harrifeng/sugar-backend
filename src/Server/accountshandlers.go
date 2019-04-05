@@ -146,7 +146,7 @@ func getUserInformationFromUserId(SessionId string, OtherUserId string) response
 	if err != nil {
 		return responseInternalServerError(err)
 	}
-	following,err:=db.CheckUserFollowingOtherUser(UserId,OtherUserId)
+	following, err := db.CheckUserFollowingOtherUser(UserId, OtherUserId)
 	return responseOKWithData(gin.H{
 		"username": user.UserName,
 		"iconUrl":  user.HeadPortraitUrl,

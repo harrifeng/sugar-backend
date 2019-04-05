@@ -59,6 +59,7 @@ type Article struct {
 	gorm.Model
 	Title           string `gorm:"not null"`
 	Content         string `gorm:"not null;type:text;"`
+	PlainContent string `gorm:"not null;type:text;"`
 	CoverImageUrl   string
 	ReadCount       int `gorm:"not null;default:'0'"`
 	ArticleComments []ArticleComment
@@ -76,11 +77,11 @@ type ArticleComment struct {
 
 type Topic struct {
 	gorm.Model
-	Content         string `gorm:"not null;type:text"`
-	User            User
-	UserID          int
-	ThumbsUpCount   int `gorm:"not null;default:'0'"`
-	LordReplies     []TopicLordReply
+	Content       string `gorm:"not null;type:text"`
+	User          User
+	UserID        int
+	ThumbsUpCount int `gorm:"not null;default:'0'"`
+	LordReplies   []TopicLordReply
 }
 
 type TopicLordReply struct {
@@ -132,10 +133,11 @@ type FamilyMember struct {
 }
 
 type UserReply struct {
-	gorm.Model
-	Content          string
-	UserId           int
-	ThumbsUpCount    int
-	TopicID          uint
-	TopicLordReplyID uint
+	TopicLordReplyKey  uint `gorm:"Column:topic_lord_reply_key"`
+	TopicLayerReplyKey uint `gorm:"Column:topic_layer_reply_key"`
+	CreatedAt          time.Time `gorm:"Column:created_at"`
+	Content            string `gorm:"Column:content"`
+	UserId             int`gorm:"Column:user_id"`
+	ThumbsUpCount      int`gorm:"Column:thumbs_up_count"`
+	FatherID           uint`gorm:"Column:father_id"`
 }

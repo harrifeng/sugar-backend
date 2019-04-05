@@ -17,6 +17,7 @@ type responseBody struct {
 }
 
 func responseInternalServerError(err error) responseBody {
+	println("error:",err.Error())
 	return responseBody{
 		Status: http.StatusInternalServerError,
 		Data: gin.H{
