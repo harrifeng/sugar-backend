@@ -58,6 +58,8 @@ func AutoCreateTableTest() {
 	mysqlDb.AutoMigrate(&UserPrivacySetting{})
 	mysqlDb.AutoMigrate(&UserCheckIn{})
 	mysqlDb.AutoMigrate(&FamilyMember{})
+	mysqlDb.AutoMigrate(&BloodRecord{})
+	mysqlDb.AutoMigrate(&HealthRecord{})
 	fmt.Printf("tables created successfully!\n ")
 }
 
