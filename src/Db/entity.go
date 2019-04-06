@@ -26,7 +26,6 @@ type User struct {
 	BloodRecords         []BloodRecord
 	HealthRecords        []HealthRecord
 	FamilyMembers        []FamilyMember
-	CheckIns             []UserCheckIn
 	UserPrivacySetting   UserPrivacySetting
 	UserPrivacySettingID uint
 
@@ -39,8 +38,7 @@ type User struct {
 
 type UserCheckIn struct {
 	gorm.Model
-	CheckTime time.Time
-	User      User
+	CheckTime time.Time `gorm:"type:date"`
 	UserID    uint
 }
 
@@ -127,7 +125,7 @@ type HealthRecord struct {
 type FamilyMember struct {
 	gorm.Model
 	PhoneNumber string
-	Call        string
+	CallName    string
 	User        User
 	UserID      uint
 }

@@ -57,6 +57,7 @@ func AutoCreateTableTest() {
 	mysqlDb.AutoMigrate(&TopicLayerReply{})
 	mysqlDb.AutoMigrate(&UserPrivacySetting{})
 	mysqlDb.AutoMigrate(&UserCheckIn{})
+	mysqlDb.AutoMigrate(&FamilyMember{})
 	fmt.Printf("tables created successfully!\n ")
 }
 
@@ -88,10 +89,10 @@ func InitTopicLayerReplyTest() {
 
 func Init() {
 	AutoCreateTableTest()
-	InitAllArticle()
-	InitUser()
-	IninArticleComment()
-	InitTopicTest()
-	InitTopicLordReplyTest()
-	InitTopicLayerReplyTest()
+	//InitAllArticle()
+	//InitUser()
+	//IninArticleComment()
+	//InitTopicTest()
+	//InitTopicLordReplyTest()
+	//InitTopicLayerReplyTest()
 }

@@ -104,6 +104,10 @@ func loginUser(phoneNumber string, password string) responseBody {
 			return responseInternalServerError(err)
 		}
 	}
+	checkIn,err:=db.CheckUserCheckIn(int(user.ID))
+	if err!=nil{
+		return responseInternalServerError(err)
+	}
 	return responseOKWithData(gin.H{
 		"userId":     user.ID,
 		"session_id": sessionId,
@@ -111,7 +115,7 @@ func loginUser(phoneNumber string, password string) responseBody {
 		"iconUrl":    user.HeadPortraitUrl,
 		"exp":        user.Exp,
 		"level":      user.Level,
-		"isCheck":    1,
+		"isCheck":    checkIn,
 	})
 }
 
@@ -124,7 +128,7 @@ func alterUserInformation(userId int, userName string, gender string, height flo
 	return responseOK()
 }
 
-func getUserInfoFromUserId(userId int)responseBody{
+func getUserInfoFromUserId(userId int) responseBody {
 	user, err := db.GetUserFromUserId(userId)
 	if err != nil {
 		return responseInternalServerError(err)
@@ -164,7 +168,6 @@ func getOtherUserInformationFromOtherUserId(userId int, otherUserId int) respons
 	})
 }
 
-
 func alterPassword(phoneNumber string, code string, newPassword string) responseBody {
 	if phoneNumber == "" {
 		return responseNormalError("手机号码不能为空")
@@ -191,7 +194,7 @@ func alterPassword(phoneNumber string, code string, newPassword string) response
 
 func getUserPrivacySetting(userId int) responseBody {
 	privacySetting, err := db.GetPrivacySettingFromUserId(userId)
-	if err!=nil{
+	if err != nil {
 		return responseInternalServerError(err)
 	}
 	return responseOKWithData(gin.H{
@@ -233,7 +236,7 @@ func ignoreUser(userId int, targetUserId int) responseBody {
 
 func getUserFollowingList(userId int, beginId int, needNumber int) responseBody {
 	users, count, err := db.GetUserFollowingList(userId, beginId, needNumber)
-	if err!=nil{
+	if err != nil {
 		return responseInternalServerError(err)
 	}
 	respUsers := make([]gin.H, len(users))
@@ -252,7 +255,7 @@ func getUserFollowingList(userId int, beginId int, needNumber int) responseBody 
 
 func getUserFollowerList(userId int, beginId int, needNumber int) responseBody {
 	users, count, err := db.GetUserFollowerList(userId, beginId, needNumber)
-	if err!=nil{
+	if err != nil {
 		return responseInternalServerError(err)
 	}
 	respUsers := make([]gin.H, len(users))

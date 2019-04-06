@@ -77,7 +77,6 @@ func runServer() {
 			fmt.Println(err)
 			return
 		}
-
 	}()
 	server.Start()
 	//db.Init()

@@ -21,12 +21,12 @@ func initRouter() {
 		accountsGroup.GET("/logout", accountLogout)
 		accountsGroup.POST("/alter", LoginAuth(), accountAlterInformation)
 		accountsGroup.GET("/info", LoginAuth(), accountGetUserInformation)
-		accountsGroup.GET("/privacy",LoginAuth(), accountGetUserPrivacySetting)
-		accountsGroup.POST("/alter/privacy",LoginAuth(), accountAlterUserPrivacySetting)
-		accountsGroup.GET("/follower",LoginAuth(), accountGetUserFollowerList)
-		accountsGroup.GET("/following", LoginAuth(),accountGetUserFollowingList)
-		accountsGroup.POST("/following/follow",LoginAuth(), accountFollowUser)
-		accountsGroup.POST("/following/ignore",LoginAuth(), accountIgnoreUser)
+		accountsGroup.GET("/privacy", LoginAuth(), accountGetUserPrivacySetting)
+		accountsGroup.POST("/alter/privacy", LoginAuth(), accountAlterUserPrivacySetting)
+		accountsGroup.GET("/follower", LoginAuth(), accountGetUserFollowerList)
+		accountsGroup.GET("/following", LoginAuth(), accountGetUserFollowingList)
+		accountsGroup.POST("/following/follow", LoginAuth(), accountFollowUser)
+		accountsGroup.POST("/following/ignore", LoginAuth(), accountIgnoreUser)
 	}
 	bbsGroup := r.Group("bbs")
 	bbsGroup.Use(LoginAuth())
@@ -64,5 +64,12 @@ func initRouter() {
 		schoolGroup.POST("/articles/user-collect", schoolCollectArticle)
 		schoolGroup.POST("/articles/user-cancel-collect", schoolCancelCollectArticle)
 		schoolGroup.POST("/article/comments/value", schoolValueArticle)
+	}
+	homeGroup := r.Group("home")
+	homeGroup.Use(LoginAuth())
+	{
+		homeGroup.POST("/checkin",homeCheckInUser)
+		homeGroup.GET("/families",homeGetUserFamilyMemberList)
+		homeGroup.POST("/family/link",homeLinkNewFamilyMember)
 	}
 }

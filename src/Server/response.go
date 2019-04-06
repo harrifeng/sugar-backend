@@ -5,11 +5,6 @@ import (
 	"net/http"
 )
 
-type responseSimpleUser struct {
-	followId uint
-	username string
-	iconUrl  string
-}
 
 type responseBody struct {
 	Status int
