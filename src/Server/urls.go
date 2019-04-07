@@ -68,13 +68,14 @@ func initRouter() {
 	homeGroup := r.Group("home")
 	homeGroup.Use(LoginAuth())
 	{
-		homeGroup.POST("/checkin",homeCheckInUser)
-		homeGroup.GET("/families",homeGetUserFamilyMemberList)
-		homeGroup.POST("/family/link",homeLinkNewFamilyMember)
-		homeGroup.POST("/blood-sugar/record",homeRecordBloodSugar)
-		homeGroup.GET("/blood-sugar/records")
-		homeGroup.POST("/health/record",homeRecordHealth)
-		homeGroup.GET("/health/records",homeGetHealthRecordList)
-		homeGroup.GET("/health/record",homeGetBloodSugarRecord)
+		homeGroup.POST("/checkin", homeCheckInUser)
+		homeGroup.GET("/families", homeGetUserFamilyMemberList)
+		homeGroup.POST("/family/link", homeLinkNewFamilyMember)
+		homeGroup.POST("/blood-sugar/record", homeRecordBloodSugar)
+		homeGroup.GET("/blood-sugar/records", homeGetBloodSugarRecordList)
+		homeGroup.GET("/blood-sugar/record", homeGetBloodSugarRecord)
+		homeGroup.POST("/health/record", homeRecordHealth)
+		homeGroup.GET("/health/records", homeGetHealthRecordList)
+
 	}
 }

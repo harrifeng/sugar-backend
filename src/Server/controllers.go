@@ -391,70 +391,76 @@ func bbsGetUserTopicReplyList(c *gin.Context) {
 	c.JSON(resp.Status, resp.Data)
 }
 
-func homeCheckInUser(c *gin.Context){
-	userId,_ := c.Get("user_id")
+func homeCheckInUser(c *gin.Context) {
+	userId, _ := c.Get("user_id")
 	resp := checkinUser(userId.(int))
 	c.JSON(resp.Status, resp.Data)
 }
 
-func homeGetUserFamilyMemberList(c *gin.Context){
-	userId,_ := c.Get("user_id")
+func homeGetUserFamilyMemberList(c *gin.Context) {
+	userId, _ := c.Get("user_id")
 	resp := getUserFamilyMemberList(userId.(int))
 	c.JSON(resp.Status, resp.Data)
 }
 
-func homeLinkNewFamilyMember(c *gin.Context){
-	userId,_ := c.Get("user_id")
+func homeLinkNewFamilyMember(c *gin.Context) {
+	userId, _ := c.Get("user_id")
 	CallName := c.PostForm("call_name")
 	PhoneNumber := c.PostForm("phone_number")
 	Code := c.PostForm("code")
-	resp:= linkNewFamilyMember(userId.(int),CallName,PhoneNumber,Code)
+	resp := linkNewFamilyMember(userId.(int), CallName, PhoneNumber, Code)
 	c.JSON(resp.Status, resp.Data)
 }
 
-func homeRecordBloodSugar(c *gin.Context){
-	userId,_ := c.Get("user_id")
+func homeRecordBloodSugar(c *gin.Context) {
+	userId, _ := c.Get("user_id")
 	Period := c.PostForm("period")
-	BloodSugarValue:= c.PostForm("blood_sugar_value")
-	RecordTime:=c.PostForm("record_time")
-	RecordDate:=c.PostForm("record_date")
-	recordDate:=utils.DateTimeParser(RecordDate)
-	resp:=recordBloodSugar(userId.(int),BloodSugarValue,Period,RecordTime,recordDate)
+	BloodSugarValue := c.PostForm("blood_sugar_value")
+	RecordTime := c.PostForm("record_time")
+	RecordDate := c.PostForm("record_date")
+	recordDate := utils.DateTimeParser(RecordDate)
+	resp := recordBloodSugar(userId.(int), BloodSugarValue, Period, RecordTime, recordDate)
 	c.JSON(resp.Status, resp.Data)
 }
 
-func homeGetBloodSugarRecordList(c *gin.Context){
-
-}
-
-func homeGetBloodSugarRecord(c *gin.Context){
-	userId,_ := c.Get("user_id")
-	RecordDate:=c.Query("record_date")
-	recordDate:=utils.DateTimeParser(RecordDate)
-	resp:=getBloodSugarRecord(userId.(int),recordDate)
-	c.JSON(resp.Status, resp.Data)
-}
-
-func homeRecordHealth(c *gin.Context){
-	userId,_ := c.Get("user_id")
-	Insulin:= c.PostForm("insulin")
-	SportTime:=c.PostForm("sport_time")
-	Weight:=c.PostForm("weight")
-	BloodPressure:=c.PostForm("blood_pressure")
-	RecordTime:=c.PostForm("record_time")
-	RecordDate:=c.PostForm("record_date")
-	recordDate:=utils.DateTimeParser(RecordDate)
-	resp:=recordHealth(userId.(int),Insulin,SportTime,Weight,BloodPressure,RecordTime,recordDate)
-	c.JSON(resp.Status, resp.Data)
-
-}
-
-func homeGetHealthRecordList(c *gin.Context){
-	userId,_ := c.Get("user_id")
+func homeGetBloodSugarRecordList(c *gin.Context) {
+	userId, _ := c.Get("user_id")
 	BeginId := c.Query("begin_id")
-	beginId ,_ := strconv.Atoi(BeginId)
-	NeedNumber:=c.Query("need_number")
-	needNumber ,_ := strconv.Atoi(NeedNumber)
-	resp:=getHealthRecordList(userId.(int),beginId,needNumber)
+	beginId, _ := strconv.Atoi(BeginId)
+	NeedNumber := c.Query("need_number")
+	needNumber, _ := strconv.Atoi(NeedNumber)
+	resp := getBloodSugarRecordList(userId.(int), beginId, needNumber)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func homeGetBloodSugarRecord(c *gin.Context) {
+	userId, _ := c.Get("user_id")
+	RecordDate := c.Query("record_date")
+	recordDate := utils.DateTimeParser(RecordDate)
+	resp := getBloodSugarRecord(userId.(int), recordDate)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func homeRecordHealth(c *gin.Context) {
+	userId, _ := c.Get("user_id")
+	Insulin := c.PostForm("insulin")
+	SportTime := c.PostForm("sport_time")
+	Weight := c.PostForm("weight")
+	BloodPressure := c.PostForm("blood_pressure")
+	RecordTime := c.PostForm("record_time")
+	RecordDate := c.PostForm("record_date")
+	recordDate := utils.DateTimeParser(RecordDate)
+	resp := recordHealth(userId.(int), Insulin, SportTime, Weight, BloodPressure, RecordTime, recordDate)
+	c.JSON(resp.Status, resp.Data)
+
+}
+
+func homeGetHealthRecordList(c *gin.Context) {
+	userId, _ := c.Get("user_id")
+	BeginId := c.Query("begin_id")
+	beginId, _ := strconv.Atoi(BeginId)
+	NeedNumber := c.Query("need_number")
+	needNumber, _ := strconv.Atoi(NeedNumber)
+	resp := getHealthRecordList(userId.(int), beginId, needNumber)
 	c.JSON(resp.Status, resp.Data)
 }
