@@ -104,8 +104,8 @@ func loginUser(phoneNumber string, password string) responseBody {
 			return responseInternalServerError(err)
 		}
 	}
-	checkIn,err:=db.CheckUserCheckIn(int(user.ID))
-	if err!=nil{
+	checkIn, err := db.CheckUserCheckIn(int(user.ID))
+	if err != nil {
 		return responseInternalServerError(err)
 	}
 	return responseOKWithData(gin.H{

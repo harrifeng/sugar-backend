@@ -76,6 +76,22 @@ func initRouter() {
 		homeGroup.GET("/blood-sugar/record", homeGetBloodSugarRecord)
 		homeGroup.POST("/health/record", homeRecordHealth)
 		homeGroup.GET("/health/records", homeGetHealthRecordList)
-
+	}
+	socialGroup := r.Group("social")
+	socialGroup.Use(LoginAuth())
+	{
+		socialGroup.GET("/unread")
+		socialGroup.GET("/chatting/unread")
+		socialGroup.GET("/group/chatting/unread")
+		socialGroup.POST("/group/create")
+		socialGroup.POST("/group/remove")
+		socialGroup.POST("/group/add-members")
+		socialGroup.POST("/group/level")
+		socialGroup.GET("/groups", socialGetUserJoinGroupList)
+		socialGroup.POST("/group/chatting/send")
+		socialGroup.GET("/group/chatting/records")
+		socialGroup.GET("/chatting/records", socialGetHistoryMessageU2uList)
+		socialGroup.GET("/chatting/records/latest", socialGetLatestMessageU2uList)
+		socialGroup.POST("/chatting/send", socialSendMessageUser)
 	}
 }

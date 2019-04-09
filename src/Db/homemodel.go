@@ -18,6 +18,7 @@ func CheckInUser(userId int) error {
 
 func CheckUserCheckIn(userId int) (bool, error) {
 	checkIn := !mysqlDb.First(&UserCheckIn{UserID: uint(userId), CheckTime: time.Now()}).RecordNotFound()
+	println(userId, checkIn)
 	return checkIn, nil
 }
 

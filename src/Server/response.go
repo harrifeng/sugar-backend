@@ -5,7 +5,6 @@ import (
 	"net/http"
 )
 
-
 type responseBody struct {
 	Status int
 	Data   interface{}

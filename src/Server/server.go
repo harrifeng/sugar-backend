@@ -8,7 +8,9 @@ import (
 var r *gin.Engine
 
 func Start() {
+	// init database
 	db.AutoCreateTableTest()
+	//init gin http server
 	r = gin.New()
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())

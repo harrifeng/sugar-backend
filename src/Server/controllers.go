@@ -464,3 +464,46 @@ func homeGetHealthRecordList(c *gin.Context) {
 	resp := getHealthRecordList(userId.(int), beginId, needNumber)
 	c.JSON(resp.Status, resp.Data)
 }
+
+func socialSendMessageUser(c *gin.Context) {
+	userId, _ := c.Get("user_id")
+	Content := c.PostForm("content")
+	TargetUserId := c.PostForm("target_user_id")
+	targetUserId, _ := strconv.Atoi(TargetUserId)
+	resp := sendMessageToUser(userId.(int), Content, targetUserId)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func socialGetLatestMessageU2uList(c *gin.Context) {
+	userId, _ := c.Get("user_id")
+	TargetUserId := c.Query("target_user_id")
+	targetUserId, _ := strconv.Atoi(TargetUserId)
+	LatestMessageId := c.Query("latest_message_id")
+	latestMessageId, _ := strconv.Atoi(LatestMessageId)
+	NeedNumber := c.Query("need_number")
+	needNumber, _ := strconv.Atoi(NeedNumber)
+	resp := getLatestMessageU2uList(userId.(int), targetUserId, latestMessageId, needNumber)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func socialGetHistoryMessageU2uList(c *gin.Context) {
+	userId, _ := c.Get("user_id")
+	TargetUserId := c.Query("target_user_id")
+	targetUserId, _ := strconv.Atoi(TargetUserId)
+	OldestMessageId := c.Query("oldest_message_id")
+	oldestMessageId, _ := strconv.Atoi(OldestMessageId)
+	NeedNumber := c.Query("need_number")
+	needNumber, _ := strconv.Atoi(NeedNumber)
+	resp := getHistoryMessageU2uList(userId.(int), targetUserId, oldestMessageId, needNumber)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func socialGetUserJoinGroupList(c *gin.Context) {
+	userId, _ := c.Get("user_id")
+	BeginId := c.Query("begin_id")
+	beginId, _ := strconv.Atoi(BeginId)
+	NeedNumber := c.Query("need_number")
+	needNumber, _ := strconv.Atoi(NeedNumber)
+	resp := getUserJoinGroupList(userId.(int), beginId, needNumber)
+	c.JSON(resp.Status, resp.Data)
+}

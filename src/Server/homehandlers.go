@@ -75,7 +75,10 @@ func recordHealth(userId int, insulin string, sportTime string, weight string, b
 }
 
 func getBloodSugarRecord(userId int, recordDate time.Time) responseBody {
-	bloodRecord, _, err := db.GetBloodSugarRecordFromRecordDate(userId, recordDate)
+	bloodRecord, exist, err := db.GetBloodSugarRecordFromRecordDate(userId, recordDate)
+	if !exist {
+		return responseOKWithData([]gin.H{})
+	}
 	if err != nil {
 		return responseInternalServerError(err)
 	}

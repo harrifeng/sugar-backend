@@ -16,18 +16,23 @@ type User struct {
 	Age         int
 
 	// User Account data
-	Exp                  int       `gorm:"not null;default:'0'"`
-	Level                int       `gorm:"not null;default:'1'"`
-	HeadPortraitUrl      string    ``
-	FollowingUsers       []*User   `gorm:"many2many:user_following_ships;association_jointable_foreignkey:following_user_id"`
-	FollowerUsers        []*User   `gorm:"many2many:user_follower_ships;association_jointable_foreignkey:follower_user_id"`
-	CollectedArticles    []Article `gorm:"many2many:user_collected_article"`
-	CollectedTopics      []Topic   `gorm:"many2many:user_collected_topic"`
-	BloodRecords         []BloodRecord
-	HealthRecords        []HealthRecord
-	FamilyMembers        []FamilyMember
-	UserPrivacySetting   UserPrivacySetting
-	UserPrivacySettingID uint
+	Exp                   int           `gorm:"not null;default:'0'"`
+	Level                 int           `gorm:"not null;default:'1'"`
+	HeadPortraitUrl       string        ``
+	FollowingUsers        []*User       `gorm:"many2many:user_following_ships;association_jointable_foreignkey:following_user_id"`
+	FollowerUsers         []*User       `gorm:"many2many:user_follower_ships;association_jointable_foreignkey:follower_user_id"`
+	CollectedArticles     []Article     `gorm:"many2many:user_collected_article"`
+	CollectedTopics       []Topic       `gorm:"many2many:user_collected_topic"`
+	JoinedGroups          []FriendGroup `gorm:"many2many:user_joined_group"`
+	BloodRecords          []BloodRecord
+	HealthRecords         []HealthRecord
+	FamilyMembers         []FamilyMember
+	UserPrivacySetting    UserPrivacySetting
+	MessageStateInGroup   MessageStateInGroup
+	MessageStateU2u       MessageStateU2u
+	UserPrivacySettingID  uint
+	MessageStateInGroupID uint
+	MessageStateU2uID     uint
 
 	// User healthy data
 	Height float64
@@ -128,6 +133,41 @@ type FamilyMember struct {
 	CallName    string
 	User        User
 	UserID      uint
+}
+
+type MessageStateU2u struct {
+	gorm.Model
+	LastReadTime time.Time
+}
+
+type MessageU2u struct {
+	gorm.Model
+	SenderID uint
+	Sender   User
+	Content  string `gorm:"type:text"`
+	TargetID uint
+	Target   User
+}
+
+type FriendGroup struct {
+	gorm.Model
+	Name    string
+	Members []User
+	User    User
+	UserID  uint
+}
+
+type MessageStateInGroup struct {
+	gorm.Model
+	LastReadTime time.Time
+}
+
+type MessageInGroup struct {
+	gorm.Model
+	SenderID uint
+	Sender   User
+	GroupID  uint
+	Content  string `gorm:"type:text"`
 }
 
 type UserReply struct {
