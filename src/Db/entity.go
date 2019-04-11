@@ -23,7 +23,7 @@ type User struct {
 	FollowerUsers         []*User       `gorm:"many2many:user_follower_ships;association_jointable_foreignkey:follower_user_id"`
 	CollectedArticles     []Article     `gorm:"many2many:user_collected_article"`
 	CollectedTopics       []Topic       `gorm:"many2many:user_collected_topic"`
-	JoinedGroups          []FriendGroup `gorm:"many2many:user_joined_group"`
+	JoinedGroups          []*FriendGroup `gorm:"many2many:user_joined_group"`
 	BloodRecords          []BloodRecord
 	HealthRecords         []HealthRecord
 	FamilyMembers         []FamilyMember
@@ -151,8 +151,8 @@ type MessageU2u struct {
 
 type FriendGroup struct {
 	gorm.Model
-	Name    string
-	Members []User
+	Name    string `gorm:"unique;not null;"`
+	Members []*User `gorm:"many2many:user_joined_group"`
 	User    User
 	UserID  uint
 }

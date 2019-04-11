@@ -83,7 +83,7 @@ func initRouter() {
 		socialGroup.GET("/unread")
 		socialGroup.GET("/chatting/unread")
 		socialGroup.GET("/group/chatting/unread")
-		socialGroup.POST("/group/create")
+		socialGroup.POST("/group/create",socialCreateGroup)
 		socialGroup.POST("/group/remove")
 		socialGroup.POST("/group/add-members")
 		socialGroup.POST("/group/level")

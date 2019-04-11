@@ -126,6 +126,7 @@ func accountIgnoreUser(c *gin.Context) {
 	c.JSON(resp.Status, resp.Data)
 }
 
+
 func schoolGetArticle(c *gin.Context) {
 	userId, _ := c.Get("user_id")
 	ArticleId := c.Query("article_id")
@@ -505,5 +506,13 @@ func socialGetUserJoinGroupList(c *gin.Context) {
 	NeedNumber := c.Query("need_number")
 	needNumber, _ := strconv.Atoi(NeedNumber)
 	resp := getUserJoinGroupList(userId.(int), beginId, needNumber)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func socialCreateGroup(c *gin.Context){
+	userId, _ := c.Get("user_id")
+	GroupName := c.PostForm("group_name")
+	GroupMembers := c.PostForm("group_members")
+	resp:=createGroup(userId.(int),GroupName,GroupMembers)
 	c.JSON(resp.Status, resp.Data)
 }

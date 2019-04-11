@@ -40,6 +40,20 @@ func GetUserJoinGroupList(userId int, beginId int, needNumber int) ([]FriendGrou
 	var groups []FriendGroup
 	var count int
 	mysqlDb.Model(&FriendGroup{}).Where("user_id=?", userId).Count(&count)
-	err := mysqlDb.Where("user_id=?", userId).Offset(beginId).Limit(needNumber).Find(&groups).Error
+	err := mysqlDb.Preload("Members").Where("user_id=?", userId).Offset(beginId).Limit(needNumber).Find(&groups).Error
 	return groups, count, err
+}
+
+func AddGroup(userId int,groupName string ,groupMembers []int)error{
+	var members []*User
+	err:=mysqlDb.Where(groupMembers).Find(&members).Error
+	if err!=nil{
+		return err
+	}
+	group:=FriendGroup{
+		UserID:uint(userId),
+		Name:groupName,
+		Members:members,
+	}
+	return mysqlDb.Create(&group).Save(&group).Error
 }

@@ -2,7 +2,9 @@ package server
 
 import (
 	"db"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"strconv"
 )
 
 func sendMessageToUser(userId int, content string, targetUserId int) responseBody {
@@ -73,11 +75,32 @@ func getUserJoinGroupList(userId int, beginId int, needNumber int) responseBody 
 		respGroups[i] = gin.H{
 			"groupId":     group.ID,
 			"name":        group.Name,
-			"memberCount": len(group.Members),
+			"memberCount": len(group.Members) + 1 ,
+			"host": userId == int(group.UserID),
 		}
 	}
 	return responseOKWithData(gin.H{
 		"total": count,
 		"data":  respGroups,
 	})
+}
+
+func createGroup(userId int,groupName string,groupMembers string)responseBody{
+	if groupName == "" {
+		return responseNormalError("群组名不能为空")
+	}
+	var MemberList []string
+	err := json.Unmarshal([]byte(groupMembers), &MemberList)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	iMembers:=make([]int,len(MemberList))
+	for i,v:=range MemberList{
+		iMembers[i],err = strconv.Atoi(v)
+	}
+	err = db.AddGroup(userId,groupName,iMembers)
+	if err!=nil{
+		return responseInternalServerError(err)
+	}
+	return responseOK()
 }

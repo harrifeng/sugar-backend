@@ -282,3 +282,4 @@ func logoutUser(SessionId string) responseBody {
 	}
 	return responseOK()
 }
+
