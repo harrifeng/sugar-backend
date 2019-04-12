@@ -17,8 +17,8 @@ func sendMessageToUser(userId int, content string, targetUserId int) responseBod
 	})
 }
 
-func getLatestMessageU2uList(userId int, targetUserId int, latestMessageId int, NeedNumber int) responseBody {
-	messages, err := db.GetLatestMessageToUser(userId, targetUserId, latestMessageId, NeedNumber)
+func getLatestMessageU2uList(userId int, targetUserId int, latestMessageId int, needNumber int) responseBody {
+	messages, err := db.GetLatestMessageToUser(userId, targetUserId, latestMessageId, needNumber)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
@@ -41,8 +41,8 @@ func getLatestMessageU2uList(userId int, targetUserId int, latestMessageId int, 
 	return responseOKWithData(respMessages)
 }
 
-func getHistoryMessageU2uList(userId int, targetUserId int, oldestMessageId int, NeedNumber int) responseBody {
-	messages, err := db.GetHistoryMessageToUser(userId, targetUserId, oldestMessageId, NeedNumber)
+func getHistoryMessageU2uList(userId int, targetUserId int, oldestMessageId int, needNumber int) responseBody {
+	messages, err := db.GetHistoryMessageToUser(userId, targetUserId, oldestMessageId, needNumber)
 	if err != nil {
 		return responseInternalServerError(err)
 	}
@@ -75,8 +75,8 @@ func getUserJoinGroupList(userId int, beginId int, needNumber int) responseBody 
 		respGroups[i] = gin.H{
 			"groupId":     group.ID,
 			"name":        group.Name,
-			"memberCount": len(group.Members) + 1 ,
-			"host": userId == int(group.UserID),
+			"memberCount": len(group.Members),
+			"host":        userId == int(group.UserID),
 		}
 	}
 	return responseOKWithData(gin.H{
@@ -85,7 +85,7 @@ func getUserJoinGroupList(userId int, beginId int, needNumber int) responseBody 
 	})
 }
 
-func createGroup(userId int,groupName string,groupMembers string)responseBody{
+func createGroup(userId int, groupName string, groupMembers string) responseBody {
 	if groupName == "" {
 		return responseNormalError("群组名不能为空")
 	}
@@ -94,13 +94,61 @@ func createGroup(userId int,groupName string,groupMembers string)responseBody{
 	if err != nil {
 		return responseInternalServerError(err)
 	}
-	iMembers:=make([]int,len(MemberList))
-	for i,v:=range MemberList{
-		iMembers[i],err = strconv.Atoi(v)
+	iMembers := make([]int, len(MemberList))
+	for i, v := range MemberList {
+		iMembers[i], err = strconv.Atoi(v)
 	}
-	err = db.AddGroup(userId,groupName,iMembers)
-	if err!=nil{
+	err = db.AddGroup(userId, groupName, iMembers)
+	if err != nil {
 		return responseInternalServerError(err)
 	}
 	return responseOK()
+}
+
+func sendMessageInGroup(userId int, groupId int, content string) responseBody {
+	messageId, err := db.AddMessageInGroup(userId, groupId, content)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	return responseOKWithData(gin.H{
+		"messageId": messageId,
+	})
+}
+
+func getHistoryMessageInGroupList(userId int, groupId int, oldestMessageId int, needNumber int) responseBody {
+	messages, err := db.GetHistoryMessageInGroup(groupId, oldestMessageId, needNumber)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	respMessages := make([]gin.H, len(messages))
+	for i, message := range messages {
+		respMessages[i] = gin.H{
+			"content":        message.Content,
+			"messageId":      message.ID,
+			"senderId":       message.SenderID,
+			"senderUserName": message.Sender.UserName,
+			"host":           message.SenderID == uint(userId),
+			"createdAt":      message.CreatedAt,
+			"imageUrl":       message.Sender.HeadPortraitUrl,
+		}
+	}
+	return responseOKWithData(respMessages)
+}
+
+func getLatestMessageInGroupList(userId int, groupId int, latestMessageId int, needNumber int) responseBody {
+	messages, err := db.GetLatestMessageInGroup(groupId, latestMessageId, needNumber)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	respMessages := make([]gin.H, len(messages))
+	for i, message := range messages {
+		respMessages[i] = gin.H{
+			"content":   message.Content,
+			"messageId": message.ID,
+			"host":      message.SenderID == uint(userId),
+			"createdAt": message.CreatedAt,
+			"imageUrl":  message.Sender.HeadPortraitUrl,
+		}
+	}
+	return responseOKWithData(respMessages)
 }

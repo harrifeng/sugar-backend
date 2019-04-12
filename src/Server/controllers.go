@@ -126,7 +126,6 @@ func accountIgnoreUser(c *gin.Context) {
 	c.JSON(resp.Status, resp.Data)
 }
 
-
 func schoolGetArticle(c *gin.Context) {
 	userId, _ := c.Get("user_id")
 	ArticleId := c.Query("article_id")
@@ -509,10 +508,43 @@ func socialGetUserJoinGroupList(c *gin.Context) {
 	c.JSON(resp.Status, resp.Data)
 }
 
-func socialCreateGroup(c *gin.Context){
+func socialCreateGroup(c *gin.Context) {
 	userId, _ := c.Get("user_id")
 	GroupName := c.PostForm("group_name")
 	GroupMembers := c.PostForm("group_members")
-	resp:=createGroup(userId.(int),GroupName,GroupMembers)
+	resp := createGroup(userId.(int), GroupName, GroupMembers)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func socialSendMessageInGroup(c *gin.Context) {
+	userId, _ := c.Get("user_id")
+	GroupId := c.PostForm("group_id")
+	groupId, _ := strconv.Atoi(GroupId)
+	Content := c.PostForm("content")
+	resp := sendMessageInGroup(userId.(int), groupId, Content)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func socialGetHistoryMessageInGroupList(c *gin.Context) {
+	userId, _ := c.Get("user_id")
+	GroupId := c.Query("group_id")
+	groupId, _ := strconv.Atoi(GroupId)
+	OldestMessageId := c.Query("oldest_message_id")
+	oldestMessageId, _ := strconv.Atoi(OldestMessageId)
+	NeedNumber := c.Query("need_number")
+	needNumber, _ := strconv.Atoi(NeedNumber)
+	resp := getHistoryMessageInGroupList(userId.(int), groupId, oldestMessageId, needNumber)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func socialGetLatestMessageInGroupList(c *gin.Context) {
+	userId, _ := c.Get("user_id")
+	GroupId := c.Query("group_id")
+	groupId, _ := strconv.Atoi(GroupId)
+	LatestMessageId := c.Query("latest_message_id")
+	latestMessageId, _ := strconv.Atoi(LatestMessageId)
+	NeedNumber := c.Query("need_number")
+	needNumber, _ := strconv.Atoi(NeedNumber)
+	resp := getLatestMessageInGroupList(userId.(int), groupId, latestMessageId, needNumber)
 	c.JSON(resp.Status, resp.Data)
 }
