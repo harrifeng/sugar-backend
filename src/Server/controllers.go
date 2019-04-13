@@ -548,3 +548,12 @@ func socialGetLatestMessageInGroupList(c *gin.Context) {
 	resp := getLatestMessageInGroupList(userId.(int), groupId, latestMessageId, needNumber)
 	c.JSON(resp.Status, resp.Data)
 }
+
+func socialGetMessageList(c *gin.Context){
+	userId ,_:=c.Get("user_id")
+	ExistList := c.Query("exist_list")
+	NeedNumber := c.Query("need_number")
+	needNumber,_ := strconv.Atoi(NeedNumber)
+	resp := getMessageList(userId.(int),ExistList,needNumber)
+	c.JSON(resp.Status, resp.Data)
+}

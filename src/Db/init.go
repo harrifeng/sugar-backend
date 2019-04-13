@@ -60,8 +60,6 @@ func AutoCreateTableTest() {
 	mysqlDb.AutoMigrate(&FamilyMember{})
 	mysqlDb.AutoMigrate(&BloodRecord{})
 	mysqlDb.AutoMigrate(&HealthRecord{})
-	mysqlDb.AutoMigrate(&MessageStateU2u{})
-	mysqlDb.AutoMigrate(&MessageStateInGroup{})
 	mysqlDb.AutoMigrate(&MessageU2u{})
 	mysqlDb.AutoMigrate(&MessageInGroup{})
 	mysqlDb.AutoMigrate(&FriendGroup{})
@@ -97,10 +95,10 @@ func InitTopicLayerReplyTest() {
 
 func Init() {
 	AutoCreateTableTest()
-	//InitAllArticle()
-	//InitUser()
-	//IninArticleComment()
-	//InitTopicTest()
-	//InitTopicLordReplyTest()
-	//InitTopicLayerReplyTest()
+	InitAllArticle()
+	InitUser()
+	IninArticleComment()
+	InitTopicTest()
+	InitTopicLordReplyTest()
+	InitTopicLayerReplyTest()
 }

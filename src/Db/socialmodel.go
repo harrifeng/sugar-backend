@@ -93,3 +93,58 @@ func GetLatestMessageInGroup(groupId int, latestMessageId int, needNumber int) (
 	println(messages)
 	return messages, err
 }
+
+func GetMessageInGroup(userId int,groupIds []int,needNumber int)([]MessageInGroup,error){
+	var groupMessages []MessageInGroup
+	var groups []*FriendGroup
+	user, err := GetUserFromUserId(userId)
+	if err != nil {
+		return groupMessages, err
+	}
+	err = mysqlDb.Model(&user).Not(groupIds).Related(&groups, "JoinedGroups").Error
+	joinedGroupIds :=make([]int,len(groups))
+	for i,group:=range groups{
+		joinedGroupIds[i] = int(group.ID)
+	}
+	// 当数组空时为not in(null),通过push一个0解决
+	joinedGroupIds = append(joinedGroupIds, 0)
+	err = mysqlDb.Raw(
+		`select a.* from message_in_groups a where group_id in (?) and id = 
+			(select max(id) from message_in_groups where group_id = a.group_id) 
+			order by a.group_id limit ?`,
+		joinedGroupIds,needNumber).Scan(&groupMessages).Error
+	for i,message:=range groupMessages{
+		err = mysqlDb.First(&groupMessages[i].Group,message.GroupID).Error
+		if err!=nil{
+			return groupMessages, err
+		}
+		err = mysqlDb.First(&groupMessages[i].Sender,message.SenderID).Error
+		if err!=nil{
+			return groupMessages, err
+		}
+	}
+	return groupMessages,  err
+}
+
+func GetMessageU2u(userId int,U2uIds []int,needNumber int)([]UserU2uMessage,error){
+	var messages []UserU2uMessage
+	// 当数组空时为not in(null),通过push一个0解决
+	U2uIds = append(U2uIds, 0)
+	err:=mysqlDb.Raw(`select * from(
+				(select id, content,target_id as other_id,created_at from message_u2us where sender_id=? and target_id not in (?))
+				union all
+				(select id, content,sender_id as other_id,created_at from message_u2us where target_id=? and sender_id not in (?))
+				order by id desc
+				)  as T group by T.other_id limit ?`,
+				userId,U2uIds,userId,U2uIds,needNumber).Scan(&messages).Error
+	if err!=nil{
+		return messages,err
+	}
+	for i,v:=range messages{
+		messages[i].Other ,err = GetUserFromUserId(v.OtherId)
+		if err!=nil{
+			return messages, err
+		}
+	}
+	return messages,err
+}

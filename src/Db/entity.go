@@ -28,11 +28,7 @@ type User struct {
 	HealthRecords         []HealthRecord
 	FamilyMembers         []FamilyMember
 	UserPrivacySetting    UserPrivacySetting
-	MessageStateInGroup   MessageStateInGroup
-	MessageStateU2u       MessageStateU2u
 	UserPrivacySettingID  uint
-	MessageStateInGroupID uint
-	MessageStateU2uID     uint
 
 	// User healthy data
 	Height float64
@@ -135,10 +131,6 @@ type FamilyMember struct {
 	UserID      uint
 }
 
-type MessageStateU2u struct {
-	gorm.Model
-	LastReadTime time.Time
-}
 
 type MessageU2u struct {
 	gorm.Model
@@ -157,16 +149,12 @@ type FriendGroup struct {
 	UserID  uint
 }
 
-type MessageStateInGroup struct {
-	gorm.Model
-	LastReadTime time.Time
-}
-
 type MessageInGroup struct {
 	gorm.Model
 	SenderID uint
 	Sender   User
 	GroupID  uint
+	Group FriendGroup
 	Content  string `gorm:"type:text"`
 }
 
@@ -178,4 +166,12 @@ type UserReply struct {
 	UserId             int       `gorm:"Column:user_id"`
 	ThumbsUpCount      int       `gorm:"Column:thumbs_up_count"`
 	FatherID           uint      `gorm:"Column:father_id"`
+}
+
+type UserU2uMessage struct{
+	Id int
+	Content string
+	OtherId int
+	Other User
+	CreatedAt time.Time
 }

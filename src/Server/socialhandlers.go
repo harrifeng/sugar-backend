@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"strconv"
+	"utils"
 )
 
 func sendMessageToUser(userId int, content string, targetUserId int) responseBody {
@@ -151,4 +152,47 @@ func getLatestMessageInGroupList(userId int, groupId int, latestMessageId int, n
 		}
 	}
 	return responseOKWithData(respMessages)
+}
+
+func getMessageList(userId int ,existList string,needNumber int )responseBody{
+	existIds := make(map[string][]int)
+	err:=json.Unmarshal([]byte(existList),&existIds)
+	if err!=nil{
+		return responseInternalServerError(err)
+	}
+	groupNeedNumber := needNumber / 2
+	u2uNeedNumber := needNumber - groupNeedNumber
+	groupMessages,err:=db.GetMessageInGroup(userId,existIds["groupIds"],groupNeedNumber)
+	if len(groupMessages) < groupNeedNumber{
+		u2uNeedNumber = needNumber - len(groupMessages)
+	}
+	u2uMessages,err:=db.GetMessageU2u(userId,existIds["u2uIds"],u2uNeedNumber)
+	if err!=nil{
+		return responseInternalServerError(err)
+	}
+	// build response data
+	respGroupMessages:=make([]gin.H,len(groupMessages))
+	for i,message:=range groupMessages{
+		respGroupMessages[i] = gin.H{
+			"groupId" : message.GroupID,
+			"content" : message.Content,
+			"groupName":message.Group.Name,
+			"senderUserName" : message.Sender.UserName,
+			"updatedTime": utils.GoTimeToESTime(message.CreatedAt),
+		}
+	}
+	respU2uMessages:=make([]gin.H,len(u2uMessages))
+	for i,message:=range u2uMessages{
+		respU2uMessages[i] = gin.H{
+			"otherId" : message.OtherId,
+			"content" : message.Content,
+			"otherImageUrl":message.Other.HeadPortraitUrl,
+			"otherUserName" : message.Other.UserName,
+			"updatedTime": utils.GoTimeToESTime(message.CreatedAt),
+		}
+	}
+	return responseOKWithData(gin.H{
+		"groupMessages":respGroupMessages,
+		"u2uMessages":respU2uMessages,
+	})
 }
