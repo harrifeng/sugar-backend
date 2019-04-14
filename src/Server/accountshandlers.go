@@ -23,7 +23,7 @@ func sendVerificationCode(phoneNumber string) responseBody {
 	} else {
 		code = utils.RandCode()
 	}
-	url := fmt.Sprintf("http://127.0.0.1:7799/send_message?phone_number=%s&code=%s",
+	url := fmt.Sprintf("http://127.0.0.1:19987/send_message?phone_number=%s&code=%s",
 		phoneNumber, code)
 	resp, err := http.Get(url)
 
