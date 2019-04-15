@@ -557,3 +557,28 @@ func socialGetMessageList(c *gin.Context){
 	resp := getMessageList(userId.(int),ExistList,needNumber)
 	c.JSON(resp.Status, resp.Data)
 }
+
+func socialGetUserInGroup(c *gin.Context){
+	userId ,_:=c.Get("user_id")
+	GroupId :=c.Query("group_id")
+	groupId,_ :=strconv.Atoi(GroupId)
+	resp:=getUserListInGroup(userId.(int),groupId)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func socialMemberLevelGroup(c *gin.Context){
+	GroupId :=c.PostForm("group_id")
+	groupId,_ :=strconv.Atoi(GroupId)
+	MemberId :=c.PostForm("member_id")
+	memberId,_ :=strconv.Atoi(MemberId)
+	resp:=removeMemberInGroup(groupId,memberId)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func socialRemoveGroup(c *gin.Context){
+	userId ,_:=c.Get("user_id")
+	GroupId :=c.PostForm("group_id")
+	groupId,_ :=strconv.Atoi(GroupId)
+	resp:=removeGroup(userId.(int),groupId)
+	c.JSON(resp.Status, resp.Data)
+}

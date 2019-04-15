@@ -80,9 +80,10 @@ func initRouter() {
 	socialGroup := r.Group("social")
 	socialGroup.Use(LoginAuth())
 	{
+		socialGroup.GET("/group/members",socialGetUserInGroup)
 		socialGroup.POST("/group/create", socialCreateGroup)
-		socialGroup.POST("/group/remove")
-		socialGroup.POST("/group/level")
+		socialGroup.POST("/group/remove",socialRemoveGroup)
+		socialGroup.POST("/group/level",socialMemberLevelGroup)
 		socialGroup.GET("/messages",socialGetMessageList)
 		socialGroup.GET("/groups", socialGetUserJoinGroupList)
 		socialGroup.POST("/group/chatting/send", socialSendMessageInGroup)

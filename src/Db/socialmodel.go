@@ -1,5 +1,10 @@
 package db
 
+import (
+	"errors"
+	"github.com/jinzhu/gorm"
+)
+
 func AddMessageToUser(userId int, content string, targetUserId int) (uint, error) {
 	message := MessageU2u{
 		SenderID: uint(userId),
@@ -147,4 +152,49 @@ func GetMessageU2u(userId int,U2uIds []int,needNumber int)([]UserU2uMessage,erro
 		}
 	}
 	return messages,err
+}
+
+func GetUserListInGroup(userId int,groupId int)([]*User,error){
+	var group FriendGroup
+	err:=mysqlDb.Preload("Members").First(&group,groupId).Error
+	return group.Members,err
+}
+
+func GetHostInGroup(groupId int)(uint,error){
+	var group FriendGroup
+	err:= mysqlDb.First(&group,groupId).Error
+	return group.UserID,err
+}
+
+func RemoveMemberInGroup(groupId int,memberId int)error{
+	var group FriendGroup
+	user,err:=GetUserFromUserId(memberId)
+	if err!=nil{
+		return err
+	}
+	err = mysqlDb.First(&group,groupId).Association("Members").Delete(user).Error
+	return err
+}
+
+func ReomveGroup(userId int ,groupId int)error{
+	var group FriendGroup
+	err:=mysqlDb.First(&group,groupId).Error
+	if err!=nil{
+		return err
+	}
+	if int(group.UserID) != userId{
+		return errors.New("only creator can remove group")
+	}
+	return Transaction(func(db *gorm.DB) error {
+		err:= db.Model(&group).Association("Members").Clear().Error
+		if err!=nil{
+			return err
+		}
+		var messages []MessageInGroup
+		err = db.Where("group_id=?",group.ID).Delete(&messages).Error
+		if err!=nil{
+			return err
+		}
+		return db.Delete(&group).Error
+	})
 }

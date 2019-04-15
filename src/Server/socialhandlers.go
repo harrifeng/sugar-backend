@@ -196,3 +196,44 @@ func getMessageList(userId int ,existList string,needNumber int )responseBody{
 		"u2uMessages":respU2uMessages,
 	})
 }
+
+
+func getUserListInGroup(userId int,groupId int)responseBody{
+	members,err:=db.GetUserListInGroup(userId,groupId)
+	if err!=nil{
+		return responseInternalServerError(err)
+	}
+	respMembers:=make([]gin.H,len(members))
+	for i,member:=range members{
+		respMembers[i] = gin.H{
+			"userId":member.ID,
+			"userName":member.UserName,
+			"userImageUrl":member.HeadPortraitUrl,
+		}
+	}
+	creatorId,err:=db.GetHostInGroup(groupId)
+	if err!=nil{
+		return responseInternalServerError(err)
+	}
+	return responseOKWithData(gin.H{
+		"total":len(respMembers),
+		"data":respMembers,
+		"host":creatorId == uint(userId),
+	})
+}
+
+func removeMemberInGroup(groupId int,memberId int )responseBody{
+	err:=db.RemoveMemberInGroup(groupId,memberId)
+	if err!=nil{
+		return responseInternalServerError(err)
+	}
+	return responseOK()
+}
+
+func removeGroup(userId int,groupId int)responseBody{
+	err:=db.ReomveGroup(userId,groupId)
+	if err!=nil{
+		return responseInternalServerError(err)
+	}
+	return responseOK()
+}
