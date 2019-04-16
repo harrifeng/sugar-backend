@@ -2,6 +2,7 @@ package server
 
 import (
 	"db"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -23,7 +24,7 @@ func sendVerificationCode(phoneNumber string) responseBody {
 	} else {
 		code = utils.RandCode()
 	}
-	url := fmt.Sprintf("http://127.0.0.1:19987/send_message?phone_number=%s&code=%s",
+	url := fmt.Sprintf("http://127.0.0.1:19987/send_message?phone_number=%s&code=%s&pwd=04bc1911b62299651aa9ce63c8d74770",
 		phoneNumber, code)
 	resp, err := http.Get(url)
 
@@ -41,7 +42,12 @@ func sendVerificationCode(phoneNumber string) responseBody {
 	if err != nil {
 		return responseInternalServerError(err)
 	}
-	if body[0] == 'o' {
+	respMap := make(map[string]int)
+	err = json.Unmarshal(body, &respMap)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	if respMap["code"] == 0 {
 		err := db.SetNewVerificationCode(phoneNumber, code)
 		if err != nil {
 			return responseInternalServerError(err)
@@ -49,7 +55,7 @@ func sendVerificationCode(phoneNumber string) responseBody {
 			return responseOK()
 		}
 	}
-	return responseInternalServerError(errors.New("external service(send message) error"))
+	return responseInternalServerError(errors.New("external service(send_message) error"))
 
 }
 
@@ -282,4 +288,3 @@ func logoutUser(SessionId string) responseBody {
 	}
 	return responseOK()
 }
-
