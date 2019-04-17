@@ -16,19 +16,19 @@ type User struct {
 	Age         int
 
 	// User Account data
-	Exp                   int           `gorm:"not null;default:'0'"`
-	Level                 int           `gorm:"not null;default:'1'"`
-	HeadPortraitUrl       string        ``
-	FollowingUsers        []*User       `gorm:"many2many:user_following_ships;association_jointable_foreignkey:following_user_id"`
-	FollowerUsers         []*User       `gorm:"many2many:user_follower_ships;association_jointable_foreignkey:follower_user_id"`
-	CollectedArticles     []Article     `gorm:"many2many:user_collected_article"`
-	CollectedTopics       []Topic       `gorm:"many2many:user_collected_topic"`
-	JoinedGroups          []*FriendGroup `gorm:"many2many:user_joined_group"`
-	BloodRecords          []BloodRecord
-	HealthRecords         []HealthRecord
-	FamilyMembers         []FamilyMember
-	UserPrivacySetting    UserPrivacySetting
-	UserPrivacySettingID  uint
+	Exp                  int            `gorm:"not null;default:'0'"`
+	Level                int            `gorm:"not null;default:'1'"`
+	HeadPortraitUrl      string         ``
+	FollowingUsers       []*User        `gorm:"many2many:user_following_ships;association_jointable_foreignkey:following_user_id"`
+	FollowerUsers        []*User        `gorm:"many2many:user_follower_ships;association_jointable_foreignkey:follower_user_id"`
+	CollectedArticles    []Article      `gorm:"many2many:user_collected_article"`
+	CollectedTopics      []Topic        `gorm:"many2many:user_collected_topic"`
+	JoinedGroups         []*FriendGroup `gorm:"many2many:user_joined_group"`
+	BloodRecords         []BloodRecord
+	HealthRecords        []HealthRecord
+	FamilyMembers        []FamilyMember
+	UserPrivacySetting   UserPrivacySetting
+	UserPrivacySettingID uint
 
 	// User healthy data
 	Height float64
@@ -131,7 +131,6 @@ type FamilyMember struct {
 	UserID      uint
 }
 
-
 type MessageU2u struct {
 	gorm.Model
 	SenderID uint
@@ -143,7 +142,7 @@ type MessageU2u struct {
 
 type FriendGroup struct {
 	gorm.Model
-	Name    string `gorm:"unique;not null;"`
+	Name    string  `gorm:"unique;not null;"`
 	Members []*User `gorm:"many2many:user_joined_group"`
 	User    User
 	UserID  uint
@@ -154,7 +153,7 @@ type MessageInGroup struct {
 	SenderID uint
 	Sender   User
 	GroupID  uint
-	Group FriendGroup
+	Group    FriendGroup
 	Content  string `gorm:"type:text"`
 }
 
@@ -168,10 +167,10 @@ type UserReply struct {
 	FatherID           uint      `gorm:"Column:father_id"`
 }
 
-type UserU2uMessage struct{
-	Id int
-	Content string
-	OtherId int
-	Other User
+type UserU2uMessage struct {
+	Id        int
+	Content   string
+	OtherId   int
+	Other     User
 	CreatedAt time.Time
 }

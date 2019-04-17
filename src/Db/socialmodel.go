@@ -99,7 +99,7 @@ func GetLatestMessageInGroup(groupId int, latestMessageId int, needNumber int) (
 	return messages, err
 }
 
-func GetMessageInGroup(userId int,groupIds []int,needNumber int)([]MessageInGroup,error){
+func GetMessageInGroup(userId int, groupIds []int, needNumber int) ([]MessageInGroup, error) {
 	var groupMessages []MessageInGroup
 	var groups []*FriendGroup
 	user, err := GetUserFromUserId(userId)
@@ -107,8 +107,8 @@ func GetMessageInGroup(userId int,groupIds []int,needNumber int)([]MessageInGrou
 		return groupMessages, err
 	}
 	err = mysqlDb.Model(&user).Not(groupIds).Related(&groups, "JoinedGroups").Error
-	joinedGroupIds :=make([]int,len(groups))
-	for i,group:=range groups{
+	joinedGroupIds := make([]int, len(groups))
+	for i, group := range groups {
 		joinedGroupIds[i] = int(group.ID)
 	}
 	// 当数组空时为not in(null),通过push一个0解决
@@ -117,82 +117,82 @@ func GetMessageInGroup(userId int,groupIds []int,needNumber int)([]MessageInGrou
 		`select a.* from message_in_groups a where group_id in (?) and id = 
 			(select max(id) from message_in_groups where group_id = a.group_id) 
 			order by a.group_id limit ?`,
-		joinedGroupIds,needNumber).Scan(&groupMessages).Error
-	for i,message:=range groupMessages{
-		err = mysqlDb.First(&groupMessages[i].Group,message.GroupID).Error
-		if err!=nil{
+		joinedGroupIds, needNumber).Scan(&groupMessages).Error
+	for i, message := range groupMessages {
+		err = mysqlDb.First(&groupMessages[i].Group, message.GroupID).Error
+		if err != nil {
 			return groupMessages, err
 		}
-		err = mysqlDb.First(&groupMessages[i].Sender,message.SenderID).Error
-		if err!=nil{
+		err = mysqlDb.First(&groupMessages[i].Sender, message.SenderID).Error
+		if err != nil {
 			return groupMessages, err
 		}
 	}
-	return groupMessages,  err
+	return groupMessages, err
 }
 
-func GetMessageU2u(userId int,U2uIds []int,needNumber int)([]UserU2uMessage,error){
+func GetMessageU2u(userId int, U2uIds []int, needNumber int) ([]UserU2uMessage, error) {
 	var messages []UserU2uMessage
 	// 当数组空时为not in(null),通过push一个0解决
 	U2uIds = append(U2uIds, 0)
-	err:=mysqlDb.Raw(`select * from(
+	err := mysqlDb.Raw(`select * from(
 				(select id, content,target_id as other_id,created_at from message_u2us where sender_id=? and target_id not in (?))
 				union all
 				(select id, content,sender_id as other_id,created_at from message_u2us where target_id=? and sender_id not in (?))
 				order by id desc
 				)  as T group by T.other_id limit ?`,
-				userId,U2uIds,userId,U2uIds,needNumber).Scan(&messages).Error
-	if err!=nil{
-		return messages,err
+		userId, U2uIds, userId, U2uIds, needNumber).Scan(&messages).Error
+	if err != nil {
+		return messages, err
 	}
-	for i,v:=range messages{
-		messages[i].Other ,err = GetUserFromUserId(v.OtherId)
-		if err!=nil{
+	for i, v := range messages {
+		messages[i].Other, err = GetUserFromUserId(v.OtherId)
+		if err != nil {
 			return messages, err
 		}
 	}
-	return messages,err
+	return messages, err
 }
 
-func GetUserListInGroup(userId int,groupId int)([]*User,error){
+func GetUserListInGroup(userId int, groupId int) ([]*User, error) {
 	var group FriendGroup
-	err:=mysqlDb.Preload("Members").First(&group,groupId).Error
-	return group.Members,err
+	err := mysqlDb.Preload("Members").First(&group, groupId).Error
+	return group.Members, err
 }
 
-func GetHostInGroup(groupId int)(uint,error){
+func GetHostInGroup(groupId int) (uint, error) {
 	var group FriendGroup
-	err:= mysqlDb.First(&group,groupId).Error
-	return group.UserID,err
+	err := mysqlDb.First(&group, groupId).Error
+	return group.UserID, err
 }
 
-func RemoveMemberInGroup(groupId int,memberId int)error{
+func RemoveMemberInGroup(groupId int, memberId int) error {
 	var group FriendGroup
-	user,err:=GetUserFromUserId(memberId)
-	if err!=nil{
+	user, err := GetUserFromUserId(memberId)
+	if err != nil {
 		return err
 	}
-	err = mysqlDb.First(&group,groupId).Association("Members").Delete(user).Error
+	err = mysqlDb.First(&group, groupId).Association("Members").Delete(user).Error
 	return err
 }
 
-func ReomveGroup(userId int ,groupId int)error{
+func ReomveGroup(userId int, groupId int) error {
 	var group FriendGroup
-	err:=mysqlDb.First(&group,groupId).Error
-	if err!=nil{
+	err := mysqlDb.First(&group, groupId).Error
+	if err != nil {
 		return err
 	}
-	if int(group.UserID) != userId{
+	if int(group.UserID) != userId {
 		return errors.New("only creator can remove group")
 	}
 	return Transaction(func(db *gorm.DB) error {
-		err:= db.Model(&group).Association("Members").Clear().Error
-		if err!=nil{
+		err := db.Model(&group).Association("Members").Clear().Error
+		if err != nil {
 			return err
 		}
 		var messages []MessageInGroup
-		err = db.Where("group_id=?",group.ID).Delete(&messages).Error
-		if err!=nil{
+		err = db.Where("group_id=?", group.ID).Delete(&messages).Error
+		if err != nil {
 			return err
 		}
 		return db.Delete(&group).Error

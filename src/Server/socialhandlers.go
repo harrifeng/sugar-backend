@@ -154,85 +154,84 @@ func getLatestMessageInGroupList(userId int, groupId int, latestMessageId int, n
 	return responseOKWithData(respMessages)
 }
 
-func getMessageList(userId int ,existList string,needNumber int )responseBody{
+func getMessageList(userId int, existList string, needNumber int) responseBody {
 	existIds := make(map[string][]int)
-	err:=json.Unmarshal([]byte(existList),&existIds)
-	if err!=nil{
+	err := json.Unmarshal([]byte(existList), &existIds)
+	if err != nil {
 		return responseInternalServerError(err)
 	}
 	groupNeedNumber := needNumber / 2
 	u2uNeedNumber := needNumber - groupNeedNumber
-	groupMessages,err:=db.GetMessageInGroup(userId,existIds["groupIds"],groupNeedNumber)
-	if len(groupMessages) < groupNeedNumber{
+	groupMessages, err := db.GetMessageInGroup(userId, existIds["groupIds"], groupNeedNumber)
+	if len(groupMessages) < groupNeedNumber {
 		u2uNeedNumber = needNumber - len(groupMessages)
 	}
-	u2uMessages,err:=db.GetMessageU2u(userId,existIds["u2uIds"],u2uNeedNumber)
-	if err!=nil{
+	u2uMessages, err := db.GetMessageU2u(userId, existIds["u2uIds"], u2uNeedNumber)
+	if err != nil {
 		return responseInternalServerError(err)
 	}
 	// build response data
-	respGroupMessages:=make([]gin.H,len(groupMessages))
-	for i,message:=range groupMessages{
+	respGroupMessages := make([]gin.H, len(groupMessages))
+	for i, message := range groupMessages {
 		respGroupMessages[i] = gin.H{
-			"groupId" : message.GroupID,
-			"content" : message.Content,
-			"groupName":message.Group.Name,
-			"senderUserName" : message.Sender.UserName,
-			"updatedTime": utils.GoTimeToESTime(message.CreatedAt),
+			"groupId":        message.GroupID,
+			"content":        message.Content,
+			"groupName":      message.Group.Name,
+			"senderUserName": message.Sender.UserName,
+			"updatedTime":    utils.GoTimeToESTime(message.CreatedAt),
 		}
 	}
-	respU2uMessages:=make([]gin.H,len(u2uMessages))
-	for i,message:=range u2uMessages{
+	respU2uMessages := make([]gin.H, len(u2uMessages))
+	for i, message := range u2uMessages {
 		respU2uMessages[i] = gin.H{
-			"otherId" : message.OtherId,
-			"content" : message.Content,
-			"otherImageUrl":message.Other.HeadPortraitUrl,
-			"otherUserName" : message.Other.UserName,
-			"updatedTime": utils.GoTimeToESTime(message.CreatedAt),
+			"otherId":       message.OtherId,
+			"content":       message.Content,
+			"otherImageUrl": message.Other.HeadPortraitUrl,
+			"otherUserName": message.Other.UserName,
+			"updatedTime":   utils.GoTimeToESTime(message.CreatedAt),
 		}
 	}
 	return responseOKWithData(gin.H{
-		"groupMessages":respGroupMessages,
-		"u2uMessages":respU2uMessages,
+		"groupMessages": respGroupMessages,
+		"u2uMessages":   respU2uMessages,
 	})
 }
 
-
-func getUserListInGroup(userId int,groupId int)responseBody{
-	members,err:=db.GetUserListInGroup(userId,groupId)
-	if err!=nil{
+func getUserListInGroup(userId int, groupId int) responseBody {
+	members, err := db.GetUserListInGroup(userId, groupId)
+	if err != nil {
 		return responseInternalServerError(err)
 	}
-	respMembers:=make([]gin.H,len(members))
-	for i,member:=range members{
+	respMembers := make([]gin.H, len(members))
+	for i, member := range members {
 		respMembers[i] = gin.H{
-			"userId":member.ID,
-			"userName":member.UserName,
-			"userImageUrl":member.HeadPortraitUrl,
+			"userId":       member.ID,
+			"userName":     member.UserName,
+			"userImageUrl": member.HeadPortraitUrl,
 		}
 	}
-	creatorId,err:=db.GetHostInGroup(groupId)
-	if err!=nil{
+	creatorId, err := db.GetHostInGroup(groupId)
+	if err != nil {
 		return responseInternalServerError(err)
 	}
 	return responseOKWithData(gin.H{
-		"total":len(respMembers),
-		"data":respMembers,
-		"host":creatorId == uint(userId),
+		"total": len(respMembers),
+		"data":  respMembers,
+		"host":  creatorId == uint(userId),
 	})
 }
 
-func removeMemberInGroup(groupId int,memberId int )responseBody{
-	err:=db.RemoveMemberInGroup(groupId,memberId)
-	if err!=nil{
+func removeMemberInGroup(groupId int, memberId int) responseBody {
+	err := db.RemoveMemberInGroup(groupId, memberId)
+	if err != nil {
 		return responseInternalServerError(err)
 	}
 	return responseOK()
 }
 
-func removeGroup(userId int,groupId int)responseBody{
-	err:=db.ReomveGroup(userId,groupId)
-	if err!=nil{
+func removeGroup(userId int, groupId int) responseBody {
+	err := db.ReomveGroup(userId, groupId)
+	if err != nil {
 		return responseInternalServerError(err)
 	}
 	return responseOK()

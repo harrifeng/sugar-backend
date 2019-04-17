@@ -465,6 +465,18 @@ func homeGetHealthRecordList(c *gin.Context) {
 	c.JSON(resp.Status, resp.Data)
 }
 
+func  homeParseBloodSugarRecordVoiceInput(c *gin.Context) {
+	audio := c.PostForm("audio")
+	resp := parseBloodSugarRecordVoiceInput(audio)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func homeParseHealthRecordVoiceInput(c *gin.Context) {
+	audio := c.PostForm("audio")
+	resp := parseHealthRecordVoiceInput(audio)
+	c.JSON(resp.Status, resp.Data)
+}
+
 func socialSendMessageUser(c *gin.Context) {
 	userId, _ := c.Get("user_id")
 	Content := c.PostForm("content")
@@ -549,36 +561,36 @@ func socialGetLatestMessageInGroupList(c *gin.Context) {
 	c.JSON(resp.Status, resp.Data)
 }
 
-func socialGetMessageList(c *gin.Context){
-	userId ,_:=c.Get("user_id")
+func socialGetMessageList(c *gin.Context) {
+	userId, _ := c.Get("user_id")
 	ExistList := c.Query("exist_list")
 	NeedNumber := c.Query("need_number")
-	needNumber,_ := strconv.Atoi(NeedNumber)
-	resp := getMessageList(userId.(int),ExistList,needNumber)
+	needNumber, _ := strconv.Atoi(NeedNumber)
+	resp := getMessageList(userId.(int), ExistList, needNumber)
 	c.JSON(resp.Status, resp.Data)
 }
 
-func socialGetUserInGroup(c *gin.Context){
-	userId ,_:=c.Get("user_id")
-	GroupId :=c.Query("group_id")
-	groupId,_ :=strconv.Atoi(GroupId)
-	resp:=getUserListInGroup(userId.(int),groupId)
+func socialGetUserInGroup(c *gin.Context) {
+	userId, _ := c.Get("user_id")
+	GroupId := c.Query("group_id")
+	groupId, _ := strconv.Atoi(GroupId)
+	resp := getUserListInGroup(userId.(int), groupId)
 	c.JSON(resp.Status, resp.Data)
 }
 
-func socialMemberLevelGroup(c *gin.Context){
-	GroupId :=c.PostForm("group_id")
-	groupId,_ :=strconv.Atoi(GroupId)
-	MemberId :=c.PostForm("member_id")
-	memberId,_ :=strconv.Atoi(MemberId)
-	resp:=removeMemberInGroup(groupId,memberId)
+func socialMemberLevelGroup(c *gin.Context) {
+	GroupId := c.PostForm("group_id")
+	groupId, _ := strconv.Atoi(GroupId)
+	MemberId := c.PostForm("member_id")
+	memberId, _ := strconv.Atoi(MemberId)
+	resp := removeMemberInGroup(groupId, memberId)
 	c.JSON(resp.Status, resp.Data)
 }
 
-func socialRemoveGroup(c *gin.Context){
-	userId ,_:=c.Get("user_id")
-	GroupId :=c.PostForm("group_id")
-	groupId,_ :=strconv.Atoi(GroupId)
-	resp:=removeGroup(userId.(int),groupId)
+func socialRemoveGroup(c *gin.Context) {
+	userId, _ := c.Get("user_id")
+	GroupId := c.PostForm("group_id")
+	groupId, _ := strconv.Atoi(GroupId)
+	resp := removeGroup(userId.(int), groupId)
 	c.JSON(resp.Status, resp.Data)
 }

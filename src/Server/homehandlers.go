@@ -3,7 +3,14 @@ package server
 import (
 	"db"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"net/url"
+	"regexp"
 	"strconv"
 	"time"
 	"utils"
@@ -159,4 +166,82 @@ func getBloodSugarRecordList(userId int, beginId int, needNumber int) responseBo
 		}
 	}
 	return responseOKWithData(respRecords)
+}
+
+func getVoiceDictationResult(audioBase64 string) (string, error) {
+	u := fmt.Sprintf("http://106.15.187.190:19987/voice_dictation?pwd=04bc1911b62299651aa9ce63c8d74770")
+	resp, err := http.PostForm(u, url.Values{"audio": {audioBase64}})
+	if err != nil {
+		return "", err
+	}
+	defer func() {
+		err := resp.Body.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+	respMap := make(map[string]interface{})
+	err = json.Unmarshal(body, &respMap)
+	if err != nil {
+		return "", err
+	}
+	fmt.Println(respMap)
+	if int(respMap["code"].(float64)) == 0{
+		return respMap["data"].(string),nil
+	}else{
+		return "",errors.New(fmt.Sprintf("external service(voice_dictation:%s) error",respMap["msg"].(string)))
+	}
+}
+
+func parseBloodSugarRecordVoiceInput(audioBase64 string) responseBody {
+	dictationResult, err := getVoiceDictationResult(audioBase64)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	timeString := []string{"早餐前","早餐后","午餐前","午餐后","晚餐前","晚餐后","睡前"}
+	conString,conTime:=utils.StringContains(dictationResult,timeString)
+	if !conTime {
+		return responseNormalError("请说明记录的时间段")
+	}
+	reg := regexp.MustCompile(`[\d]+[:.][\d]+`)
+	conValue:=reg.FindAllString(dictationResult,-1)
+	var valueResult float64
+	var valueMatch bool
+	for _,value:=range conValue{
+		fv,err:=strconv.ParseFloat(value,64)
+		if err == nil && fv >=1.0 && fv <= 33.3{
+			valueResult = fv
+			valueMatch = true
+			break
+		}
+	}
+	if !valueMatch {
+		return responseNormalError("未解析到合法的血糖值（范围在1.0到33.3之间）")
+	}
+	periodMap := map[string]string{
+		"早餐前":"beforeBF",
+		"早餐后":"afterBF",
+		"午餐前":"beforeLC",
+		"午餐后":"afterLC",
+		"晚餐前":"beforeDN",
+		"晚餐后":"afterDN",
+		"睡前":"beforeSP",
+	}
+	return responseOKWithData(gin.H{
+		"periodValue":periodMap[conString],
+		"periodLabel":conString,
+		"value":valueResult,
+	})
+}
+
+func parseHealthRecordVoiceInput(audioBase64 string) responseBody {
+	dictationResult, err := getVoiceDictationResult(audioBase64)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	return responseOKWithData(dictationResult)
 }

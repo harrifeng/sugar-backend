@@ -22,7 +22,7 @@ func GoTimeToDateTime(tt time.Time) string {
 }
 
 //UTC
-func GoTimeToESTime(t time.Time)string{
+func GoTimeToESTime(t time.Time) string {
 	return fmt.Sprintf("%04d-%02d-%02dT%02d:%02d:%02d+08:00",
-		t.Year(),t.Month(),t.Day(),t.Hour(),t.Minute(),t.Second())
+		t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())
 }
