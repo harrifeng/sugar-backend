@@ -4,6 +4,7 @@ import (
 	"db"
 	"flag"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -12,17 +13,23 @@ import (
 )
 
 func main() {
-	var genFlag, runFlag, helpFlag bool
+	var genFlag, runFlag, helpFlag,releaseFlag bool
+	var port uint
 	flag.BoolVar(&genFlag, "gen", false, "generate a configuration example file.")
-	flag.BoolVar(&runFlag, "server", false, "run server")
+	flag.BoolVar(&runFlag, "server", false, "run server on debug")
+	flag.BoolVar(&releaseFlag, "release", false, "run server on release")
 	flag.BoolVar(&helpFlag, "help", false, "cat help information")
+	flag.UintVar(&port,"port",8080,"set port of server")
 	flag.Parse()
 	if helpFlag {
 		flag.Usage()
 	} else if genFlag && !runFlag {
 		genConfigurationFile()
 	} else if !genFlag && runFlag {
-		runServer()
+		if releaseFlag{
+			gin.SetMode(gin.ReleaseMode)
+		}
+		runServer(port)
 	} else {
 		fmt.Println("only can do one thing")
 	}
@@ -46,7 +53,7 @@ func genConfigurationFile() {
 }
 
 // run server
-func runServer() {
+func runServer(port uint) {
 	// init configuration
 	config, err := server.LoadConfiguration()
 	if err != nil {
@@ -78,5 +85,5 @@ func runServer() {
 			return
 		}
 	}()
-	server.Start()
+	server.Start(port)
 }

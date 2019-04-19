@@ -24,7 +24,7 @@ func sendVerificationCode(phoneNumber string) responseBody {
 	} else {
 		code = utils.RandCode()
 	}
-	url := fmt.Sprintf("http://106.15.187.190:19987/send_message?phone_number=%s&code=%s&pwd=04bc1911b62299651aa9ce63c8d74770",
+	url := fmt.Sprintf("http://cloud.cywom.com/send_message?phone_number=%s&code=%s&pwd=04bc1911b62299651aa9ce63c8d74770",
 		phoneNumber, code)
 	resp, err := http.Get(url)
 

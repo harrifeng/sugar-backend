@@ -170,7 +170,7 @@ func getBloodSugarRecordList(userId int, beginId int, needNumber int) responseBo
 }
 
 func getVoiceDictationResult(audioBase64 string) (string, error) {
-	u := fmt.Sprintf("http://106.15.187.190:19987/voice_dictation?pwd=04bc1911b62299651aa9ce63c8d74770")
+	u := fmt.Sprintf("http://cloud.cywom.com/voice_dictation?pwd=04bc1911b62299651aa9ce63c8d74770")
 	resp, err := http.PostForm(u, url.Values{"audio": {audioBase64}})
 	if err != nil {
 		return "", err

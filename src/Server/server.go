@@ -2,12 +2,14 @@ package server
 
 import (
 	"db"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"log"
 )
 
 var r *gin.Engine
 
-func Start() {
+func Start(port uint) {
 	// init database
 	db.AutoCreateTableTest()
 	//init gin http server
@@ -17,5 +19,5 @@ func Start() {
 	r.LoadHTMLGlob("templates/*")
 	r.Static("/static", "static")
 	initRouter()
-	_ = r.Run(":8080")
+	log.Fatal(r.Run(fmt.Sprintf(":%d",port)))
 }
