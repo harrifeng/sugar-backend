@@ -13,9 +13,10 @@ import (
 )
 
 func main() {
-	var genFlag, runFlag, helpFlag,releaseFlag bool
+	var genFlag, runFlag, helpFlag,releaseFlag,initFlag bool
 	var port uint
 	flag.BoolVar(&genFlag, "gen", false, "generate a configuration example file.")
+	flag.BoolVar(&initFlag, "init", false, "init the database")
 	flag.BoolVar(&runFlag, "server", false, "run server on debug")
 	flag.BoolVar(&releaseFlag, "release", false, "run server on release")
 	flag.BoolVar(&helpFlag, "help", false, "cat help information")
@@ -23,6 +24,8 @@ func main() {
 	flag.Parse()
 	if helpFlag {
 		flag.Usage()
+	}else if initFlag{
+		db.Init()
 	} else if genFlag && !runFlag {
 		genConfigurationFile()
 	} else if !genFlag && runFlag {
