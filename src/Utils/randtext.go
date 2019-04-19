@@ -263,10 +263,6 @@ func RandWords() string {
 	return textGroups[index]
 }
 
-func RandUserName() string {
-	return RandWords()
-}
-
 func RandGender() string {
 	x := rand.Intn(2)
 	if x == 0 {

@@ -236,3 +236,11 @@ func removeGroup(userId int, groupId int) responseBody {
 	}
 	return responseOK()
 }
+
+func recommendUser(userId int) responseBody {
+	users, err := db.GetRecommendUserList(userId)
+	if err != nil {
+		return responseInternalServerError(err)
+	}
+	return responseOKWithData(users)
+}

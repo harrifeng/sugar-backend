@@ -9,11 +9,20 @@ func StringCut(str string, length int) string {
 	return str[:length]
 }
 
-func StringContains(o string,strList []string)(string,bool){
-	for _,str:=range strList{
-		if strings.Contains(o,str){
-			return str,true
+func StringContains(o string, strList []string) (string, bool) {
+	for _, str := range strList {
+		if strings.Contains(o, str) {
+			return str, true
 		}
 	}
-	return "",false
+	return "", false
+}
+
+func StringHasPrefixs(o string, strList []string) (string, bool) {
+	for _, str := range strList {
+		if strings.HasPrefix(o, str) {
+			return str, true
+		}
+	}
+	return "", false
 }

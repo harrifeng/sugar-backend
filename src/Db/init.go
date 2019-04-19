@@ -34,12 +34,12 @@ func InitAllArticle() {
 
 func InitUser() {
 	for i := 1; i <= 100; i++ {
-		_ = CreateNewUser(utils.RandPhoneNumber(), utils.RandUserName(), "0c152176187ce61c9614c072e1a1e2f7")
+		_ = CreateNewUser(utils.RandPhoneNumber(), utils.RandUsername(), "0c152176187ce61c9614c072e1a1e2f7")
 		fmt.Printf("user.%d created successfully!\n ", i)
 	}
 }
 
-func IninArticleComment() {
+func InitArticleComment() {
 	for i := 1; i <= 1000; i++ {
 		userId := rand.Intn(10) + 1
 		articleId := rand.Intn(100) + 1
@@ -97,7 +97,7 @@ func Init() {
 	AutoCreateTableTest()
 	InitAllArticle()
 	InitUser()
-	IninArticleComment()
+	InitArticleComment()
 	InitTopicTest()
 	InitTopicLordReplyTest()
 	InitTopicLayerReplyTest()

@@ -27,6 +27,7 @@ func initRouter() {
 		accountsGroup.GET("/following", LoginAuth(), accountGetUserFollowingList)
 		accountsGroup.POST("/following/follow", LoginAuth(), accountFollowUser)
 		accountsGroup.POST("/following/ignore", LoginAuth(), accountIgnoreUser)
+
 	}
 	bbsGroup := r.Group("bbs")
 	bbsGroup.Use(LoginAuth())
@@ -76,8 +77,8 @@ func initRouter() {
 		homeGroup.GET("/blood-sugar/record", homeGetBloodSugarRecord)
 		homeGroup.POST("/health/record", homeRecordHealth)
 		homeGroup.GET("/health/records", homeGetHealthRecordList)
-		homeGroup.POST("/health/voice")
-		homeGroup.POST("/blood-sugar/voice",homeParseBloodSugarRecordVoiceInput)
+		homeGroup.POST("/health/voice", homeParseHealthRecordVoiceInput)
+		homeGroup.POST("/blood-sugar/voice", homeParseBloodSugarRecordVoiceInput)
 	}
 	socialGroup := r.Group("social")
 	socialGroup.Use(LoginAuth())
@@ -94,5 +95,6 @@ func initRouter() {
 		socialGroup.GET("/chatting/records", socialGetHistoryMessageU2uList)
 		socialGroup.GET("/chatting/records/latest", socialGetLatestMessageU2uList)
 		socialGroup.POST("/chatting/send", socialSendMessageUser)
+		socialGroup.GET("/recommend", socialRecommendUser)
 	}
 }

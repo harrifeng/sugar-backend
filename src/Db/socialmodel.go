@@ -3,6 +3,7 @@ package db
 import (
 	"errors"
 	"github.com/jinzhu/gorm"
+	"math/rand"
 )
 
 func AddMessageToUser(userId int, content string, targetUserId int) (uint, error) {
@@ -197,4 +198,28 @@ func ReomveGroup(userId int, groupId int) error {
 		}
 		return db.Delete(&group).Error
 	})
+}
+
+func GetRecommendUserList(userId int) ([]User, error) {
+
+	var users []User
+	var total int
+	err := mysqlDb.Model(&User{}).Count(&total).Error
+	if err != nil {
+		return users, err
+	}
+	MAX := 10
+	m := make(map[int]bool)
+	var x []int
+	i := 0
+	for i < MAX && i < total {
+		n := rand.Intn(total) + 1
+		if !m[n] && n != userId {
+			x = append(x, n)
+			m[n] = true
+			i++
+		}
+	}
+	err = mysqlDb.Where(x).Find(&users).Error
+	return users, err
 }

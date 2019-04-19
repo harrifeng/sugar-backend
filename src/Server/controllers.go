@@ -465,7 +465,7 @@ func homeGetHealthRecordList(c *gin.Context) {
 	c.JSON(resp.Status, resp.Data)
 }
 
-func  homeParseBloodSugarRecordVoiceInput(c *gin.Context) {
+func homeParseBloodSugarRecordVoiceInput(c *gin.Context) {
 	audio := c.PostForm("audio")
 	resp := parseBloodSugarRecordVoiceInput(audio)
 	c.JSON(resp.Status, resp.Data)
@@ -592,5 +592,11 @@ func socialRemoveGroup(c *gin.Context) {
 	GroupId := c.PostForm("group_id")
 	groupId, _ := strconv.Atoi(GroupId)
 	resp := removeGroup(userId.(int), groupId)
+	c.JSON(resp.Status, resp.Data)
+}
+
+func socialRecommendUser(c *gin.Context) {
+	userId, _ := c.Get("user_id")
+	resp := recommendUser(userId.(int))
 	c.JSON(resp.Status, resp.Data)
 }

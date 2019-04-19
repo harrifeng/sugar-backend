@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 	"utils"
 )
@@ -190,10 +191,10 @@ func getVoiceDictationResult(audioBase64 string) (string, error) {
 		return "", err
 	}
 	fmt.Println(respMap)
-	if int(respMap["code"].(float64)) == 0{
-		return respMap["data"].(string),nil
-	}else{
-		return "",errors.New(fmt.Sprintf("external service(voice_dictation:%s) error",respMap["msg"].(string)))
+	if int(respMap["code"].(float64)) == 0 {
+		return respMap["data"].(string), nil
+	} else {
+		return "", errors.New(fmt.Sprintf("external service(voice_dictation:%s) error", respMap["msg"].(string)))
 	}
 }
 
@@ -202,18 +203,18 @@ func parseBloodSugarRecordVoiceInput(audioBase64 string) responseBody {
 	if err != nil {
 		return responseInternalServerError(err)
 	}
-	timeString := []string{"早餐前","早餐后","午餐前","午餐后","晚餐前","晚餐后","睡前"}
-	conString,conTime:=utils.StringContains(dictationResult,timeString)
+	timeString := []string{"早餐前", "早餐后", "午餐前", "午餐后", "晚餐前", "晚餐后", "睡前"}
+	conString, conTime := utils.StringContains(dictationResult, timeString)
 	if !conTime {
 		return responseNormalError("请说明记录的时间段")
 	}
-	reg := regexp.MustCompile(`[\d]+[:.][\d]+`)
-	conValue:=reg.FindAllString(dictationResult,-1)
+	reg := regexp.MustCompile(`\d+[:.]*\d*`)
+	conValue := reg.FindAllString(dictationResult, -1)
 	var valueResult float64
 	var valueMatch bool
-	for _,value:=range conValue{
-		fv,err:=strconv.ParseFloat(value,64)
-		if err == nil && fv >=1.0 && fv <= 33.3{
+	for _, value := range conValue {
+		fv, err := strconv.ParseFloat(value, 64)
+		if err == nil && fv >= 1.0 && fv <= 33.3 {
 			valueResult = fv
 			valueMatch = true
 			break
@@ -223,18 +224,18 @@ func parseBloodSugarRecordVoiceInput(audioBase64 string) responseBody {
 		return responseNormalError("未解析到合法的血糖值（范围在1.0到33.3之间）")
 	}
 	periodMap := map[string]string{
-		"早餐前":"beforeBF",
-		"早餐后":"afterBF",
-		"午餐前":"beforeLC",
-		"午餐后":"afterLC",
-		"晚餐前":"beforeDN",
-		"晚餐后":"afterDN",
-		"睡前":"beforeSP",
+		"早餐前": "beforeBF",
+		"早餐后": "afterBF",
+		"午餐前": "beforeLC",
+		"午餐后": "afterLC",
+		"晚餐前": "beforeDN",
+		"晚餐后": "afterDN",
+		"睡前":  "beforeSP",
 	}
 	return responseOKWithData(gin.H{
-		"periodValue":periodMap[conString],
-		"periodLabel":conString,
-		"value":valueResult,
+		"periodValue": periodMap[conString],
+		"periodLabel": conString,
+		"value":       valueResult,
 	})
 }
 
@@ -243,5 +244,82 @@ func parseHealthRecordVoiceInput(audioBase64 string) responseBody {
 	if err != nil {
 		return responseInternalServerError(err)
 	}
-	return responseOKWithData(dictationResult)
+	prefixStrings := []string{"胰岛素用量", "运动时长", "体重", "舒张压", "收缩压"}
+	sentences := strings.Split(dictationResult, "，")
+	resultMap := make(gin.H)
+	for _, st := range sentences {
+		pre, con := utils.StringHasPrefixs(st, prefixStrings)
+		if !con {
+			continue
+		}
+		switch pre {
+		case "胰岛素用量":
+			reg := regexp.MustCompile(`\d+[:.]*\d*`)
+			result := reg.FindString(st)
+			insulin, err := strconv.ParseFloat(result, 64)
+			if err != nil {
+				break
+			}
+			resultMap["insulin"] = insulin
+		case "运动时长":
+			regData := regexp.MustCompile(`\d+[:.]*\d*`)
+			regHour := regexp.MustCompile(`\d+[:.]*\d*小时`)
+			regMinute := regexp.MustCompile(`\d+[:.]*\d*分钟?`)
+			hour := regHour.FindString(st)
+			minute := regMinute.FindString(st)
+			timeMap := gin.H{}
+			if minute != "" {
+				minute = regData.FindString(minute)
+				minuteF, err := strconv.ParseFloat(minute, 64)
+				if err != nil {
+					break
+				}
+				timeMap["minute"] = int(minuteF)
+
+			} else {
+				timeMap["minute"] = 0
+			}
+			if hour != "" {
+				hour = regData.FindString(hour)
+				strings.Replace(hour, ":", ".", -1)
+				hourF, err := strconv.ParseFloat(hour, 64)
+				if err != nil {
+					break
+				}
+				timeMap["hour"] = int(hourF)
+				if timeMap["minute"] ==0 {
+					timeMap["minute"] = int((hourF - float64(int(hourF))) * 60)
+				}
+			} else {
+				timeMap["hour"] = 0
+			}
+			fmt.Println(timeMap)
+			resultMap["sportsTime"] = timeMap
+		case "体重":
+			reg := regexp.MustCompile(`\d+[:.]*\d*`)
+			result := reg.FindString(st)
+			weight, err := strconv.ParseFloat(result, 64)
+			if err != nil {
+				break
+			}
+			resultMap["weight"] = weight
+		case "舒张压":
+			reg := regexp.MustCompile(`\d+[:.]*\d*`)
+			result := reg.FindString(st)
+			pressure, err := strconv.Atoi(result)
+			if err != nil {
+				break
+			}
+			resultMap["pressure1"] = pressure
+		case "收缩压":
+			reg := regexp.MustCompile(`\d+[:.]*\d*`)
+			result := reg.FindString(st)
+			pressure, err := strconv.Atoi(result)
+			if err != nil {
+				break
+			}
+			resultMap["pressure2"] = pressure
+		}
+	}
+	return responseOKWithData(resultMap)
 }
