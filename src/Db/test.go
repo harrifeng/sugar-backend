@@ -25,6 +25,5 @@ func Test() {
 			(select  NULL as topic_lord_reply_key,id as topic_layer_reply_key,created_at,content,user_id,thumbs_up_count,
 			topic_lord_reply_id as father_id from topic_layer_replies where user_id=? and deleted_at is null)
 			`, 103, 103, 0, 2).Count(&count)
-	fmt.Println(count)
 
 }

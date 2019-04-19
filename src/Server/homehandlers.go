@@ -190,7 +190,6 @@ func getVoiceDictationResult(audioBase64 string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	fmt.Println(respMap)
 	if int(respMap["code"].(float64)) == 0 {
 		return respMap["data"].(string), nil
 	} else {
@@ -287,13 +286,12 @@ func parseHealthRecordVoiceInput(audioBase64 string) responseBody {
 					break
 				}
 				timeMap["hour"] = int(hourF)
-				if timeMap["minute"] ==0 {
+				if timeMap["minute"] == 0 {
 					timeMap["minute"] = int((hourF - float64(int(hourF))) * 60)
 				}
 			} else {
 				timeMap["hour"] = 0
 			}
-			fmt.Println(timeMap)
 			resultMap["sportsTime"] = timeMap
 		case "体重":
 			reg := regexp.MustCompile(`\d+[:.]*\d*`)
