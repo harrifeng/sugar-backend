@@ -1,7 +1,6 @@
 package main
 
 import (
-	"db"
 	"flag"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -64,7 +63,7 @@ func initDatabase(){
 		return
 	}
 	defer dbClose()
-	db.Init()
+	server.Init()
 }
 
 // run server

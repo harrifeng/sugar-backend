@@ -8,12 +8,14 @@ import (
 )
 
 var r *gin.Engine
+var serverConfig *MainConfiguration
 
 func ConnectDatabase() (func(), error) {
 	config, err := loadConfiguration()
 	if err != nil {
 		return func() {}, err
 	}
+	serverConfig = &config.ServerConfig
 	db.InitConfiguration(&config.MysqlConfig, &config.RedisConfig)
 
 	// init mysql
