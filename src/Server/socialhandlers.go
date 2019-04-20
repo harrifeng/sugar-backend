@@ -230,7 +230,7 @@ func removeMemberInGroup(groupId int, memberId int) responseBody {
 }
 
 func removeGroup(userId int, groupId int) responseBody {
-	err := db.ReomveGroup(userId, groupId)
+	err := db.ReomoveGroup(userId, groupId)
 	if err != nil {
 		return responseInternalServerError(err)
 	}

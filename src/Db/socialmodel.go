@@ -177,7 +177,7 @@ func RemoveMemberInGroup(groupId int, memberId int) error {
 	return err
 }
 
-func ReomveGroup(userId int, groupId int) error {
+func ReomoveGroup(userId int, groupId int) error {
 	var group FriendGroup
 	err := mysqlDb.First(&group, groupId).Error
 	if err != nil {

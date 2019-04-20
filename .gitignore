@@ -16,6 +16,7 @@
 .idea
 src/github.com
 src/gopkg.in
+src/golang.org
 pkg
 bin
 config.go
