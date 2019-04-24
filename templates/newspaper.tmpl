@@ -106,7 +106,7 @@
                         </tr>
                         <tr>
                             <td>空腹(早餐前)</td>
-                            {{ if eq level0  "0" }}
+                            {{ if eq .level0  "0" }}
                             <td>待测</td>
                             {{ else }}
                             <td>{{.level0}}</td>
@@ -116,7 +116,7 @@
                         </tr>
                          <tr class="info">
                             <td>早餐后</td>
-                            {{ if eq level1  "0" }}
+                            {{ if eq .level1  "0" }}
                             <td>待测</td>
                             {{ else }}
                             <td>{{.level1}}</td>
@@ -125,7 +125,7 @@
                         </tr>
                          <tr>
                             <td>午餐前</td>
-                            {{ if eq level2  "0" }}
+                            {{ if eq .level2  "0" }}
                             <td>待测</td>
                             {{ else }}
                             <td>{{.level2}}</td>
@@ -134,7 +134,7 @@
                         </tr>
                          <tr class="warning">
                             <td>午餐后</td>
-                            {{ if eq level3  "0" }}
+                            {{ if eq .level3  "0" }}
                             <td>待测</td>
                             {{ else }}
                             <td>{{.level3}}</td>
@@ -143,7 +143,7 @@
                         </tr>
                          <tr>
                             <td>晚餐前</td>
-                            {{ if eq level4  "0" }}
+                            {{ if eq .level4  "0" }}
                             <td>待测</td>
                             {{ else }}
                             <td>{{.level4}}</td>
@@ -152,7 +152,7 @@
                         </tr>
                          <tr class="success">
                             <td>晚餐后</td>
-                            {{ if eq level5  "0" }}
+                            {{ if eq .level5  "0" }}
                             <td>待测</td>
                             {{ else }}
                             <td>{{.level5}}</td>
@@ -161,7 +161,7 @@
                         </tr>
                         <tr>
                             <td>睡前</td>
-                            {{ if eq level6  "0" }}
+                            {{ if eq .level6  "0" }}
                             <td>待测</td>
                             {{ else }}
                             <td>{{.level6}}</td>
