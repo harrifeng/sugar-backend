@@ -3,10 +3,11 @@ package utils
 import "strings"
 
 func StringCut(str string, length int) string {
-	if len(str) <= length {
+	rs := []rune(str)
+	if len(rs) <= length {
 		return str
 	}
-	return str[:length]
+	return string(rs[:length])
 }
 
 func StringContains(o string, strList []string) (string, bool) {
