@@ -37,6 +37,7 @@ func main() {
 		fmt.Println("flags error")
 	}
 }
+
 // generate configuration file
 func genConfigurationFile() {
 	exeFile, err := exec.LookPath(os.Args[0])
@@ -56,9 +57,9 @@ func genConfigurationFile() {
 }
 
 // init database
-func initDatabase(){
-	dbClose,err:=server.ConnectDatabase()
-	if err!=nil{
+func initDatabase() {
+	dbClose, err := server.ConnectDatabase()
+	if err != nil {
 		log.Fatal(err)
 		return
 	}
@@ -68,8 +69,8 @@ func initDatabase(){
 
 // run server
 func runServer(port uint) {
-	dbClose,err:=server.ConnectDatabase()
-	if err!=nil{
+	dbClose, err := server.ConnectDatabase()
+	if err != nil {
 		log.Fatal(err)
 		return
 	}

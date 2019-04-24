@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>健康周报</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css">
+</head>
+<body>
+     <div id="global">
+		<div class="container-fluid">
+			<div class="panel panel-default">
+                <div class="col-md-12 success">
+                    <h4 class="text-center text-success">饮食推荐</h4>
+                    <table class="table table-bordered">
+                        <tr class="active">
+                            <th>食物</th>
+                            <th>交换数</th>
+                            <th>时间</th>
+                            <th>推荐食物</th>
+                        </tr>
+                        <tr>
+                            <td>谷物类</td>
+                            <td>{{.cerealsValue}}</td>
+                            <td>分三餐</td>
+                            <td>{{.cereals}}</td>
+                        </tr>
+                        <tr class="success">
+                            <td>水果类</td>
+                            <td>{{.fruitValue}}</td>
+                            <td>加餐(下午)</td>
+                            <td>{{.fruit}}</td>
+                        </tr>
+                        <tr>
+                            <td>鱼肉蛋类</td>
+                            <td>{{.meatValue}}</td>
+                            <td>分三餐</td>
+                            <td>{{.meat}}</td>
+                        </tr>
+                         <tr class="warning">
+                            <td>奶类</td>
+                            <td>{{.milkValue}}</td>
+                            <td>加餐:10am</td>
+                            <td>{{.milk}}</td>
+                        </tr>
+                        <tr>
+                            <td>油脂类</td>
+                            <td>{{.fatValue}}</td>
+                            <td>分三餐</td>
+                            <td>{{.fat}}</td>
+                        </tr>
+                        <tr class="info">
+                            <td>蔬菜类</td>
+                            <td>{{.vegetablesValue}}</td>
+                            <td>分三餐</td>
+                            <td>{{.vegetables}}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-12">
+                    <h4 class="text-center text-success">运动推荐</h4>
+                   <table class="table table-bordered">
+                        <tr class="active">
+                            <th>运动</th>
+                            <th>运动时长</th>
+                            <th>运动次数</th>
+                        </tr>
+                        <tr>
+                            <td>{{.sport1}}</td>
+                            <td>{{.time1}}分钟</td>
+                            <td>每周{{.week1}}次</td>
+                        </tr>
+                        <tr class="danger">
+                            <td>{{.sport2}}</td>
+                            <td>{{.time2}}分钟</td>
+                            <td>每周{{.week2}}次</td>
+                        </tr>
+                        {{ if eq .sport3 "" }}
+                        {{ else }}
+                        <tr>
+                            <td>{{.sport3}}</td>
+                            <td>{{.time3}}分钟</td>
+                            <td>每周{{.week3}}次</td>
+                        </tr>
+                        {{ end }}
+                        {{ if eq .sport4 ""  }}
+                        {{ else }}
+                        <tr class="success">
+                            <td>{{.sport4}}</td>
+                            <td>{{.time4}}分钟</td>
+                            <td>每周{{.week4}}次</td>
+                        </tr>
+                        {{ end }}
+                    </table>
+                </div>
+                <div class="col-md-12">
+                    <p class="text-primary">运动提醒：餐后90分钟的运动效果最好，谨防空腹运动。当血糖低于4.0或16.7，或患有严重并发症时候，不建议强烈运动</p>
+                </div>
+                <div class="col-md-12">
+                    <h4 class="text-center text-success">控糖方案</h4>
+                    <table class="table table-bordered">
+                        <tr class="active">
+                            <th>时间</th>
+                            <th>当前值</th>
+                            <th>目标值</th>
+                        </tr>
+                        <tr>
+                            <td>空腹(早餐前)</td>
+                            {% if level0 == '0' %}
+                            <td>待测</td>
+                            {% else %}
+                            <td>{{.level0}}</td>
+                            {% end %}
+                            <td>{{.min1}}-{{.max1}}</td>
+
+                        </tr>
+                         <tr class="info">
+                            <td>早餐后</td>
+                            {% if level1 == '0' %}
+                            <td>待测</td>
+                            {% else %}
+                            <td>{{.level1}}</td>
+                            {% end %}
+                            <td>{{.min2}}-{{.max2}}</td>
+                        </tr>
+                         <tr>
+                            <td>午餐前</td>
+                            {% if level2 == '0' %}
+                            <td>待测</td>
+                            {% else %}
+                            <td>{{.level2}}</td>
+                            {% end %}
+                            <td>{{.min1}}-{{.max1}}</td>
+                        </tr>
+                         <tr class="warning">
+                            <td>午餐后</td>
+                            {% if level3 == '0' %}
+                            <td>待测</td>
+                            {% else %}
+                            <td>{{.level3}}</td>
+                            {% end %}
+                            <td>{{.min2}}-{{.max2}}</td>
+                        </tr>
+                         <tr>
+                            <td>晚餐前</td>
+                            {% if level4 == '0' %}
+                            <td>待测</td>
+                            {% else %}
+                            <td>{{.level4}}</td>
+                            {% end %}
+                            <td>{{.min1}}-{{.max1}}</td>
+                        </tr>
+                         <tr class="success">
+                            <td>晚餐后</td>
+                            {% if level5 == '0' %}
+                            <td>待测</td>
+                            {% else %}
+                            <td>{{.level5}}</td>
+                            {% end %}
+                            <td>{{.min2}}-{{.max2}}</td>
+                        </tr>
+                        <tr>
+                            <td>睡前</td>
+                            {% if level6 == '0' %}
+                            <td>待测</td>
+                            {% else %}
+                            <td>{{.level6}}</td>
+                            {% end %}
+                            <td>{{.sleep1}}-{{.sleep2}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+     </div>
+</body>
+</html>
