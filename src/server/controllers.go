@@ -482,69 +482,69 @@ func homeSugarGuideWebsocket(c *gin.Context) {
 	sugarGuideWebsocket(c)
 }
 
-func homeWeeklyNewspaper(c *gin.Context){
-	userId,_:=c.Get("user_id")
-	resp:=getWeeklyNewspaper(userId.(int))
+func homeWeeklyNewspaper(c *gin.Context) {
+	userId, _ := c.Get("user_id")
+	resp := getWeeklyNewspaper(userId.(int))
 	fmt.Println(resp)
-	if resp.Status !=http.StatusOK{
-		c.JSON(resp.Status,resp.Data)
-	}else{
-		if resp.Data["code"].(int) !=0{
-			c.JSON(resp.Status,resp.Data)
-		}else{
+	if resp.Status != http.StatusOK {
+		c.JSON(resp.Status, resp.Data)
+	} else {
+		if resp.Data["code"].(int) != 0 {
+			c.JSON(resp.Status, resp.Data)
+		} else {
 			plan := resp.Data["data"]
-			cerealsValue:=plan.(gin.H)["diet"].(gin.H)["cereals"].(int)
-			fruitValue:=plan.(gin.H)["diet"].(gin.H)["fruit"].(int)
-			meatValue:=plan.(gin.H)["diet"].(gin.H)["meat"].(int)
-			milkValue:=plan.(gin.H)["diet"].(gin.H)["milk"].(int)
-			fatValue:=plan.(gin.H)["diet"].(gin.H)["fat"].(int)
-			vegetablesValue:=plan.(gin.H)["diet"].(gin.H)["vegetables"].(int)
+			cerealsValue := plan.(gin.H)["diet"].(gin.H)["cereals"].(int)
+			fruitValue := plan.(gin.H)["diet"].(gin.H)["fruit"].(int)
+			meatValue := plan.(gin.H)["diet"].(gin.H)["meat"].(int)
+			milkValue := plan.(gin.H)["diet"].(gin.H)["milk"].(int)
+			fatValue := plan.(gin.H)["diet"].(gin.H)["fat"].(int)
+			vegetablesValue := plan.(gin.H)["diet"].(gin.H)["vegetables"].(int)
 			c.HTML(http.StatusOK, "newspaper.tmpl", gin.H{
 				// diet
-				"cerealsValue":cerealsValue,
-				"cereals":fmt.Sprintf("%d%s%d%s",cerealsValue*25, "克大米, 麦片，面食， 面包, ",cerealsValue*50,"克马铃薯"),
-				"fruitValue":fruitValue,
-				"fruit":fmt.Sprintf("%d%s%d%s%d%s%d%s",fruitValue*500, "克西瓜, +",fruitValue*300,"克草莓，",
-					fruitValue*200,"克葡萄，橙子，橘子",fruitValue*150,"克香蕉,荔枝"),
-				"meatValue":meatValue,
-				"meat":fmt.Sprintf("%d%s%d%s%d%s%d%s%d%s%d%s",meatValue*25, "克大豆，",meatValue*20,"克腐竹，",
-					meatValue*60,"克鸡蛋，",meatValue*50,"克鸭肉,猪肉，",meatValue*80,"克草鱼，",meatValue*100,"克鲫鱼"),
-				"milkValue":milkValue,
-				"milk":fmt.Sprintf("%d%s%d%s",milkValue*20, "克奶粉,",milkValue*160,"克牛奶，羊奶"),
-				"fatValue":fatValue,
-				"fat":fmt.Sprintf("%s%d%s%d%s","（一汤勺为准）",fatValue*10, "克花生油，豆油，黄油，菜籽油,",
-					fatValue*15,"克核桃,杏仁,花生"),
-				"vegetablesValue":vegetablesValue,
-				"vegetables":fmt.Sprintf("%d%s%d%s%d%s%d%s",vegetablesValue*500, "克白菜，韭菜，西红柿，冬瓜，茄子，丝瓜,",
-					vegetablesValue*200,"克胡萝卜,",vegetablesValue*150,"克山药，",vegetablesValue*70,"克毛豆"),
+				"cerealsValue": cerealsValue,
+				"cereals":      fmt.Sprintf("%d%s%d%s", cerealsValue*25, "克大米, 麦片，面食， 面包, ", cerealsValue*50, "克马铃薯"),
+				"fruitValue":   fruitValue,
+				"fruit": fmt.Sprintf("%d%s%d%s%d%s%d%s", fruitValue*500, "克西瓜, +", fruitValue*300, "克草莓，",
+					fruitValue*200, "克葡萄，橙子，橘子", fruitValue*150, "克香蕉,荔枝"),
+				"meatValue": meatValue,
+				"meat": fmt.Sprintf("%d%s%d%s%d%s%d%s%d%s%d%s", meatValue*25, "克大豆，", meatValue*20, "克腐竹，",
+					meatValue*60, "克鸡蛋，", meatValue*50, "克鸭肉,猪肉，", meatValue*80, "克草鱼，", meatValue*100, "克鲫鱼"),
+				"milkValue": milkValue,
+				"milk":      fmt.Sprintf("%d%s%d%s", milkValue*20, "克奶粉,", milkValue*160, "克牛奶，羊奶"),
+				"fatValue":  fatValue,
+				"fat": fmt.Sprintf("%s%d%s%d%s", "（一汤勺为准）", fatValue*10, "克花生油，豆油，黄油，菜籽油,",
+					fatValue*15, "克核桃,杏仁,花生"),
+				"vegetablesValue": vegetablesValue,
+				"vegetables": fmt.Sprintf("%d%s%d%s%d%s%d%s", vegetablesValue*500, "克白菜，韭菜，西红柿，冬瓜，茄子，丝瓜,",
+					vegetablesValue*200, "克胡萝卜,", vegetablesValue*150, "克山药，", vegetablesValue*70, "克毛豆"),
 				//sport
-				"sport1":plan.(gin.H)["sport"].(gin.H)["sport1"],
-				"sport2":plan.(gin.H)["sport"].(gin.H)["sport2"],
-				"sport3":plan.(gin.H)["sport"].(gin.H)["sport3"],
-				"sport4":plan.(gin.H)["sport"].(gin.H)["sport4"],
-				"time1":plan.(gin.H)["sport"].(gin.H)["time1"],
-				"time2":plan.(gin.H)["sport"].(gin.H)["time2"],
-				"time3":plan.(gin.H)["sport"].(gin.H)["time3"],
-				"time4":plan.(gin.H)["sport"].(gin.H)["time4"],
-				"week1":plan.(gin.H)["sport"].(gin.H)["week1"],
-				"week2":plan.(gin.H)["sport"].(gin.H)["week2"],
-				"week3":plan.(gin.H)["sport"].(gin.H)["week3"],
-				"week4":plan.(gin.H)["sport"].(gin.H)["week4"],
+				"sport1": plan.(gin.H)["sport"].(gin.H)["sport1"],
+				"sport2": plan.(gin.H)["sport"].(gin.H)["sport2"],
+				"sport3": plan.(gin.H)["sport"].(gin.H)["sport3"],
+				"sport4": plan.(gin.H)["sport"].(gin.H)["sport4"],
+				"time1":  plan.(gin.H)["sport"].(gin.H)["time1"],
+				"time2":  plan.(gin.H)["sport"].(gin.H)["time2"],
+				"time3":  plan.(gin.H)["sport"].(gin.H)["time3"],
+				"time4":  plan.(gin.H)["sport"].(gin.H)["time4"],
+				"week1":  plan.(gin.H)["sport"].(gin.H)["week1"],
+				"week2":  plan.(gin.H)["sport"].(gin.H)["week2"],
+				"week3":  plan.(gin.H)["sport"].(gin.H)["week3"],
+				"week4":  plan.(gin.H)["sport"].(gin.H)["week4"],
 				// control
-				"min1":fmt.Sprintf("%.1f",plan.(gin.H)["control"].(gin.H)["min1"].(float64)),
-				"min2":fmt.Sprintf("%.1f",plan.(gin.H)["control"].(gin.H)["min2"].(float64)),
-				"max1":fmt.Sprintf("%.1f",plan.(gin.H)["control"].(gin.H)["max1"].(float64)),
-				"max2":fmt.Sprintf("%.1f",plan.(gin.H)["control"].(gin.H)["max2"].(float64)),
-				"sleep1":fmt.Sprintf("%.1f",plan.(gin.H)["control"].(gin.H)["sleep1"].(float64)),
-				"sleep2":fmt.Sprintf("%.1f",plan.(gin.H)["control"].(gin.H)["sleep2"].(float64)),
+				"min1":   fmt.Sprintf("%.1f", plan.(gin.H)["control"].(gin.H)["min1"].(float64)),
+				"min2":   fmt.Sprintf("%.1f", plan.(gin.H)["control"].(gin.H)["min2"].(float64)),
+				"max1":   fmt.Sprintf("%.1f", plan.(gin.H)["control"].(gin.H)["max1"].(float64)),
+				"max2":   fmt.Sprintf("%.1f", plan.(gin.H)["control"].(gin.H)["max2"].(float64)),
+				"sleep1": fmt.Sprintf("%.1f", plan.(gin.H)["control"].(gin.H)["sleep1"].(float64)),
+				"sleep2": fmt.Sprintf("%.1f", plan.(gin.H)["control"].(gin.H)["sleep2"].(float64)),
 				// level
-				"level0":plan.(gin.H)["level"].(gin.H)["0"],
-				"level1":plan.(gin.H)["level"].(gin.H)["1"],
-				"level2":plan.(gin.H)["level"].(gin.H)["2"],
-				"level3":plan.(gin.H)["level"].(gin.H)["3"],
-				"level4":plan.(gin.H)["level"].(gin.H)["4"],
-				"level5":plan.(gin.H)["level"].(gin.H)["5"],
-				"level6":plan.(gin.H)["level"].(gin.H)["6"],
+				"level0": plan.(gin.H)["level"].(gin.H)["0"],
+				"level1": plan.(gin.H)["level"].(gin.H)["1"],
+				"level2": plan.(gin.H)["level"].(gin.H)["2"],
+				"level3": plan.(gin.H)["level"].(gin.H)["3"],
+				"level4": plan.(gin.H)["level"].(gin.H)["4"],
+				"level5": plan.(gin.H)["level"].(gin.H)["5"],
+				"level6": plan.(gin.H)["level"].(gin.H)["6"],
 			})
 		}
 	}

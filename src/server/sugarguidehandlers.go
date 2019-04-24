@@ -185,7 +185,7 @@ func (sg *SugarGuider) calcPlan(t string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(t,out.String())
+	fmt.Println(t, out.String())
 	return out.Bytes(), nil
 }
 
@@ -237,17 +237,17 @@ func sugarGuideWebsocket(c *gin.Context) {
 	defer ws.Close()
 	//初始化糖导
 	sugarGuider := NewSugarGuider(ws, userId.(int))
-	if err:=sugarGuider.query() ;err!= nil {
+	if err := sugarGuider.query(); err != nil {
 		fmt.Println(err)
 		return
 	}
 	sugarGuider.randNextQuestion()
-	if err:=sugarGuider.query() ;err!= nil {
+	if err := sugarGuider.query(); err != nil {
 		fmt.Println(err)
 		return
 	}
 	for {
-		if err:=sugarGuider.answer() ;err!= nil {
+		if err := sugarGuider.answer(); err != nil {
 			fmt.Println(err)
 			return
 		}
@@ -256,37 +256,37 @@ func sugarGuideWebsocket(c *gin.Context) {
 				if sugarGuider.Result["judge2"] >= sugarGuider.Result["judge1"] {
 					sugarGuider.Result["type"] = 2
 					sugarGuider.setPos(27)
-					if err:=sugarGuider.query() ;err!= nil {
+					if err := sugarGuider.query(); err != nil {
 						fmt.Println(err)
 						return
 					}
 					sugarGuider.setPos(28)
-					if err:=sugarGuider.query() ;err!= nil {
+					if err := sugarGuider.query(); err != nil {
 						fmt.Println(err)
 						return
 					}
 				} else {
 					sugarGuider.Result["type"] = 1
 					sugarGuider.setPos(27)
-					if err:=sugarGuider.query() ;err!= nil {
+					if err := sugarGuider.query(); err != nil {
 						fmt.Println(err)
 						return
 					}
 					sugarGuider.setPos(29)
-					if err:=sugarGuider.query() ;err!= nil {
+					if err := sugarGuider.query(); err != nil {
 						fmt.Println(err)
 						return
 					}
 				}
 			}
-			if err:=sugarGuider.analysePlan() ;err!= nil {
+			if err := sugarGuider.analysePlan(); err != nil {
 				fmt.Println(err)
 				return
 			}
 			break
 		} else {
 			sugarGuider.randNextQuestion()
-			if err:=sugarGuider.query() ;err!= nil {
+			if err := sugarGuider.query(); err != nil {
 				fmt.Println(err)
 				return
 			}
@@ -294,69 +294,69 @@ func sugarGuideWebsocket(c *gin.Context) {
 	}
 }
 
-func getWeeklyNewspaper(userId int)responseBody{
-	exist,err:=db.CheckWeeklyNewspaper(userId)
-	if err!=nil{
+func getWeeklyNewspaper(userId int) responseBody {
+	exist, err := db.CheckWeeklyNewspaper(userId)
+	if err != nil {
 		return responseInternalServerError(err)
 	}
-	if !exist{
+	if !exist {
 		return responseNormalError("还没做糖导，尚未生成健康周报")
 	}
-	dietPlan,sportPlan,controlPlan,err:=db.GetWeeklyNewspaper(userId)
-	if err!=nil{
+	dietPlan, sportPlan, controlPlan, err := db.GetWeeklyNewspaper(userId)
+	if err != nil {
 		return responseInternalServerError(err)
 	}
-	bloodRecord,exist,err:=db.GetBloodSugarRecordFromRecordDate(userId,time.Now())
-	if err!=nil{
+	bloodRecord, exist, err := db.GetBloodSugarRecordFromRecordDate(userId, time.Now())
+	if err != nil {
 		return responseInternalServerError(err)
 	}
-	bloodMap:=make(gin.H)
+	bloodMap := make(gin.H)
 	if !exist {
-		bloodMap["0"]="0"
-		bloodMap["1"]="0"
-		bloodMap["2"]="0"
-		bloodMap["3"]="0"
-		bloodMap["4"]="0"
-		bloodMap["5"]="0"
-		bloodMap["6"]="0"
-	}else{
-		err = json.Unmarshal([]byte(bloodRecord.Level),&bloodMap)
-		if err!=nil{
+		bloodMap["0"] = "0"
+		bloodMap["1"] = "0"
+		bloodMap["2"] = "0"
+		bloodMap["3"] = "0"
+		bloodMap["4"] = "0"
+		bloodMap["5"] = "0"
+		bloodMap["6"] = "0"
+	} else {
+		err = json.Unmarshal([]byte(bloodRecord.Level), &bloodMap)
+		if err != nil {
 			return responseInternalServerError(err)
 		}
 	}
 	return responseOKWithData(gin.H{
-		"diet":gin.H{
-			"change" : dietPlan.Change,
-			"cereals" : dietPlan.Cereals,
-			"fruit" : dietPlan.Fruit,
-			"meat" : dietPlan.Meat,
-			"milk" : dietPlan.Milk,
-			"fat" : dietPlan.Fat,
-			"vegetables" :dietPlan.Vegetables,
+		"diet": gin.H{
+			"change":     dietPlan.Change,
+			"cereals":    dietPlan.Cereals,
+			"fruit":      dietPlan.Fruit,
+			"meat":       dietPlan.Meat,
+			"milk":       dietPlan.Milk,
+			"fat":        dietPlan.Fat,
+			"vegetables": dietPlan.Vegetables,
 		},
-		"sport":gin.H{
-			"sport1":sportPlan.Sport1,
-			"sport2":sportPlan.Sport2,
-			"sport3":sportPlan.Sport3,
-			"sport4":sportPlan.Sport4,
-			"time1":sportPlan.Time1,
-			"time2":sportPlan.Time2,
-			"time3":sportPlan.Time3,
-			"time4":sportPlan.Time4,
-			"week1":sportPlan.Week1,
-			"week2":sportPlan.Week2,
-			"week3":sportPlan.Week3,
-			"week4":sportPlan.Week4,
+		"sport": gin.H{
+			"sport1": sportPlan.Sport1,
+			"sport2": sportPlan.Sport2,
+			"sport3": sportPlan.Sport3,
+			"sport4": sportPlan.Sport4,
+			"time1":  sportPlan.Time1,
+			"time2":  sportPlan.Time2,
+			"time3":  sportPlan.Time3,
+			"time4":  sportPlan.Time4,
+			"week1":  sportPlan.Week1,
+			"week2":  sportPlan.Week2,
+			"week3":  sportPlan.Week3,
+			"week4":  sportPlan.Week4,
 		},
-		"control":gin.H{
-			"min1":controlPlan.Min1,
-			"min2":controlPlan.Min2,
-			"max1":controlPlan.Max1,
-			"max2":controlPlan.Max2,
-			"sleep1":controlPlan.Sleep1,
-			"sleep2":controlPlan.Sleep2,
+		"control": gin.H{
+			"min1":   controlPlan.Min1,
+			"min2":   controlPlan.Min2,
+			"max1":   controlPlan.Max1,
+			"max2":   controlPlan.Max2,
+			"sleep1": controlPlan.Sleep1,
+			"sleep2": controlPlan.Sleep2,
 		},
-		"level":bloodMap,
+		"level": bloodMap,
 	})
 }

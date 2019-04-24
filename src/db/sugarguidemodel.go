@@ -23,22 +23,22 @@ func SaveSugarGuidePlan(userId int, dietResult []byte, sportResult []byte, contr
 		return err
 	}
 	err = Transaction(func(db *gorm.DB) error {
-		if err:=db.Model(&user).Association("SugarGuideDietPlan").Clear().Error;err!=nil{
+		if err := db.Model(&user).Association("SugarGuideDietPlan").Clear().Error; err != nil {
 			return err
 		}
-		if err:=db.Model(&user).Association("SugarGuideDietPlan").Append(dietPlan).Error;err!=nil{
+		if err := db.Model(&user).Association("SugarGuideDietPlan").Append(dietPlan).Error; err != nil {
 			return err
 		}
-		if err:=db.Model(&user).Association("SugarGuideSportPlan").Clear().Error;err!=nil{
+		if err := db.Model(&user).Association("SugarGuideSportPlan").Clear().Error; err != nil {
 			return err
 		}
-		if err:=db.Model(&user).Association("SugarGuideSportPlan").Append(sportPlan).Error;err!=nil{
+		if err := db.Model(&user).Association("SugarGuideSportPlan").Append(sportPlan).Error; err != nil {
 			return err
 		}
-		if err:=db.Model(&user).Association("SugarGuideControlPlan").Clear().Error;err!=nil{
+		if err := db.Model(&user).Association("SugarGuideControlPlan").Clear().Error; err != nil {
 			return err
 		}
-		if err:=db.Model(&user).Association("SugarGuideControlPlan").Append(controlPlan).Error;err!=nil{
+		if err := db.Model(&user).Association("SugarGuideControlPlan").Append(controlPlan).Error; err != nil {
 			return err
 		}
 		return nil
@@ -46,35 +46,35 @@ func SaveSugarGuidePlan(userId int, dietResult []byte, sportResult []byte, contr
 	return err
 }
 
-func CheckWeeklyNewspaper(userId int)(bool,error){
-	user,err:=GetUserFromUserId(userId)
-	if err!=nil{
-		return false,err
+func CheckWeeklyNewspaper(userId int) (bool, error) {
+	user, err := GetUserFromUserId(userId)
+	if err != nil {
+		return false, err
 	}
-	if mysqlDb.Model(&user).Association("SugarGuideDietPlan").Count()<1||
-		mysqlDb.Model(&user).Association("SugarGuideSportPlan").Count()<1||
-		mysqlDb.Model(&user).Association("SugarGuideControlPlan").Count()<1{
-		return false,nil
+	if mysqlDb.Model(&user).Association("SugarGuideDietPlan").Count() < 1 ||
+		mysqlDb.Model(&user).Association("SugarGuideSportPlan").Count() < 1 ||
+		mysqlDb.Model(&user).Association("SugarGuideControlPlan").Count() < 1 {
+		return false, nil
 	}
-	return true,nil
+	return true, nil
 }
 
-func GetWeeklyNewspaper(userId int )(SugarGuideDietPlan,SugarGuideSportPlan,SugarGuideControlPlan,error){
+func GetWeeklyNewspaper(userId int) (SugarGuideDietPlan, SugarGuideSportPlan, SugarGuideControlPlan, error) {
 	var dietPlan SugarGuideDietPlan
 	var sportPlan SugarGuideSportPlan
 	var controlPlan SugarGuideControlPlan
-	user,err:=GetUserFromUserId(userId)
-	if err!=nil{
-		return dietPlan,sportPlan,controlPlan,err
+	user, err := GetUserFromUserId(userId)
+	if err != nil {
+		return dietPlan, sportPlan, controlPlan, err
 	}
-	if err:=mysqlDb.Model(&user).Association("SugarGuideDietPlan").Find(&dietPlan).Error;err!=nil{
-		return dietPlan,sportPlan,controlPlan,err
+	if err := mysqlDb.Model(&user).Association("SugarGuideDietPlan").Find(&dietPlan).Error; err != nil {
+		return dietPlan, sportPlan, controlPlan, err
 	}
-	if err:=mysqlDb.Model(&user).Association("SugarGuideSportPlan").Find(&sportPlan).Error;err!=nil{
-		return dietPlan,sportPlan,controlPlan,err
+	if err := mysqlDb.Model(&user).Association("SugarGuideSportPlan").Find(&sportPlan).Error; err != nil {
+		return dietPlan, sportPlan, controlPlan, err
 	}
-	if err:=mysqlDb.Model(&user).Association("SugarGuideControlPlan").Find(&controlPlan).Error;err!=nil{
-		return dietPlan,sportPlan,controlPlan,err
+	if err := mysqlDb.Model(&user).Association("SugarGuideControlPlan").Find(&controlPlan).Error; err != nil {
+		return dietPlan, sportPlan, controlPlan, err
 	}
-	return dietPlan,sportPlan,controlPlan,nil
+	return dietPlan, sportPlan, controlPlan, nil
 }

@@ -80,7 +80,7 @@ func initRouter() {
 		homeGroup.POST("/health/voice", homeParseHealthRecordVoiceInput)
 		homeGroup.POST("/blood-sugar/voice", homeParseBloodSugarRecordVoiceInput)
 		homeGroup.GET("/sugar-guide", homeSugarGuideWebsocket)
-		homeGroup.GET("/weekly-newspaper",homeWeeklyNewspaper)
+		homeGroup.GET("/weekly-newspaper", homeWeeklyNewspaper)
 	}
 	socialGroup := r.Group("social")
 	socialGroup.Use(LoginAuth())
