@@ -285,11 +285,11 @@ func GetTopicLordReplyFloor(topicLordReplyId int) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	topic, err := GetTopicFromTopicId(int(topicLordReply.TopicID))
-	var topicLordRelies []TopicLordReply
-	err = mysqlDb.Unscoped().Model(&topic).Related(&topicLordRelies, "LordReplies").
-		Where("id <= ?", topicLordReplyId).Error
-	return len(topicLordRelies), err
+	fmt.Println(topicLordReply.TopicID, topicLordReplyId)
+	var cnt int
+	err = mysqlDb.Table("topic_lord_replies").Where("topic_id=? AND id<=?",
+		topicLordReply.TopicID, topicLordReplyId).Count(&cnt).Error
+	return cnt, err
 }
 
 func GetTopicCollectingUserCount(TopicId string) (int, error) {

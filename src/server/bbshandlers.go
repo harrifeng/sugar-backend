@@ -265,6 +265,7 @@ func getUserReplyList(userId int, beginId int, needNumber int) responseBody {
 	}
 	respReplies := make([]gin.H, len(replies))
 	for i, reply := range replies {
+		// 层回复
 		if reply.TopicLordReplyKey == 0 && reply.TopicLayerReplyKey != 0 {
 			topicLordReply, err := db.GetTopicLordReplyFromTopicLordReplyId(int(reply.FatherID))
 			if err != nil {
@@ -285,6 +286,7 @@ func getUserReplyList(userId int, beginId int, needNumber int) responseBody {
 				"likes":           reply.ThumbsUpCount,
 				"floor":           floor,
 			}
+			// 楼回复
 		} else if reply.TopicLordReplyKey != 0 && reply.TopicLayerReplyKey == 0 {
 			topic, err := db.GetTopicFromTopicId(int(reply.FatherID))
 			if err != nil {
