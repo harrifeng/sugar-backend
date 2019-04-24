@@ -106,66 +106,66 @@
                         </tr>
                         <tr>
                             <td>空腹(早餐前)</td>
-                            {% if level0 == '0' %}
+                            {{ if eq level0  "0" }}
                             <td>待测</td>
-                            {% else %}
+                            {{ else }}
                             <td>{{.level0}}</td>
-                            {% end %}
+                            {{ end }}
                             <td>{{.min1}}-{{.max1}}</td>
 
                         </tr>
                          <tr class="info">
                             <td>早餐后</td>
-                            {% if level1 == '0' %}
+                            {{ if eq level1  "0" }}
                             <td>待测</td>
-                            {% else %}
+                            {{ else }}
                             <td>{{.level1}}</td>
-                            {% end %}
+                            {{ end }}
                             <td>{{.min2}}-{{.max2}}</td>
                         </tr>
                          <tr>
                             <td>午餐前</td>
-                            {% if level2 == '0' %}
+                            {{ if eq level2  "0" }}
                             <td>待测</td>
-                            {% else %}
+                            {{ else }}
                             <td>{{.level2}}</td>
-                            {% end %}
+                            {{ end }}
                             <td>{{.min1}}-{{.max1}}</td>
                         </tr>
                          <tr class="warning">
                             <td>午餐后</td>
-                            {% if level3 == '0' %}
+                            {{ if eq level3  "0" }}
                             <td>待测</td>
-                            {% else %}
+                            {{ else }}
                             <td>{{.level3}}</td>
-                            {% end %}
+                            {{ end }}
                             <td>{{.min2}}-{{.max2}}</td>
                         </tr>
                          <tr>
                             <td>晚餐前</td>
-                            {% if level4 == '0' %}
+                            {{ if eq level4  "0" }}
                             <td>待测</td>
-                            {% else %}
+                            {{ else }}
                             <td>{{.level4}}</td>
-                            {% end %}
+                            {{ end }}
                             <td>{{.min1}}-{{.max1}}</td>
                         </tr>
                          <tr class="success">
                             <td>晚餐后</td>
-                            {% if level5 == '0' %}
+                            {{ if eq level5  "0" }}
                             <td>待测</td>
-                            {% else %}
+                            {{ else }}
                             <td>{{.level5}}</td>
-                            {% end %}
+                            {{ end }}
                             <td>{{.min2}}-{{.max2}}</td>
                         </tr>
                         <tr>
                             <td>睡前</td>
-                            {% if level6 == '0' %}
+                            {{ if eq level6  "0" }}
                             <td>待测</td>
-                            {% else %}
+                            {{ else }}
                             <td>{{.level6}}</td>
-                            {% end %}
+                            {{ end }}
                             <td>{{.sleep1}}-{{.sleep2}}</td>
                         </tr>
                     </table>
