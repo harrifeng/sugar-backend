@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="main">
+
+</div>
+<div>
+    <input type="text" id="i" />
+    <input type="button" id="sub" value="send"/>
+</div>
+<script src="jquery-3.4.0.min.js"></script>
+<script>
+    const main = $("#main");
+    const inp = $("#i");
+    $("#sub").click(function () {
+        let message = inp.val();
+        websocket.send(message);
+        addMessage(message);
+        inp.val("");
+    });
+    let wsUri ="ws://localhost:8080/home/sugar-guide?session_id=73abe0ce-d97c-5d7c-bee5-b8e6e6fe6a17";
+    websocket = new WebSocket(wsUri);
+    addMessage = (message)=>{
+        main.append($("<p></p>").text(message));
+    };
+
+    websocket.onopen = function(evt) {
+        addMessage("open");
+        setTimeout(function () {
+            websocket.close();
+        },2000)
+    };
+    websocket.onclose = function(evt) {
+        addMessage("close");
+    };
+    websocket.onmessage = function(evt) {
+        addMessage(evt.data);
+    };
+    websocket.onerror = function(evt) {
+        addMessage("er");
+    };
+
+</script>
+</body>
+</html>
